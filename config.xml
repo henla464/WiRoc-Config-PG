@@ -12,7 +12,8 @@
     <access origin="*" />
 	<platform name="android" />
 	<plugin spec="https://github.com/evothings/cordova-ble.git#2.0.1" source="git" />
-    <plugin name="cordova-plugin-whitelist" />
+    <plugin name="cordova-plugin-http" />
+	<plugin name="cordova-plugin-whitelist" />
 	<allow-navigation href="*" />
 	<access origin="*" />
 </widget>
