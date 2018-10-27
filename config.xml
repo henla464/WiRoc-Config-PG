@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="se.wiroc.configpg" version="1.0.0" versionCode="1" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
+    <name>WiRoc Config</name>
+    <description>
+        Configure WiRoc Devices
+    </description>
+    <author email="laselase@gmail.com">
+        Henrik Larsson
+    </author>
+    <content src="index.html" />
+	<icon src="res/icon-512x512.png" />
+    <access origin="*" />
+	<platform name="android" />
+	<plugin spec="https://github.com/evothings/cordova-ble.git#2.0.1" source="git" />
+    <plugin name="cordova-plugin-whitelist" />
+	<allow-navigation href="*" />
+	<access origin="*" />
+</widget>
