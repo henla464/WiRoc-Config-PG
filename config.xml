@@ -8,7 +8,7 @@
         Henrik Larsson
     </author>
     <content src="index.html" />
-	<icon src="res/icon-512x512.png" />
+	<icon src="www/res/icon-512x512.png" />
     <access origin="*" />
 	<platform name="android" />
 	<preference name="phonegap-version" value="cli-8.0.0" />
