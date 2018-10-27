@@ -117,7 +117,7 @@ app.ui.onScanButton = function() {
 		app.devices = {};
 		app.ui.displayDeviceList();
 		app.ui.displayStatus('Scanning...');
-		console.log(ble);
+		console.log(evothings.ble);
 		evothings.ble.startScan(
 			/*[app.radioService],*/
 			app.ui.deviceFound,
