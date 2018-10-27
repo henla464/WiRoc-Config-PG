@@ -146,15 +146,15 @@ app.ui.deviceFound = function(device) //, errorCode)
 	//console.log("device.advertisementData connectable" + device.advertisementData.kCBAdvDataIsConnectable);
 	//console.log("device.advertisementData.kCBAdvDataServiceUUIDs" + device.advertisementData.kCBAdvDataServiceUUIDs);
 	console.log('device:' + JSON.stringify(device));
-	//var advertisedServiceUUIDs = device.advertisementData.kCBAdvDataServiceUUIDs;
-	//if (advertisedServiceUUIDs && advertisedServiceUUIDs.indexOf(app.radioService) > -1)
-    	//{
+	var advertisedServiceUUIDs = device.advertisementData.kCBAdvDataServiceUUIDs;
+	if (advertisedServiceUUIDs && advertisedServiceUUIDs.indexOf(app.radioService) > -1)
+    {
 		// Set timestamp for device (this is used to remove inactive devices).
 		device.timeStamp = Date.now();
 		//console.log('Found device: ' + device.name);
 		// Insert the device into table of found devices.
-		app.devices[device.id] = device;
-    	//}
+		app.devices[device.address] = device;
+    }
 };
 
 
