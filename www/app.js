@@ -1697,7 +1697,7 @@ app.ui.onApplyDeviceNameButton = function()
 	console.log("Device name entered: " + devName);
 	app.writeWiRocSetting('WiRocDeviceName', devName,  function() {
 		app.miscDeviceNameSuccessBar.show({
-			html: 'Device name saved (reboot required)'
+			html: 'Device name saved'
 		});
 		// save to backend
 		app.getDeviceFromBackend(app.connectedDevice.address, function(backendJsonDevice) {
