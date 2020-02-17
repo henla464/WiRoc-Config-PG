@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget android-versionCode="1" id="se.wiroc.configpg" version="1.0.0" versionCode="1" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
+    <feature name="BLE">
+        <param name="android-package" value="com.evothings.BLE" />
+    </feature>
+    <feature name="File">
+        <param name="android-package" value="org.apache.cordova.file.FileUtils" />
+        <param name="onload" value="true" />
+    </feature>
+    <allow-navigation href="cdvfile:*" />
+    <feature name="CordovaHttpPlugin">
+        <param name="android-package" value="com.synconset.CordovaHttpPlugin" />
+    </feature>
+    <feature name="Whitelist">
+        <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin" />
+        <param name="onload" value="true" />
+    </feature>
+    <name>WiRoc Config</name>
+    <description>
+        Configure WiRoc Devices
+    </description>
+    <author email="laselase@gmail.com" href="http://wiroc.se">
+        Henrik Larsson
+    </author>
+    <content src="index.html" />
+    <icon src="www/res/icon-512x512.png" />
+    <allow-navigation href="*" />
+    <access origin="*" />
+    <preference name="loglevel" value="DEBUG" />
+</widget>
