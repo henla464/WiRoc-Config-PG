@@ -1,0 +1,14 @@
+{
+    "android": {
+        "debug": {
+            "keystore": "../WiRoc.jks",
+            "alias": "WiRocConfig",
+            "keystoreType": ""
+        },
+        "release": {
+            "keystore": "../WiRoc.jks",
+            "alias": "WiRocConfig",
+            "keystoreType": ""
+        }
+    }
+}

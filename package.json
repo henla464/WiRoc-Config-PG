@@ -1,0 +1,23 @@
+{
+  "name": "se.wiroc.configpg",
+  "version": "1.0.0",
+  "displayName": "WiRoc Config",
+  "cordova": {
+    "platforms": [
+      "android"
+    ],
+    "plugins": {
+      "cordova-plugin-http": {},
+      "cordova-plugin-whitelist": {},
+      "cordova-plugin-ble": {}
+    }
+  },
+  "dependencies": {
+    "brace-expansion": "^1.1.11",
+    "cordova-android": "^8.1.0",
+    "cordova-plugin-ble": "git+https://github.com/evothings/cordova-ble.git#2.0.1",
+    "jsonfile": "^5.0.0",
+    "path-key": "^3.1.1",
+    "semver": "^7.1.3"
+  }
+}
