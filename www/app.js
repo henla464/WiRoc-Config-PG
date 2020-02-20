@@ -101,7 +101,7 @@ app.initialize = function()
 {
 	document.addEventListener(
 		'deviceready',
-		function() { scriptsLoaded(app.onDeviceReady) },
+		function() { scriptsLoaded(app.onDeviceReady); },
 		false);
 };
 
@@ -113,6 +113,7 @@ app.onDeviceReady = function()
 };
 
 app.ui.onScanButton = function() {
+	$('#scan-status').html('test');
 	if (!app.isScanning) {
 		app.isScanning = true;
 		$('.scan-button').html('Stop scan');
@@ -130,12 +131,12 @@ app.ui.onScanButton = function() {
 	} else {
 		app.stopScan();
 	}
-}
+};
 
 app.stopScan = function() {
 	app.isScanning = false;
 	$('.scan-button').html('Start scan');
-	evothings.ble.stopScan()
+	evothings.ble.stopScan();
 	app.ui.displayStatus('Scan stopped');
 	clearInterval(app.ui.updateTimer);
 };
@@ -169,7 +170,9 @@ app.ui.scanError = function(errorCode)
 app.ui.updateBackgroundColor = function()
 {
 	// radio
-	if (app.ui.radio.channel != app.ui.getChannel() || app.ui.radio.dataRate != app.ui.getDataRate())
+	if (app.ui.radio.channel != app.ui.getChannel() || 
+		((app.ui.chip == 'RF1276T' && app.ui.radio.dataRate != app.ui.getDataRate()) ||
+		(app.ui.chip == 'DRF1268DS' && app.ui.radio.range != app.ui.getRange())))
 	{
 		$('#radio').css('background-color','#FFEFD5');
 	} else {
@@ -278,7 +281,7 @@ app.ui.displayChip = function(chip)
 		$('#main-DRF1268DS').show();
 		$('#main-RF1276T').hide();
 	}
-}
+};
 
 // Channel
 app.ui.displayChannel = function(channel)
@@ -304,8 +307,8 @@ app.ui.displayChannel = function(channel)
 app.getChannel = function(callback)
 {
 	//console.log('getchannel');
-	var service = evothings.ble.getService(app.connectedDevice, app.radioService2)
-	var characteristic = evothings.ble.getCharacteristic(service, app.radioChannelCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
+	var characteristic = evothings.ble.getCharacteristic(service, app.radioChannelCharacteristic);
 	evothings.ble.readCharacteristic(
         	app.connectedDevice,
         	characteristic,
@@ -329,8 +332,8 @@ app.writeChannel = function(callback)
 {
     //console.log('writeChannel');
 	var channel = parseInt(app.ui.getChannel());
-	var service = evothings.ble.getService(app.connectedDevice, app.radioService2)
-	var characteristic = evothings.ble.getCharacteristic(service, app.radioChannelCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
+	var characteristic = evothings.ble.getCharacteristic(service, app.radioChannelCharacteristic);
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -351,8 +354,8 @@ app.writeChannel = function(callback)
 app.getAcknowledgementRequested = function(callback)
 {
 	//console.log('getack');
-	var service = evothings.ble.getService(app.connectedDevice, app.radioService2)
-	var characteristic = evothings.ble.getCharacteristic(service, app.radioAcknowledgementCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
+	var characteristic = evothings.ble.getCharacteristic(service, app.radioAcknowledgementCharacteristic);
 	evothings.ble.readCharacteristic(
         	app.connectedDevice,
         	characteristic,
@@ -377,8 +380,8 @@ app.writeAcknowledgementRequested = function(callback)
 {
 	//console.log('writeack');
 	var ack = app.ui.getAcknowledgementRequested();
-	var service = evothings.ble.getService(app.connectedDevice, app.radioService2)
-	var characteristic = evothings.ble.getCharacteristic(service, app.radioAcknowledgementCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
+	var characteristic = evothings.ble.getCharacteristic(service, app.radioAcknowledgementCharacteristic);
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -431,7 +434,7 @@ app.getDataRate = function(callback)
 };
 
 app.ui.getDataRate = function() {
-	var selected = $(".datarate [type='radio']:checked");
+	var selected = $(".datarate-" + app.ui.chip + " [type='radio']:checked");
 	return selected.val();
 };
 
@@ -466,8 +469,8 @@ app.ui.displayDataRate = function(dataRate)
 		rawDataRate = new DataView(dataRate).getUint16(0, true);
 	}
 	app.ui.radio.dataRate = rawDataRate;
-	$(".datarate [type='radio'][value = '" + rawDataRate + "']").prop("checked", true).checkboxradio("refresh");
-	$(".datarate [type='radio']").not( "[value = '" + rawDataRate + "']").prop("checked", false).checkboxradio("refresh");
+	$(".datarate-" + app.ui.chip + " [type='radio'][value = '" + rawDataRate + "']").prop("checked", true).checkboxradio("refresh");
+	$(".datarate-" + app.ui.chip + " [type='radio']").not( "[value = '" + rawDataRate + "']").prop("checked", false).checkboxradio("refresh");
 	app.ui.updateBackgroundColor();
 };
 
@@ -502,8 +505,8 @@ app.ui.displayPower = function(power)
 app.getPower = function(callback)
 {
 	//console.log('getPower');
-	var service = evothings.ble.getService(app.connectedDevice, app.radioService2)
-	var characteristic = evothings.ble.getCharacteristic(service, app.radioPowerCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
+	var characteristic = evothings.ble.getCharacteristic(service, app.radioPowerCharacteristic);
 	evothings.ble.readCharacteristic(
         	app.connectedDevice,
         	characteristic,
@@ -527,8 +530,8 @@ app.writePower = function(callback)
 {
     //console.log('writePower');
 	var power = parseInt(app.ui.getPower());
-	var service = evothings.ble.getService(app.connectedDevice, app.radioService2)
-	var characteristic = evothings.ble.getCharacteristic(service, app.radioPowerCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
+	var characteristic = evothings.ble.getCharacteristic(service, app.radioPowerCharacteristic);
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -548,10 +551,10 @@ app.writePower = function(callback)
 app.ui.displayRange = function(range)
 {
 	//console.log("displayRange");
-	app.ui.radio.range = raw;
+	app.ui.radio.range = range;
 	
-	$(".datarate [type='radio'][value = '" + range + "']").prop("checked", true).checkboxradio("refresh");
-	$(".datarate [type='radio']").not( "[value = '" + range + "']").prop("checked", false).checkboxradio("refresh");
+	$(".datarate-" + app.ui.chip + " [type='radio'][value = '" + range + "']").prop("checked", true).checkboxradio("refresh");
+	$(".datarate-" + app.ui.chip + " [type='radio']").not( "[value = '" + range + "']").prop("checked", false).checkboxradio("refresh");
 	app.ui.updateBackgroundColor();
 };
 
@@ -559,8 +562,8 @@ app.ui.displayRange = function(range)
 app.getRange = function(callback)
 {
 	//console.log('getPower');
-	var service = evothings.ble.getService(app.connectedDevice, app.radioService2)
-	var characteristic = evothings.ble.getCharacteristic(service, app.radioRangeCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
+	var characteristic = evothings.ble.getCharacteristic(service, app.radioRangeCharacteristic);
 	evothings.ble.readCharacteristic(
         	app.connectedDevice,
         	characteristic,
@@ -576,7 +579,7 @@ app.getRange = function(callback)
 };
 
 app.ui.getRange = function() {
-	var selected = $(".datarate [type='radio']:checked");
+	var selected = $(".datarate-" + app.ui.chip + " [type='radio']:checked");
 	return selected.val();
 };
 
@@ -587,8 +590,8 @@ app.writeRange = function(callback)
 	var te = new TextEncoder("utf-8").encode(range);
 	var rangeArray = new Uint8Array(te);
 	
-	var service = evothings.ble.getService(app.connectedDevice, app.radioService2)
-	var characteristic = evothings.ble.getCharacteristic(service, app.radioRangeCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
+	var characteristic = evothings.ble.getCharacteristic(service, app.radioRangeCharacteristic);
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -626,7 +629,7 @@ app.getWiRocPythonVersionsFromGithub = function(callback) {
 		   function (response) {
 			  if (response) {
 				console.log('get python versions: ' + response.data);
-				versionsJson = JSON.parse(response.data);
+				var versionsJson = JSON.parse(response.data);
 				var versionsArray = [];
 				for (var i = 0; i < 5; i++) {
 					versionsArray.push(versionsJson[i].tag_name);
@@ -659,7 +662,7 @@ app.getWiRocPythonVersionsFromGithub = function(callback) {
 			}
 			return versionsArray;
 		})
-		.catch(function(res){ console.log(res) });
+		.catch(function(res){ console.log(res); });
 	}
 };
 
@@ -675,7 +678,7 @@ app.getWiRocPythonLatestVersionFromGithub = function(callback) {
 		   function (response) {
 			if (response) {
 				console.log('get python latest version: ' + response.data);
-				latest = JSON.parse(response.data);
+				var latest = JSON.parse(response.data);
 				if (latest.tag_name) {
 					callback(latest.tag_name);
 					return;
@@ -705,7 +708,7 @@ app.getWiRocPythonLatestVersionFromGithub = function(callback) {
 			}
 			return null;
 		})
-		.catch(function(res){ console.log(res) });
+		.catch(function(res){ console.log(res); });
 	}
 };
 
@@ -801,8 +804,8 @@ app.writeUpdateWiRocPython = function(callback)
 	console.log('version: '+version);
 	var te = new TextEncoder("utf-8").encode('wirocpython;' + version);
 	var typeAndVersionArray = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.miscService)
-	var characteristic = evothings.ble.getCharacteristic(service, app.miscUpdateCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.miscService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.miscUpdateCharacteristic);
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -840,7 +843,7 @@ app.getWiRocBLEVersionsFromGithub = function(callback) {
 		   function (response) {
 			  if (response) {
 				console.log('get ble versions: ' + response.data);
-				versionsJson = JSON.parse(response.data);
+				var versionsJson = JSON.parse(response.data);
 				var versionsArray = [];
 				for (var i = 0; i < 5; i++) {
 					versionsArray.push(versionsJson[i].tag_name);
@@ -889,7 +892,7 @@ app.getWiRocBLELatestVersionFromGithub = function(callback) {
 		   function (response) {
 			  if (response) {
 				console.log('get latest: ' + response.data);
-				versionObj = JSON.parse(response.data);
+				var versionObj = JSON.parse(response.data);
 				if (versionObj.tag_name) {
 					callback(versionObj.tag_name);
 					return;
@@ -1014,8 +1017,8 @@ app.writeUpdateWiRocBLE = function(callback)
 	var version = app.ui.getUpdateWiRocBLE();
 	var te = new TextEncoder("utf-8").encode('wirocble;' + version);
 	var typeAndVersionArray = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.miscService)
-	var characteristic = evothings.ble.getCharacteristic(service, app.miscUpdateCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.miscService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.miscUpdateCharacteristic);
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -1063,7 +1066,7 @@ app.ui.displayBatteryLevel = function(batteryLevel)
 		var dv = new DataView(batteryLevel, 0);
 		rawBatteryLevel = dv.getUint8(0);
 	}
-	levelBar = $('.level');
+	var levelBar = $('.level');
 	levelBar.removeClass('high');
 	levelBar.removeClass('med');
 	levelBar.removeClass('low');
@@ -1115,7 +1118,7 @@ app.ui.displayIsCharging = function(isCharging)
 	}
 	//console.log('IsCharging: ' + rawIsCharging);
 
-	levelBar = $('.level');
+	var levelBar = $('.level');
 	if (rawIsCharging > 0) {
 	  levelBar.addClass('charging');
         } else {
@@ -1154,8 +1157,8 @@ app.writeSendToSirapEnabled = function(callback)
 {
 	//console.log('write send to sirap enabled');
 	var sirapEnabled = app.ui.getSendToSirapEnabled();
-	var service = evothings.ble.getService(app.connectedDevice, app.sirapService)
-	var characteristic = evothings.ble.getCharacteristic(service, app.sendToSirapEnabledCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.sirapService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.sendToSirapEnabledCharacteristic);
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -1176,7 +1179,7 @@ app.ui.displaySendToSirapEnabled = function(sirapEnabled)
 	if (typeof sirapEnabled === 'number') {
 		raw = sirapEnabled;
 	} else {
-		var raw = new DataView(sirapEnabled).getUint8(0, true);
+		raw = new DataView(sirapEnabled).getUint8(0, true);
 	}
 	app.ui.sirap.sendToSirapEnabled = raw;
 	//console.log('send to sirap enabled: ' + raw);
@@ -1197,7 +1200,7 @@ app.validateIPaddress = function(ipaddress)
 		return true;  
 	}
 	return false;
-}
+};
 
 //-- Send to Sirap ip
 app.getSendToSirapIP = function(callback)
@@ -1235,8 +1238,8 @@ app.writeSendToSirapIP = function(callback)
 	} else {
 		var te = new TextEncoder("utf-8").encode(sirapIP);
 		var sirapIPArray = new Uint8Array(te);
-		var service = evothings.ble.getService(app.connectedDevice, app.sirapService)
-		var characteristic = evothings.ble.getCharacteristic(service, app.sendToSirapIPCharacteristic)
+		var service = evothings.ble.getService(app.connectedDevice, app.sirapService);
+		var characteristic = evothings.ble.getCharacteristic(service, app.sendToSirapIPCharacteristic);
 		evothings.ble.writeCharacteristic(
 			app.connectedDevice,
 			characteristic,
@@ -1258,7 +1261,7 @@ app.ui.displaySendToSirapIP = function(sirapIP)
 	if (typeof sirapIP === 'string') {
 		sirapIPString = sirapIP;
 	} else {
-		var sirapIPString = new TextDecoder("utf-8").decode(sirapIP);
+		sirapIPString = new TextDecoder("utf-8").decode(sirapIP);
 	}
 	app.ui.sirap.sendToSirapIP = sirapIPString;
 	//console.log('sirap ip: ' + sirapIPString);
@@ -1290,7 +1293,7 @@ app.getSendToSirapIPPort = function(callback)
 
 app.ui.getSendToSirapIPPort = function() {
 	var sirapIPPort = $("#sendtosirapipport").val();
-	sirapIPPortInteger = parseInt(sirapIPPort);
+	var sirapIPPortInteger = parseInt(sirapIPPort);
 	//console.log("sirapIPPortInteger: " + sirapIPPortInteger);
 	if (app.isNumber(sirapIPPortInteger)) {
 		return sirapIPPortInteger;
@@ -1308,8 +1311,8 @@ app.writeSendToSirapIPPort = function(callback, errorCallback)
 		});
 		errorCallback();
 	} else {
-		var service = evothings.ble.getService(app.connectedDevice, app.sirapService)
-		var characteristic = evothings.ble.getCharacteristic(service, app.sendToSirapIPPortCharacteristic)
+		var service = evothings.ble.getService(app.connectedDevice, app.sirapService);
+		var characteristic = evothings.ble.getCharacteristic(service, app.sendToSirapIPPortCharacteristic);
 		evothings.ble.writeCharacteristic(
 			app.connectedDevice,
 			characteristic,
@@ -1407,7 +1410,7 @@ app.ui.displayNetworkWifiList = function(wifiList)
 		element.find('a.wifi-connect-button').bind("click",
 			{name: networkName, isConnected: isConnected},
 			app.ui.onWifiConnectButton);
-		taevothings.ble.append(element);
+		table.append(element);
 	}
 };
 
@@ -1455,8 +1458,8 @@ app.writeConnectWifi = function(networkName, password, callback)
 	var te = new TextEncoder("utf-8").encode(networkName + '\n' + password);
 	var networkNameArray = new Uint8Array(te);
 	console.log('writeConnectWifi 2: ' + networkNameArray);
-	var service = evothings.ble.getService(app.connectedDevice, app.networkService)
-	var characteristic = evothings.ble.getCharacteristic(service, app.networkConnectWifiCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.networkService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.networkConnectWifiCharacteristic);
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -1477,8 +1480,8 @@ app.writeDisconnectWifi = function(networkName, callback)
 	//console.log('writeDisconnectWifi: ' + networkName);
 	var te = new TextEncoder("utf-8").encode(networkName);
 	var networkNameArray = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.networkService)
-	var characteristic = evothings.ble.getCharacteristic(service, app.networkDisconnectWifiCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.networkService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.networkDisconnectWifiCharacteristic);
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -1532,8 +1535,8 @@ app.ui.onRenewIPWifi = function(event)
 	//console.log('onRenewIPWifi');
 	var te = new TextEncoder("utf-8").encode('wifi');
 	var networkType = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.networkService)
-	var characteristic = evothings.ble.getCharacteristic(service, app.networkRenewIPCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.networkService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.networkRenewIPCharacteristic);
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -1559,8 +1562,8 @@ app.ui.onRenewIPEthernet = function(event)
 	//console.log('onRenewIPEthernet');
 	var te = new TextEncoder("utf-8").encode('ethernet');
 	var networkType = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.networkService)
-	var characteristic = evothings.ble.getCharacteristic(service, app.networkRenewIPCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.networkService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.networkRenewIPCharacteristic);
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -1584,7 +1587,7 @@ app.ui.onRenewIPEthernet = function(event)
 app.ui.displayAll = function(data) {
 	var allString = new TextDecoder("utf-8").decode(data);
 	console.log(allString);
-	all = allString.split('¤');
+	var all = allString.split('¤');
 	//     0             1                2               3            4                       5                 6        7        8         9       10    11   12
 	// isCharging¤wirocDeviceName¤sentToSirapIPPort¤sendToSirapIP¤sentToSirapEnabled¤acknowledgementRequested¤dataRate¤channel¤intPercent¤ipAddress¤power¤chip¤range
 	app.ui.displayIsCharging(parseInt(all[0]));
@@ -1602,7 +1605,7 @@ app.ui.displayAll = function(data) {
 	}
 	if (all.length > 11) {
 		app.ui.displayChip(all[11]);
-		app.ui.displayRange(parseInt(all[12]));
+		app.ui.displayRange(all[12]);
 	}
 };
 
@@ -1614,7 +1617,11 @@ app.readAndDisplayAll = function() {
 app.readBasicSettings = function() {
 	app.getBatteryLevel(app.ui.displayBatteryLevel);
 	app.getIsCharging(app.ui.displayIsCharging);
-	app.getDataRate(app.ui.displayDataRate);
+	if (app.ui.chip == 'RF1276T') {
+		app.getDataRate(app.ui.displayDataRate);
+	} else {
+		app.getRange(app.ui.displayRange);
+	}
 	app.getChannel(app.ui.displayChannel);
 	app.getAcknowledgementRequested(app.ui.displayAcknowledgementRequested);
 	app.getIPAddress(app.ui.displayIPAddress);
@@ -1736,7 +1743,7 @@ app.getDeviceFromBackend = function(btAddress, callback) {
 		.then(function(res) { 
 			return res.json();
 		})
-		.catch(function(res){ console.log(res) });
+		.catch(function(res){ console.log(res); });
 	}
 };
 
@@ -1767,7 +1774,7 @@ app.saveDeviceToBackend = function(backendJsonDevice) {
 			method: "PUT",
 			body: JSON.stringify( backendJsonDevice )
 		})
-		.catch(function(res){ console.log('fetch device: ' + res) });
+		.catch(function(res){ console.log('fetch device: ' + res); });
 	}
 };
 
@@ -1869,8 +1876,8 @@ app.writeWiRocStatus = function(offset, callback)
 	console.log('writeWiRocStatus: ' + offset);
 	var te = new TextEncoder("utf-8").encode(offset+'');
 	var offsetArr = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.miscService)
-	var characteristic = evothings.ble.getCharacteristic(service, app.miscStatusCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.miscService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.miscStatusCharacteristic);
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -1930,7 +1937,7 @@ app.ui.displayWiRocStatus = function(status) {
 
 	html += "<h2>Output:</h2><table width=\"100%\" border=1><thead>";
 	html += "<tr><th align=\"left\">Type</th><th align=\"left\">Instance</th><th align=\"left\">Msg In</th><th align=\"left\">Msg Out</th><th align=\"left\">Enabled</th></tr></thead><tbody>";
-	for (var i = 0; i < statusObj.subscriberAdapters.length ; i++) {
+	for (i = 0; i < statusObj.subscriberAdapters.length ; i++) {
 		var subscriber = statusObj.subscriberAdapters[i];
 		html += "<tr><td>" + subscriber.TypeName + "</td><td>" + subscriber.InstanceName + "</td><td>" + subscriber.MessageInName + "</td><td>" + subscriber.MessageOutName + "</td><td>" + subscriber.Enabled + "</td></tr>";
 	}
@@ -1998,8 +2005,8 @@ app.writeWiRocSetting = function(key, value, callback, errorCallback)
 	}
 	var te = new TextEncoder("utf-8").encode(key+';'+value);
 	var settingArray = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.miscService)
-	var characteristic = evothings.ble.getCharacteristic(service, app.miscSettingsCharacteristic)
+	var service = evothings.ble.getService(app.connectedDevice, app.miscService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.miscSettingsCharacteristic);
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -2276,11 +2283,11 @@ app.ui.displayTestPunches = function(testPunches) {
 		console.log('displayTestPunches: ' + rawTestPunches);
 		var punchesObj = JSON.parse(rawTestPunches);
 
+		var ackReq = $('#acknowledgement').prop("checked");
 		var table = $("#wiroc-test-punches-table tbody");
 		for (var i = 0; i < punchesObj.punches.length; i++) {
 			var punch = punchesObj.punches[i];
 			var trs = table.find('tr[data-id="' + punch.Id + '"]');
-			var ackReq = $('#acknowledgement').prop("checked");
 			var noOfSendTriesColor = "";
 			if (punch.NoOfSendTries == 1 && ((punch.Status == 'Acked' && ackReq) || (punch.Status == 'Not acked' && !ackReq))) {
 				// Success
@@ -2295,7 +2302,7 @@ app.ui.displayTestPunches = function(testPunches) {
 			} else if (punch.NoOfSendTries > 1 && (punch.Status == 'Not sent' || punch.Status == 'Not acked')) {
 				statusColor = ' style="background-color:#E74C3C"';
 			}
-			var rowText = '<tr data-id="' + punch.Id + '" data-subscrId="' + punch.SubscrId + '"><td>' + punch.SINo + '</td><td>' + punch.Time + '</td><td' + noOfSendTriesColor +'>' + punch.NoOfSendTries + '</td><td'+ statusColor + '>' + punch.Status + '</td></tr>';
+			var rowText = '<tr data-id="' + punch.Id + '" data-subscrId="' + punch.SubscrId + '"><td>' + punch.SINo + '</td><td>' + punch.Time + '</td><td>' + punch.RSSI + '</td><td' + noOfSendTriesColor +'>' + punch.NoOfSendTries + '</td><td'+ statusColor + '>' + punch.Status + '</td></tr>';
 			var rowElement = $(rowText);
 			if (trs.length > 0) {
 				trs[0].replaceWith(rowElement[0]);
@@ -2306,17 +2313,19 @@ app.ui.displayTestPunches = function(testPunches) {
 			}
 		}
 
+		var status;
+		var noOfSendTries;
 		// calculate percentages
 		var allTrs = table.find('tr');
 		var triesPercentage = "Unknown";
-		var statusPercentage = "Unknown"
+		var statusPercentage = "Unknown";
 		if (ackReq) {
 			var sumNoOfFailedTries = 0;
 			var sumNoOfSuccessTries = 0;
 			var sumNoOfTries = 0;
 			for (var j = 0; j < allTrs.length; j++) {
-				var noOfSendTries = $(allTrs[j]).find('td').eq(2).html();
-				var status = $(allTrs[j]).find('td').eq(3).html();
+				noOfSendTries = $(allTrs[j]).find('td').eq(2).html();
+				status = $(allTrs[j]).find('td').eq(3).html();
 				console.log("noOfSendTries: " + noOfSendTries);
 				console.log("status: " + status);
 				if (status == 'Not sent' || status == 'Not acked') {
@@ -2337,16 +2346,16 @@ app.ui.displayTestPunches = function(testPunches) {
 		}
 		var tfoot = $("#wiroc-test-punches-table tfoot");
 		var summaryTrs = tfoot.find('tr[data-id="summary"]');
-		var sumRowElement = $('<tr data-id="summary"><td colspan="2">Success %</td><td>' + triesPercentage + '%</td><td>' + statusPercentage + '%</td></tr>');
+		var sumRowElement = $('<tr data-id="summary"><td></td><td colspan="2">Success %</td><td>' + triesPercentage + '%</td><td>' + statusPercentage + '%</td></tr>');
 		if (summaryTrs.length > 0) {
 			summaryTrs[0].replaceWith(sumRowElement[0]);
 		}
 	
 
 		var noOfCompletedRows = 0;
-		for (var j = 0; j < allTrs.length; j++) {
-			var noOfSendTries = $(allTrs[j]).find('td').eq(2).html();
-			var status = $(allTrs[j]).find('td').eq(3).html();
+		for (k = 0; k < allTrs.length; k++) {
+			noOfSendTries = $(allTrs[k]).find('td').eq(2).html();
+			status = $(allTrs[k]).find('td').eq(3).html();
 			console.log("noOfSendTries: " + noOfSendTries);
 			console.log("status: " + status);
 			if ((status == 'Acked' && ackReq) || (status =='Not acked' && !ackReq) || 
@@ -2359,8 +2368,8 @@ app.ui.displayTestPunches = function(testPunches) {
 		console.log("No of rows: " + allTrs.length);
 		console.log("No of punches to send: " + app.ui.misc.noOfTestPunchesToSend);
 		console.log("No of completed rows: " + noOfCompletedRows);
-		if (allTrs.length == app.ui.misc.noOfTestPunchesToSend 
-			&& app.ui.misc.noOfTestPunchesToSend == noOfCompletedRows)
+		if (allTrs.length == app.ui.misc.noOfTestPunchesToSend &&
+			app.ui.misc.noOfTestPunchesToSend == noOfCompletedRows)
 		{
 			console.log("we received all");
 			var service = evothings.ble.getService(app.connectedDevice, app.miscService);
@@ -2550,8 +2559,8 @@ app.onConnectError = function(error)
              function() 
              { 
                 app.connect(app.devices[app.btAddressToConnect]); 
-             }
-             ,1000);
+             },
+             1000);
     } else {
 		app.searchDevicesErrorBar.show({
 			html: 'Connect error: ' + error + ' | Reseting BT'
@@ -2576,8 +2585,8 @@ app.disconnect = function()
              function() 
              { 
                 evothings.ble.reset(function() { console.log('reset success 3'); },function() { console.log('reset fail'); });
-             }
-        ,1000);
+             },
+        1000);
 	}
 };
 

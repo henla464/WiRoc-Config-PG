@@ -450,6 +450,7 @@
         }
 		
 		$(document).ready(function() {
+			
 			app.networkInfoBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-network'), autohide: true, backgroundColor: '#80d4ff' });
 
 			app.radioSuccessBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-radio'), autohide: true, backgroundColor: '#99ff99' });
@@ -529,7 +530,10 @@
 				app.ui.updateBackgroundColor();
 			});
 
-			$('input[type=radio][name=radio-choice-data-rate]').on("change", function(event, ui) {
+			$('input[type=radio][name=radio-choice-data-rate-RF1276T]').on("change", function(event, ui) {
+				app.ui.updateBackgroundColor();
+			});
+			$('input[type=radio][name=radio-choice-data-rate-DRF1268DS').on("change", function(event, ui) {
 				app.ui.updateBackgroundColor();
 			});
 			$("#sendtosirapenabled").on("change", function(event, ui) {
@@ -594,6 +598,8 @@
 				//	app.getAcknowledgementRequested();
 				//};
 			} );
+			
+			$('#scan-status').html('test1');
 		});
 	</script>
 </head>
@@ -674,7 +680,7 @@
 					<div id="notification-radio" style="height:1px"></div>
 				
 					<div id="main-RF1276T">
-						<label id="channel-header-RF1276T" class="channel-header">Channel</label>
+						<label id="channel-header" class="channel-header">Channel</label>
 						<div class="ui-field-contain channel">
 							<select name="channel" id="channel-select-RF1276T" data-native-menu="false">
 								<option value="1">1</option>
@@ -715,7 +721,7 @@
 						<fieldset data-role="controlgroup" data-mini="true" class="datarate-DRF1268DS">
 							<legend>Range - Data rate</legend>
 							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-1-DRF1268DS" value="UL">
-								<label for="radio-choice-data-rate-1-DRF1268DS">Ultra Long        73 bps</label>
+								<label for="radio-choice-data-rate-1-DRF1268DS">Ultra Long       73 bps</label>
 							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-2-DRF1268DS" value="XL">
 								<label for="radio-choice-data-rate-2-DRF1268DS">eXtra long       134 bps</label>
 							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-3-DRF1268DS" value="L" checked="checked">
@@ -825,8 +831,8 @@
 
 					<div id="wiroc-test-punches-content">
 						<table id="wiroc-test-punches-table" width="100%" border=1>
-							<thead><tr><th align=\"left\">SINo</th><th align=\"left\">Time</th><th>Tries</th><th>Status</th></tr></thead>
-							<tfoot><tr data-id="summary"><td colspan=2">Success %</td><td>Unknown%</td><td>Unknown%</td></tr></tfoot>
+							<thead><tr><th align="left">SINo</th><th align="left">Time</th><th>RSSI</th><th>Tries</th><th>Status</th></tr></thead>
+							<tfoot><tr data-id="summary"><td colspan="3">Success %</td><td>Unknown%</td><td>Unknown%</td></tr></tfoot>
 							<tbody></tbody>
 						</table>
 					</div>
