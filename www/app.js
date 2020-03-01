@@ -1797,9 +1797,6 @@ app.ui.onReadSirapButton = function() {
 
 app.ui.onApplySirapButton = function() {
 	app.writeSendToSirapEnabled(function() {
-		app.sirapErrorBar.show({
-				html: 'enabled saved'
-			});
 		app.writeSendToSirapIP(function() {
 			app.writeSendToSirapIPPort(function() {
 				app.sirapSuccessBar.show({
@@ -2504,8 +2501,8 @@ app.ui.displayTestPunches = function(testPunches) {
 
 		var noOfCompletedRows = 0;
 		for (var k = 0; k < allTrs.length; k++) {
-			noOfSendTries = $(allTrs[k]).find('td').eq(2).html();
-			status = $(allTrs[k]).find('td').eq(3).html();
+			noOfSendTries = $(allTrs[k]).find('td').eq(3).html();
+			status = $(allTrs[k]).find('td').eq(4).html();
 			console.log("noOfSendTries: " + noOfSendTries);
 			console.log("status: " + status);
 			if ((status == 'Acked' && ackReq) || (status =='Not acked' && !ackReq) || 
