@@ -35,6 +35,8 @@ app.miscTestPunchesSuccessBar = null;
 app.miscTestPunchesErrorBar = null;
 app.miscUpdateErrorBar = null;
 app.miscUpdateInfoBar = null;
+app.miscSportIdentErrorBar = null;
+app.miscSportIdentSuccessBar = null;
 
 
 app.radioService = 'f6026b69-9254-fd82-0242-60d9aaff57dc';
@@ -72,6 +74,8 @@ app.deviceStatusUpgradeCharacteristic =			'fb88090c-4ab2-40a2-a8f0-14cc1c2e5608'
 app.punchesService = 					'02d249a5-e318-4b46-8218-3ff2101a333c';
 app.debugService =						'a0a5a3c7-1a36-4ebe-b293-953cf7126e56';
 app.sportIdentService =					'24e54c05-f1e1-4bfe-9083-a27455c01101';
+app.sportIdentForce4800BaudRateCharacteristic =    'fb880910-4ab2-40a2-a8f0-14cc1c2e5608';
+app.sportIdentOneWayCharacteristic =    'fb880911-4ab2-40a2-a8f0-14cc1c2e5608';
 app.deviceStatusService = 				'd5a27219-f64e-4283-bd66-6e6231d5daed';
 
 app.isScanning = false;
@@ -94,6 +98,9 @@ app.ui.sirap.sendToSirapIPPort = null;
 app.ui.misc = {};
 app.ui.misc.deviceName = null;
 app.ui.misc.noOfTestPunchesToSend = null;
+app.ui.sportident = {}
+app.ui.sportident.oneway = null;
+app.ui.sportident.force4800 = null;
 
 // Timer that updates the device list and removes inactive
 // devices in case no devices are found by scan.
@@ -299,7 +306,13 @@ app.ui.updateBackgroundColor = function()
 	} else {
 		$('#radio-adv').css('background-color','white');
 	}
-
+	// sportident
+	if (app.ui.sportident.oneway != app.ui.getOneWay() || app.ui.sportident.force4800 != app.ui.getForce4800())
+	{
+		$('#sportident').css('background-color','#FFEFD5');
+	} else {
+		$('#sportident').css('background-color','white');
+	}
 };
 
 
@@ -373,9 +386,13 @@ app.ui.displayChip = function(chip)
 	if (chip == 'RF1276T') {
 		$('#main-RF1276T').show();
 		$('#main-DRF1268DS').hide();
+		$('#radio-adv-RF1276T').show();
+		$('#radio-adv-DRF1268DS').hide();
 	} else {
 		$('#main-DRF1268DS').show();
 		$('#main-RF1276T').hide();
+		$('#radio-adv-DRF1268DS').show();
+		$('#radio-adv-RF1276T').hide();
 	}
 };
 
@@ -584,16 +601,16 @@ app.ui.displayPower = function(power)
 	app.ui.radio.power = raw;
 	
 	// Select the relevant option, de-select any others
-	$('#lorapower-select').val(raw).attr('selected', true).siblings('option').removeAttr('selected');
+	$('#lorapower-select-' + app.ui.chip).val(raw).attr('selected', true).siblings('option').removeAttr('selected');
 
 	// jQM refresh
-	var w = $("#lorapower-select");
+	var w = $("#lorapower-select-" + app.ui.chip);
 	if( w.data("mobile-selectmenu") === undefined) {
 		// not initialized yet, lets do so
 		w.selectmenu({ nativeMenu: false });
 	}
 	//$('#lorapower-select').selectmenu({ nativeMenu: false }).selectmenu("refresh", true);
-	$('#lorapower-select').selectmenu("refresh", true);
+	$('#lorapower-select-' + app.ui.chip).selectmenu("refresh", true);
 	app.ui.updateBackgroundColor();
 };
 
@@ -618,7 +635,7 @@ app.getPower = function(callback)
 };
 
 app.ui.getPower = function() {
-	var value = $("#lorapower-select option:selected").val();
+	var value = $('#lorapower-select-' +  app.ui.chip + ' option:selected').val();
 	return value;
 };
 
@@ -687,7 +704,7 @@ app.ui.getRange = function() {
 
 app.writeRange = function(callback)
 {
-    //console.log('writePower');
+    //console.log('writeRange');
 	var range = app.ui.getRange();
 	var te = new TextEncoder("utf-8").encode(range);
 	var rangeArray = new Uint8Array(te);
@@ -1135,6 +1152,172 @@ app.writeUpdateWiRocBLE = function(callback)
 	);
 };
 
+
+//---- one-way
+app.ui.enableDisableForce4800 = function(oneWayChecked) 
+{
+  app.ui.enableDisableForce4800WithParam(this.checked);
+};
+
+app.ui.enableDisableForce4800WithParam = function(oneWayChecked) 
+{
+  if (oneWayChecked) {
+    $("#force-4800-bps").removeAttr("disabled");
+    $('#force-4800-bps').prop("checked", false).checkboxradio("refresh");
+  } else {
+    $("#force-4800-bps").attr("disabled", true);
+    $('#force-4800-bps').prop("checked", false).checkboxradio("refresh");
+  }
+};
+
+app.getOneWay = function(callback)
+{
+	//console.log('getOneWay');
+	var service = evothings.ble.getService(app.connectedDevice, app.sportIdentService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.sportIdentOneWayCharacteristic);
+	evothings.ble.readCharacteristic(
+        	app.connectedDevice,
+        	characteristic,
+        	function(data) {
+			callback(data);
+		},
+		function(error) {
+			console.log('getOneWay error');
+			app.miscSportIdentErrorBar.show({
+				html: 'Error getting one-way: ' + error,
+			});
+		}
+	);
+};
+
+
+app.ui.getOneWay = function() {
+	return $('#sportident-oneway').prop("checked") ? 1 : 0;
+};
+
+app.writeOneWay = function(callback)
+{
+	//console.log('writeOneWay');
+	var oneway = app.ui.getOneWay();
+	var service = evothings.ble.getService(app.connectedDevice, app.sportIdentService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.sportIdentOneWayCharacteristic);
+	evothings.ble.writeCharacteristic(
+		app.connectedDevice,
+		characteristic,
+		new Uint8Array([oneway]),
+		callback,
+		function(error) {
+			app.miscSportIdentErrorBar.show({
+				html: 'Error saving one-way: ' + error,
+			});
+		}
+	);
+
+};
+
+app.ui.displayOneWay = function(oneway)
+{
+	//console.log("displayOneWay");
+	var raw = 0;
+	if (typeof oneway === 'number') {
+		raw = oneway;
+	} else {
+		raw = new DataView(oneway).getUint8(0, true);
+	}
+	app.ui.sportident.oneway = raw;
+	//console.log('ack: ' + raw);
+    $('#sportident-oneway').checkboxradio();
+	$('#sportident-oneway').prop("checked",raw != 0).checkboxradio("refresh");
+	app.ui.enableDisableForce4800WithParam(raw != 0);
+	app.ui.updateBackgroundColor();
+};
+
+
+//---- force4800
+
+app.getForce4800 = function(callback)
+{
+	//console.log('getForce4800');
+	var service = evothings.ble.getService(app.connectedDevice, app.sportIdentService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.sportIdentForce4800BaudRateCharacteristic);
+	evothings.ble.readCharacteristic(
+        	app.connectedDevice,
+        	characteristic,
+        	function(data) {
+			callback(data);
+		},
+		function(error) {
+			console.log('getForce4800 error');
+			app.miscSportIdentErrorBar.show({
+				html: 'Error getting force 4800: ' + error,
+			});
+		}
+	);
+};
+
+
+app.ui.getForce4800 = function() {
+	return $('#force-4800-bps').prop("checked") ? 1 : 0;
+};
+
+app.writeForce4800 = function(callback)
+{
+	//console.log('writeForce4800');
+	var force4800 = app.ui.getForce4800();
+	var service = evothings.ble.getService(app.connectedDevice, app.sportIdentService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.sportIdentForce4800BaudRateCharacteristic);
+	evothings.ble.writeCharacteristic(
+		app.connectedDevice,
+		characteristic,
+		new Uint8Array([force4800]),
+		callback,
+		function(error) {
+			app.miscSportIdentErrorBar.show({
+				html: 'Error saving force4800: ' + error,
+			});
+		}
+	);
+
+};
+
+app.ui.displayForce4800 = function(oneway)
+{
+	//console.log("displayForce4800");
+	var raw = 0;
+	if (typeof oneway === 'number') {
+		raw = oneway;
+	} else {
+		raw = new DataView(oneway).getUint8(0, true);
+	}
+	app.ui.sportident.force4800 = raw;
+	//console.log('ack: ' + raw);
+    $('#force-4800-bps').checkboxradio();
+	$('#force-4800-bps').prop("checked",raw != 0).checkboxradio("refresh");
+	app.ui.updateBackgroundColor();
+};
+
+
+app.ui.onReadSportIdentButton = function() {
+	app.readSportIdentSettings();	
+};
+
+app.ui.onApplySportIdentButton = function() {
+    //console.log('onApplyRadioAdvButton');
+    app.writeOneWay(function() {
+		app.writeForce4800(function() {
+			app.miscSportIdentSuccessBar.show({
+				html: 'SportIdent saved'
+			});
+			app.readSportIdentSettings();
+		});
+	});
+};
+
+app.readSportIdentSettings = function() {
+	app.getOneWay(app.ui.displayOneWay);
+	app.getForce4800(app.ui.displayForce4800);
+};
+
 //-- Battery
 
 app.getBatteryLevel = function(callback)
@@ -1197,9 +1380,6 @@ app.getIsCharging = function(callback)
 		app.connectedDevice,
 		characteristic,
 		function(data) {
-			app.radioSuccessBar.show({
-		    		html: 'hej'
-			});
 			callback(data);
 		},
 		function(error) {
@@ -1712,6 +1892,7 @@ app.ui.displayAll = function(data) {
 	app.ui.displayPower(parseInt(all[10]));
 	if (all.length < 13) {
 		app.ui.displayDataRate(parseInt(all[6]));
+		app.ui.displayChip('RF1276T');
 	}
 	if (all.length > 11) {
 		app.ui.displayChip(all[11]);
@@ -1747,15 +1928,25 @@ app.ui.onApplyBasicButton = function() {
     //console.log('onApplyBasicButton');
 	app.writeChannel(function() {
         //console.log('writeChannel2');
-		app.writeDataRate(function() {
+        var displayRadioSettings = function() {
 			app.radioSuccessBar.show({
 		    		html: 'Radio settings saved'
 			});
 
+			if (app.ui.chip == 'RF1276T') {
+				app.getDataRate(app.ui.displayDataRate);
+			} else {
+				app.getRange(app.ui.displayRange);
+			}
 			app.getChannel(app.ui.displayChannel);
 			app.getAcknowledgementRequested(app.ui.displayAcknowledgementRequested);
-			app.getDataRate(app.ui.displayDataRate);
-		});
+		};
+		
+		if (app.ui.chip == 'RF1276T') {
+			app.writeDataRate(displayRadioSettings);
+		} else {
+			app.writeRange(displayRadioSettings);
+		}
 	});
 };
 
@@ -1771,8 +1962,7 @@ app.ui.onApplyRadioAdvButton = function() {
 			app.miscRadioAdvSuccessBar.show({
 				html: 'Radio adv saved'
 			});
-			app.getAcknowledgementRequested(app.ui.displayAcknowledgementRequested);
-			app.getPower(app.ui.displayPower);
+			app.readRadioAdvSettings();
 		});
 	});
 };
@@ -1797,9 +1987,6 @@ app.ui.onReadSirapButton = function() {
 
 app.ui.onApplySirapButton = function() {
 	app.writeSendToSirapEnabled(function() {
-		app.sirapErrorBar.show({
-				html: 'enabled saved'
-			});
 		app.writeSendToSirapIP(function() {
 			app.writeSendToSirapIPPort(function() {
 				app.sirapSuccessBar.show({
@@ -2358,14 +2545,8 @@ app.dropAllTables = function() {
 	console.log('Drop all tables');
 	var te = new TextEncoder("utf-8").encode('dropalltables');
 	var operationName = new Uint8Array(te);
-	app.miscDatabaseAdvSuccessBar.show({
-			    html: '1'
-			});
 	var service = evothings.ble.getService(app.connectedDevice, app.debugService);
 	var characteristic = evothings.ble.getCharacteristic(service, app.debugDatabaseCharacteristic);
-	app.miscDatabaseAdvSuccessBar.show({
-			    html: '2'
-			});
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -2480,8 +2661,8 @@ app.ui.displayTestPunches = function(testPunches) {
 			var sumNoOfSuccessTries = 0;
 			var sumNoOfTries = 0;
 			for (var j = 0; j < allTrs.length; j++) {
-				noOfSendTries = $(allTrs[j]).find('td').eq(2).html();
-				status = $(allTrs[j]).find('td').eq(3).html();
+				noOfSendTries = $(allTrs[j]).find('td').eq(3).html();
+				status = $(allTrs[j]).find('td').eq(4).html();
 				console.log("noOfSendTries: " + noOfSendTries);
 				console.log("status: " + status);
 				if (status == 'Not sent' || status == 'Not acked') {
@@ -2510,8 +2691,8 @@ app.ui.displayTestPunches = function(testPunches) {
 
 		var noOfCompletedRows = 0;
 		for (var k = 0; k < allTrs.length; k++) {
-			noOfSendTries = $(allTrs[k]).find('td').eq(2).html();
-			status = $(allTrs[k]).find('td').eq(3).html();
+			noOfSendTries = $(allTrs[k]).find('td').eq(3).html();
+			status = $(allTrs[k]).find('td').eq(4).html();
 			console.log("noOfSendTries: " + noOfSendTries);
 			console.log("status: " + status);
 			if ((status == 'Acked' && ackReq) || (status =='Not acked' && !ackReq) || 
@@ -2572,6 +2753,9 @@ app.ui.onSendTestPunchesStopButton = function(event) {
 };
 
 app.ui.onSendTestPunchesButton = function(event) {
+	app.miscTestPunchesErrorBar.show({
+						html: 'Test punch: '
+					});
 	console.log('onSendTestPunchesButton');
 	app.testPunches = null;
 

@@ -72,17 +72,29 @@
     	
     	
     	/* Visible power */
-    	#lorapower-select-button span {
+    	#lorapower-select-DRF1268DS-button span {
     		font-size: 4vw;
     		font-weight: normal;
     	}
     	/* Lora power list */
-    	#lorapower-select-menu li a {
+    	#lorapower-select-DRF1268DS-menu li a {
     		font-size: 4vw;
     		padding-top:0.5em;
     		padding-bottom:0.5em;
     	}
     	
+    	/* Visible power */
+    	#lorapower-select-RF1276T-button span {
+    		font-size: 4vw;
+    		font-weight: normal;
+    	}
+    	/* Lora power list */
+    	#lorapower-select-RF1276T-menu li a {
+    		font-size: 4vw;
+    		padding-top:0.5em;
+    		padding-bottom:0.5em;
+    	}
+
     	label.lorapower-header {
 			line-height: 16vw;
     		font-size: 10vw;
@@ -92,6 +104,7 @@
     		/*transition: font-size 1s;*/
     	}
 	
+    		
     	.ui-select {
     		margin-top: 0px;
     	}
@@ -100,9 +113,9 @@
     		margin: auto;
     		margin-top:0px;
     	}
-    	
-    	 div.ui-controlgroup-label legend
-    	 {
+   
+		div.ui-controlgroup-label legend
+    	{
 			margin-left:auto;
 			margin-right:auto;
 		}
@@ -114,8 +127,7 @@
 			height: 12vw;
 		}
 
-		
-		
+	
     	.ui-mobile [data-role=page] {
 			position: inherit;
 		}
@@ -462,6 +474,7 @@
 			app.miscDatabaseAdvSuccessBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-database-adv'), autohide: true, backgroundColor: '#99ff99' });
 			app.miscTestPunchesSuccessBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-test'), autohide: true, backgroundColor: '#99ff99' });
 			app.miscRadioAdvSuccessBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-radio-adv'), autohide: true, backgroundColor: '#99ff99' });
+			app.miscSportIdentSuccessBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-sportident'), autohide: true, backgroundColor: '#99ff99' });
 			
 			app.miscUpdateInfoBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-update-adv'), autohide: true, backgroundColor: '#41e8eb' });
 			app.searchDevicesInfoBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-search-devices'), autohide: true, backgroundColor: '#41e8eb' });
@@ -480,10 +493,12 @@
 			app.miscTestPunchesErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-test'), autohide: true, backgroundColor: '#ffbf00' });
 			app.miscRadioAdvErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-radio-adv'), autohide: true, backgroundColor: '#ffbf00' });
 			app.miscUpdateErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-update-adv'), autohide: true, backgroundColor: '#ffbf00' });
+			app.miscSportIdentErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-sportident'), autohide: true, backgroundColor: '#ffbf00' });
 			
 			
 			$('#wifiConnect').click(app.ui.onWifiPasswordConnectButton);
 			$('#saveSettingButton').click(app.ui.onEditSettingSaveButton);
+			$('#sportident-oneway').click(app.ui.enableDisableForce4800);		
 			
 
 			$(":mobile-pagecontainer").on( "pagecontainerbeforechange", function( event, ui ) {
@@ -503,6 +518,9 @@
 					{
 						app.ui.displayUpdateWiRocPython();
 						app.ui.displayUpdateWiRocBLE();
+						app.readRadioAdvSettings();	
+						app.readSportIdentSettings();
+						
 						if (app.advancedConfigTab == null) {
 							setTimeout(function(){ $('#tab-devicename').trigger('click'); }, 500);
 						} else {
@@ -553,10 +571,22 @@
 				app.ui.updateBackgroundColor();
 			});
 			
-			$("#lorapower-select").on( "change", function(event, ui) {
+			$("#lorapower-select-DRF1268DS").on( "change", function(event, ui) {
 				app.ui.updateBackgroundColor();
 			});
 
+			$("#lorapower-select-RF1276T").on( "change", function(event, ui) {
+				app.ui.updateBackgroundColor();
+			});
+
+			$("#portident-oneway").on( "change", function(event, ui) {
+				app.ui.updateBackgroundColor();
+			});
+			
+			$("#force-4800-bps").on( "change", function(event, ui) {
+				app.ui.updateBackgroundColor();
+			});
+			
 			// Scan header
 			$('#ScanHeader').click(function() {
 				evothings.ble.reset(function() { console.log('reset success'); },function() { console.log('reset fail'); });
@@ -928,6 +958,7 @@
 					<li data-tabname="database-adv"><a href="#database-adv" data-ajax="false" id="tab-database-adv">Database &amp; Logs</a></li>
 					<li data-tabname="radio-adv"><a href="#radio-adv" data-ajax="false" id="tab-radio-adv">Radio adv.</a></li>
 					<li data-tabname="update-adv"><a href="#update-adv" data-ajax="false" id="tab-radio-adv">Update</a></li>
+					<li data-tabname="sportident"><a href="#sportident" data-ajax="false" id="tab-sportident">SportIdent</a></li>
 					</ul>
 				</div>
 				<div id="devicename" class="ui-body-d ui-content" style="padding:2vw">
@@ -1009,21 +1040,70 @@
 					<div id="acknowledge-div">
 		 				<label><input type="checkbox" id="acknowledgement">Request acknowledgement</label>
 					</div>
-					<div class="ui-field-contain lorapower">
-						<select name="lorapower" id="lorapower-select" data-native-menu="false">
-							<option value="1">4dBm</option>
-							<option value="2">7dBm</option>
-							<option value="3">10dBm</option>
-							<option value="4">13dBm</option>
-							<option value="5">14dBm (&le;11 el. Yagi)</option>
-							<option value="6">17dBm (&le;7 el. Yagi)</option>
-							<option value="7" selected>20dBm (&le;4 el. Yagi)</option>
-						</select>
+					<div id="radio-adv-RF1276T">
+						<div class="ui-field-contain lorapower-RF1276T">
+							<select name="lorapower" id="lorapower-select-RF1276T" data-native-menu="false">
+								<option value="1">4dBm</option>
+								<option value="2">7dBm</option>
+								<option value="3">10dBm</option>
+								<option value="4">13dBm</option>
+								<option value="5">14dBm (&le;11 el. Yagi)</option>
+								<option value="6">17dBm (&le;7 el. Yagi)</option>
+								<option value="7" selected>20dBm (&le;4 el. Yagi)</option>
+							</select>
+						</div>
+					</div>
+					<div id="radio-adv-DRF1268DS">
+						<div class="ui-field-contain lorapower-DRF1268DS">
+							<select name="lorapower" id="lorapower-select-DRF1268DS" data-native-menu="false">
+								<option value="1">1dBm</option>
+								<option value="2">2dBm</option>
+								<option value="3">3dBm</option>
+								<option value="4">4dBm</option>
+								<option value="5">5dBm</option>
+								<option value="6">6dBm</option>
+								<option value="7">7dBm</option>
+								<option value="8">7dBm</option>
+								<option value="9">9dBm</option>
+								<option value="10">10dBm</option>
+								<option value="11">11dBm</option>
+								<option value="12">12dBm</option>
+								<option value="13">13dBm</option>
+								<option value="14">14dBm</option>
+								<option value="15">15dBm</option>
+								<option value="16">16dBm (&le;11 el. Yagi)</option>
+								<option value="17">17dBm</option>
+								<option value="18">18dBm</option>
+								<option value="19">19dBm (&le;7 el. Yagi)</option>
+								<option value="20">20dBm</option>
+								<option value="21">21dBm</option>
+								<option value="22" selected>22dBm (&le;4 el. Yagi)</option>
+							</select>
+						</div>
 					</div>
 					<div style="text-align:center">
 						<div style="display:inline-block">
 							<a href="#" onclick="app.ui.onReadRadioAdvButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
 							<a href="#" onclick="app.ui.onApplyRadioAdvButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
+						</div>
+					</div>
+				</div>
+				<div id="sportident" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-sportident" style="height:1px"></div>
+					
+					
+					<div id="sportident">
+						<div id="sportident-oneway-div">
+							<label><input type="checkbox" id="sportident-oneway">One-Way (only listen on SI serial)</label>
+						</div>
+						<div id="force-4800-bps-div" style="margin-left: 5vw">
+							<label><input type="checkbox" id="force-4800-bps">Force 4800 bps</label>
+						</div>
+					</div>
+					<div style="text-align:center">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onReadSportIdentButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
+							<a href="#" onclick="app.ui.onApplySportIdentButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
 						</div>
 					</div>
 				</div>
