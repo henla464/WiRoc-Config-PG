@@ -519,8 +519,13 @@
 						app.ui.displayUpdateWiRocPython();
 						app.ui.displayUpdateWiRocBLE();
 						app.readRadioAdvSettings();	
+						app.radioErrorBar.show({
+							html: "update wp6"
+						});
 						app.readSportIdentSettings();
-						
+						app.radioErrorBar.show({
+							html: "update wp7"
+						});
 						if (app.advancedConfigTab == null) {
 							setTimeout(function(){ $('#tab-devicename').trigger('click'); }, 500);
 						} else {
@@ -579,7 +584,7 @@
 				app.ui.updateBackgroundColor();
 			});
 
-			$("#portident-oneway").on( "change", function(event, ui) {
+			$("#sportident-oneway").on( "change", function(event, ui) {
 				app.ui.updateBackgroundColor();
 			});
 			

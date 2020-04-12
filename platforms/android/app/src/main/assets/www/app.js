@@ -600,6 +600,10 @@ app.ui.displayPower = function(power)
 	}
 	app.ui.radio.power = raw;
 	
+	if (app.ui.chip == 'RF1276T' && raw > 0x07) {
+		raw = 0x07; // max power for this chip 0x07. 
+	}
+		
 	// Select the relevant option, de-select any others
 	$('#lorapower-select-' + app.ui.chip).val(raw).attr('selected', true).siblings('option').removeAttr('selected');
 
@@ -835,8 +839,12 @@ app.getWiRocPythonLatestVersionFromGithub = function(callback) {
 app.ui.displayUpdateWiRocPython = function()
 {
 	console.log("displayWiRocPython");
+	
 	// load content
 	if (window.cordova) {
+			app.radioErrorBar.show({
+				html: "update wp2"
+			});
 		//app.getWiRocPythonLatestVersionFromGithub(function(latest) {
 		//	console.log(latest);
 			app.getWiRocPythonVersionsFromGithub(function(versions) {
@@ -872,6 +880,9 @@ app.ui.displayUpdateWiRocPython = function()
 			});
 		//});
 	} else {
+		app.radioErrorBar.show({
+				html: "update wp3"
+			});
 		var latestPromise = app.getWiRocPythonLatestVersionFromGithub();
 		latestPromise.then(function(latest) {
 			console.log(latest);
@@ -1173,8 +1184,17 @@ app.ui.enableDisableForce4800WithParam = function(oneWayChecked)
 app.getOneWay = function(callback)
 {
 	//console.log('getOneWay');
+	app.radioErrorBar.show({
+							html: "update wp6.5"
+						});
 	var service = evothings.ble.getService(app.connectedDevice, app.sportIdentService);
+	app.radioErrorBar.show({
+							html: "update wp6.6"
+						});
 	var characteristic = evothings.ble.getCharacteristic(service, app.sportIdentOneWayCharacteristic);
+	app.radioErrorBar.show({
+							html: "update wp6.7"
+						});
 	evothings.ble.readCharacteristic(
         	app.connectedDevice,
         	characteristic,
@@ -1199,8 +1219,17 @@ app.writeOneWay = function(callback)
 {
 	//console.log('writeOneWay');
 	var oneway = app.ui.getOneWay();
+			app.miscSportIdentErrorBar.show({
+				html: '1',
+			});
 	var service = evothings.ble.getService(app.connectedDevice, app.sportIdentService);
+				app.miscSportIdentErrorBar.show({
+				html: '2',
+			});
 	var characteristic = evothings.ble.getCharacteristic(service, app.sportIdentOneWayCharacteristic);
+				app.miscSportIdentErrorBar.show({
+				html: '3',
+			});
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -1212,7 +1241,6 @@ app.writeOneWay = function(callback)
 			});
 		}
 	);
-
 };
 
 app.ui.displayOneWay = function(oneway)
@@ -1314,8 +1342,17 @@ app.ui.onApplySportIdentButton = function() {
 };
 
 app.readSportIdentSettings = function() {
+	app.radioErrorBar.show({
+							html: "update wp6.1"
+						});
 	app.getOneWay(app.ui.displayOneWay);
+	app.radioErrorBar.show({
+							html: "update wp6.2"
+						});
 	app.getForce4800(app.ui.displayForce4800);
+	app.radioErrorBar.show({
+							html: "update wp6.3"
+						});
 };
 
 //-- Battery
@@ -1446,9 +1483,7 @@ app.writeSendToSirapEnabled = function(callback)
 	var sirapEnabled = app.ui.getSendToSirapEnabled();
 	var service = evothings.ble.getService(app.connectedDevice, app.sirapService);
 	var characteristic = evothings.ble.getCharacteristic(service, app.sendToSirapEnabledCharacteristic);
-app.sirapErrorBar.show({
-				html: 'write sirap en'
-			});	
+
 	evothings.ble.writeCharacteristic(
 		app.connectedDevice,
 		characteristic,
@@ -1969,7 +2004,13 @@ app.ui.onApplyRadioAdvButton = function() {
 
 app.readRadioAdvSettings = function() {
 	app.getAcknowledgementRequested(app.ui.displayAcknowledgementRequested);
+		app.radioErrorBar.show({
+				html: "update wp5.1"
+			});
 	app.getPower(app.ui.displayPower);
+	app.radioErrorBar.show({
+				html: "update wp5.2"
+			});
 };
 
 // Sirap
@@ -2753,9 +2794,6 @@ app.ui.onSendTestPunchesStopButton = function(event) {
 };
 
 app.ui.onSendTestPunchesButton = function(event) {
-	app.miscTestPunchesErrorBar.show({
-						html: 'Test punch: '
-					});
 	console.log('onSendTestPunchesButton');
 	app.testPunches = null;
 
@@ -2868,7 +2906,6 @@ app.onConnected = function(device)
 					
 			app.readAndDisplayAll(function() {
 				$('#device-name').text(device.name);
-				$('#wirocdevicename').val(device.name);
 				$('#tab-radio').css('ui-btn-active');
 				$('#tab-radio').trigger('click');
 				//app.discoverServices(); only last readServiceData remembered :-( and reading one is as slow as reading all
