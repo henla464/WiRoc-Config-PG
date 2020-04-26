@@ -404,6 +404,11 @@
 		.ui-tabs-panel {
 			overflow:auto;
 		}
+		
+		.warning-note.ui-btn.ui-icon-alert {
+			border-style:none;
+			color:orangered;
+		}
     </style>
 	<!--<script>
 	// Redirect console.log to Evothings Workbench.
@@ -516,16 +521,8 @@
 						app.disconnect();
 					} else if (toPageName == "page-advanced-config") 
 					{
-						app.ui.displayUpdateWiRocPython();
-						app.ui.displayUpdateWiRocBLE();
 						app.readRadioAdvSettings();	
-						app.radioErrorBar.show({
-							html: "update wp6"
-						});
 						app.readSportIdentSettings();
-						app.radioErrorBar.show({
-							html: "update wp7"
-						});
 						if (app.advancedConfigTab == null) {
 							setTimeout(function(){ $('#tab-devicename').trigger('click'); }, 500);
 						} else {
@@ -592,6 +589,14 @@
 				app.ui.updateBackgroundColor();
 			});
 			
+			$("#wirocpythonversions-select").on( "change", function(event, ui) {
+				app.ui.updateBackgroundColor();
+			});
+			
+			$("#wirocbleversions-select").on( "change", function(event, ui) {
+				app.ui.updateBackgroundColor();
+			});
+			
 			// Scan header
 			$('#ScanHeader').click(function() {
 				evothings.ble.reset(function() { console.log('reset success'); },function() { console.log('reset fail'); });
@@ -653,7 +658,6 @@
 			<a href="#" onclick="app.ui.onScanButton()" class="ui-btn ui-btn-inline ui-corner-all scan-button">Start scan</a>
 	
 			<p id="scan-status" class="scan-status">Not scanning</p>
-	
 			<ul id="found-devices" class="dynamic"></ul>
 		</div>
 	</div>
@@ -698,7 +702,7 @@
 			</span>
 		</div>
 		<div role="main" class="ui-content" class="page" style="padding:0">
-			<h1 id="device-name" style="font-size:5vw;text-align: center;margin:0">WiRoc</h1>
+			<h1 id="device-name" style="font-size:5vw;text-align: center;margin:0"></h1>
 			<div data-role="tabs" id="tabs-main">
 			 	<div data-role="navbar">
 					<ul>
@@ -728,13 +732,13 @@
 						</div>
 						<fieldset data-role="controlgroup" data-type="horizontal" class="datarate-RF1276T">
 							<legend>Range<br/>Data rate</legend>
-							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-1-RF1276T" value="293" checked="checked">
+							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-1-RF1276T" value="L" checked="checked">
 								<label for="radio-choice-data-rate-1-RF1276T">Long<br/>293 bps</label>
-							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-2-RF1276T" value="537">
+							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-2-RF1276T" value="ML">
 								<label for="radio-choice-data-rate-2-RF1276T">Med-Long<br/>537 bps</label>
-							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-3-RF1276T" value="977">
+							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-3-RF1276T" value="MS">
 								<label for="radio-choice-data-rate-3-RF1276T">Med-Short<br/>977 bps</label>
-							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-4-RF1276T" value="1758">
+							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-4-RF1276T" value="S">
 								<label for="radio-choice-data-rate-4-RF1276T">Short<br/>1758 bps</label>
 						</fieldset>
 					</div>
@@ -766,6 +770,11 @@
 							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-6-DRF1268DS" value="S">
 								<label for="radio-choice-data-rate-6-DRF1268DS">Short           1367 bps</label>
 						</fieldset>
+					</div>
+					<div>
+						<a href="#" id="warning-note-req-ack" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Request acknowledgement disabled</a>
+						<a href="#" id="warning-note-radio-power" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Radio power changed</a>
+						<a href="#" id="warning-note-si-one-way" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">SportIdent one-way enabled</a>
 					</div>
 					<div style="text-align:center">
 						<div style="display:inline-block">
@@ -951,7 +960,7 @@
 		</div>
 		
 		<div role="main" class="ui-content" class="page" style="padding:0">
-			<h1 id="device-name" style="font-size:5vw;text-align: center;margin:0"></h1>
+			<h1 id="device-name2" style="font-size:5vw;text-align: center;margin:0"></h1>
 			<div data-role="tabs" id="tabs-adv">
 			 	<div data-role="navbar">
 					<ul>
