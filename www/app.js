@@ -40,42 +40,15 @@ app.miscSportIdentSuccessBar = null;
 
 
 app.radioService =                              'f6026b69-9254-fd82-0242-60d9aaff57dc';
-app.radioService2 =                             'dc57ffaa-d960-4202-82fd-5492696b02f6';
-//app.radioChannelCharacteristic =                'dc57ffab-d960-4202-82fd-5492696b02f6';
-//app.radioAcknowledgementCharacteristic =        'dc57ffac-d960-4202-82fd-5492696b02f6';
-//app.radioRangeCharacteristic =                  'dc57ffae-d960-4202-82fd-5492696b02f6';
-//app.radioPowerCharacteristic =                  'dc57ffa8-d960-4202-82fd-5492696b02f6';
-app.sirapService =                              '6e30b300-be1b-401c-8a6d-1a59d5c23c64';
-//app.sendToSirapEnabledCharacteristic =          '6e30b301-be1b-401c-8a6d-1a59d5c23c64';
-//app.sendToSirapIPCharacteristic =               '6e30b302-be1b-401c-8a6d-1a59d5c23c64';
-//app.sendToSirapIPPortCharacteristic =           '6e30b303-be1b-401c-8a6d-1a59d5c23c64';
-app.batteryService =                            '0000180f-0000-1000-8000-00805f9b34fb';
-app.batteryLevelCharacteristic =                '00002a19-0000-1000-8000-00805f9b34fb';
-app.networkService =                            'f5ea6200-bcc5-4406-a981-89c6c5fc09cf';
-app.networkListWifiCharacteristic =             'f5ea6201-bcc5-4406-a981-89c6c5fc09cf';
-app.networkConnectWifiCharacteristic =          'f5ea6202-bcc5-4406-a981-89c6c5fc09cf';
-app.networkDisconnectWifiCharacteristic =       'f5ea6203-bcc5-4406-a981-89c6c5fc09cf';
-app.networkRenewIPCharacteristic =              'f5ea6204-bcc5-4406-a981-89c6c5fc09cf';
 app.miscService =                               'fb880900-4ab2-40a2-a8f0-14cc1c2e5608';
-app.propertyCharacteristic =                    'fb880912-4ab2-40a2-a8f0-14cc1c2e5608';
-app.punchesPunchesCharacteristic =              'fb880901-4ab2-40a2-a8f0-14cc1c2e5608';
-app.debugDebugCharacteristic =                  'fb880902-4ab2-40a2-a8f0-14cc1c2e5608';
-app.deviceStatusStatusCharacteristic =          'fb880903-4ab2-40a2-a8f0-14cc1c2e5608';
-app.deviceStatusSettingsCharacteristic =        'fb880904-4ab2-40a2-a8f0-14cc1c2e5608';
-app.deviceStatusServicesCharacteristic =        'fb880905-4ab2-40a2-a8f0-14cc1c2e5608';
-app.debugDatabaseCharacteristic =               'fb880906-4ab2-40a2-a8f0-14cc1c2e5608';
-app.punchesTestPunchesCharacteristic =          'fb880907-4ab2-40a2-a8f0-14cc1c2e5608';
-app.deviceStatusBatteryCharacteristic =         'fb880908-4ab2-40a2-a8f0-14cc1c2e5608';
-app.miscAllCharacteristic =                     'fb880909-4ab2-40a2-a8f0-14cc1c2e5608';
-app.deviceStatusDeviceNameCharacteristic =      'fb88090a-4ab2-40a2-a8f0-14cc1c2e5608';
-app.debugLogArchivesCharacteristic =            'fb88090b-4ab2-40a2-a8f0-14cc1c2e5608';
-app.deviceStatusUpgradeCharacteristic =         'fb88090c-4ab2-40a2-a8f0-14cc1c2e5608';
+app.batteryService =                            '0000180f-0000-1000-8000-00805f9b34fb';
 app.punchesService =                            '02d249a5-e318-4b46-8218-3ff2101a333c';
-app.debugService =                              'a0a5a3c7-1a36-4ebe-b293-953cf7126e56';
-app.sportIdentService =                         '24e54c05-f1e1-4bfe-9083-a27455c01101';
-app.sportIdentForce4800BaudRateCharacteristic = 'fb880910-4ab2-40a2-a8f0-14cc1c2e5608';
-app.sportIdentOneWayCharacteristic =            'fb880911-4ab2-40a2-a8f0-14cc1c2e5608';
-app.deviceStatusService =                       'd5a27219-f64e-4283-bd66-6e6231d5daed';
+
+app.propertyCharacteristic =                    'fb880912-4ab2-40a2-a8f0-14cc1c2e5608';
+app.commandCharacteristic =                    'fb880913-4ab2-40a2-a8f0-14cc1c2e5608';
+app.batteryLevelCharacteristic =                '00002a19-0000-1000-8000-00805f9b34fb';  //R: bash, std service
+app.punchesPunchesCharacteristic =              'fb880901-4ab2-40a2-a8f0-14cc1c2e5608';  //N: subscribe to punches
+app.punchesTestPunchesCharacteristic =          'fb880907-4ab2-40a2-a8f0-14cc1c2e5608';  //N,R,W: test sending punches, subscribe, periodic
 
 app.isScanning = false;
 app.servicesDiscovered = false;
@@ -109,6 +82,8 @@ app.ui.updateTimer = null;
 
 app.punches = null;
 app.testPunches = null;
+app.commandResponse = null;
+app.propertyResponse = null;
 app.wirocSettings = null;
 
 app.initialize = function()
@@ -155,95 +130,6 @@ app.stopScan = function() {
 	clearInterval(app.ui.updateTimer);
 };
 
-app.discoverServices = function() {
-	// misc read in onconnected, so only read the others
-	evothings.ble.readServiceData(
-		app.connectedDevice,
-		function readServicesSuccess(services)
-		{
-			evothings.ble.readServiceData(
-				app.connectedDevice,
-				function readServicesSuccess(services)
-				{
-					evothings.ble.readServiceData(
-						app.connectedDevice,
-						function readServicesSuccess(services)
-						{
-							evothings.ble.readServiceData(
-								app.connectedDevice,
-								function readServicesSuccess(services)
-								{
-									if (app.miscService != app.deviceStatusService) {
-										evothings.ble.readServiceData(
-											app.connectedDevice,
-											function readServicesSuccess(services)
-											{
-												evothings.ble.readServiceData(
-													app.connectedDevice,
-													function readServicesSuccess(services)
-													{
-														evothings.ble.readServiceData(
-															app.connectedDevice,
-															function readServicesSuccess(services)
-															{
-																evothings.ble.readServiceData(
-																	app.connectedDevice,
-																	function readServicesSuccess(services)
-																	{
-																		app.servicesDiscovered = true;
-																		app.radioSuccessBar.show({ html: 'services read' });
-																	},
-																	function error() {
-																		app.radioErrorBar.show({ html: 'Error getting punches service' });
-																	},
-																	{ serviceUUIDs: [app.punchesService]}
-																);
-															},
-															function error() {
-																app.radioErrorBar.show({ html: 'Error getting sportident service' });
-															},
-															{ serviceUUIDs: [app.sportIdentService]}
-														);
-													},
-													function error() {
-														app.radioErrorBar.show({ html: 'Error getting debug service' });
-													},
-													{ serviceUUIDs: [app.debugService]}
-												);
-											},
-											function error() {
-												app.radioErrorBar.show({ html: 'Error getting device status service' });
-											},
-											{ serviceUUIDs: [app.deviceStatusService]}
-										);
-									} else {
-										app.servicesDiscovered = true;
-									}
-								},
-								function error() {
-									app.radioErrorBar.show({ html: 'Error getting network service' });
-								},
-								{ serviceUUIDs: [app.networkService]}
-							);
-						},
-						function error() {
-							app.radioErrorBar.show({ html: 'Error getting battery service' });
-						},
-						{ serviceUUIDs: [app.batteryService]}
-					);
-				},
-				function error() {
-					app.radioErrorBar.show({ html: 'Error getting sirap service' });
-				},
-				{ serviceUUIDs: [app.sirapService]}
-			);
-		},
-		function error() {
-			app.radioErrorBar.show({ html: 'Error getting radio service' });
-		},
-		{ serviceUUIDs: [app.radioService2]}
-	);
-};
 
 
 // Called when a device is found.
@@ -259,7 +145,6 @@ app.ui.deviceFound = function(device) //, errorCode)
 	{
 		// Set timestamp for device (this is used to remove inactive devices).
 		device.timeStamp = Date.now();
-		//console.log('Found device: ' + device.name);
 		// Insert the device into table of found devices.
 		app.devices[device.address] = device;
 	}
@@ -300,6 +185,7 @@ app.ui.updateBackgroundColor = function()
  	//console.log('updatebackgroundcolor - getAcknowledgementRequested: ' + app.ui.getAcknowledgementRequested());
 	//console.log('updatebackgroundcolor - power: ' + app.ui.radio.power);
  	//console.log('updatebackgroundcolor - getPower: ' + app.ui.getPower());
+
 	if (app.ui.radio.acknowledgementRequested != app.ui.getAcknowledgementRequested() 
 		|| app.ui.radio.power != app.ui.getPower())
 	{
@@ -308,6 +194,9 @@ app.ui.updateBackgroundColor = function()
 		$('#radio-adv').css('background-color','white');
 	}
 	// sportident
+	app.miscSportIdentErrorBar.show({
+		html: app.ui.sportident.oneway.toString() +':' +app.ui.getOneWay() + ':' +app.ui.sportident.force4800 +':'+app.ui.getForce4800()
+	});
 	if (app.ui.sportident.oneway != app.ui.getOneWay() || app.ui.sportident.force4800 != app.ui.getForce4800())
 	{
 		$('#sportident').css('background-color','#FFEFD5');
@@ -408,17 +297,10 @@ app.ui.displayChip = function(chip)
 app.ui.displayChannel = function(channel)
 {
 	//console.log("displayChannel");
-	var raw = 1;
-	if (typeof channel === 'number') {
-		raw = channel;
-	} else {
-		raw = new DataView(channel).getUint8(0, true);
-	}
-	app.ui.radio.channel = raw;
-	//console.log('channel: ' + raw);
+	app.ui.radio.channel = channel;
 
 	// Select the relevant option, de-select any others
-	$('#channel-select-' + app.ui.chip).val(raw).attr('selected', true).siblings('option').removeAttr('selected');
+	$('#channel-select-' + app.ui.chip).val(channel).attr('selected', true).siblings('option').removeAttr('selected');
 
 	// jQM refresh
 	$('#channel-select-' + app.ui.chip).selectmenu("refresh", true);
@@ -436,21 +318,6 @@ app.getChannel = function(callback)
 			});
 		}
 	);
-	
-	//var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.radioChannelCharacteristic);
-	//evothings.ble.readCharacteristic(
-        	//app.connectedDevice,
-        	//characteristic,
-        	//function(data) {
-			//callback(data);
-		//},
-		//function(error) {
-			//app.radioErrorBar.show({
-				//html: 'Error getting radio setting (Channel): ' + error
-			//});
-		//}
-	//);
 };
 
 app.ui.getChannel = function() {
@@ -460,8 +327,6 @@ app.ui.getChannel = function() {
 
 app.writeChannel = function(callback)
 {
-    //console.log('writeChannel');
-	//var channel = parseInt(app.ui.getChannel());
 	app.writeProperty('channel', app.ui.getChannel(), 
 		callback,
 		function(error) {
@@ -471,21 +336,6 @@ app.writeChannel = function(callback)
 			});
 		}
 	);
-	
-	//var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.radioChannelCharacteristic);
-	//evothings.ble.writeCharacteristic(
-	//	app.connectedDevice,
-	//	characteristic,
-	//	new Uint8Array([channel]),
-	//	callback,
-	//	function(error) {
-	//		console.log('writechannel error: ' + error);
-	//		app.radioErrorBar.show({
-	//			html: 'Error saving radio setting (Channel): ' + error
-	//		});
-	//	}
-	//);
 };
 
 //
@@ -493,7 +343,7 @@ app.ui.displayWarningNotes = function(chip, ackReq, power, siOneWay)
 {
 	//app.radioErrorBar.show({ html: (chip==null?'null':chip) +':'+(ackReq==null?'null':ackReq) +':'+(power==null?'null':power)+':'+(siOneWay==null?'null':siOneWay) });
 	if (ackReq != null) {
-		if (ackReq) {
+		if (ackReq == '1') {
 			$('#warning-note-req-ack').hide();
 		} else {
 			$('#warning-note-req-ack').show();
@@ -508,7 +358,7 @@ app.ui.displayWarningNotes = function(chip, ackReq, power, siOneWay)
 		}
 	}
 	if (siOneWay != null) {
-		if (siOneWay) {
+		if (siOneWay == '1') {
 			$('#warning-note-si-one-way').show();
 		} else {
 			$('#warning-note-si-one-way').hide();
@@ -522,7 +372,6 @@ app.ui.displayWarningNotes = function(chip, ackReq, power, siOneWay)
 
 app.getAcknowledgementRequested = function(callback)
 {
-	//console.log('getack');
 	app.writeProperty('acknowledgementrequested', null, 
 		callback,
 		function(error) {
@@ -531,22 +380,6 @@ app.getAcknowledgementRequested = function(callback)
 			});
 		}
 	);
-	
-	//var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.radioAcknowledgementCharacteristic);
-	//evothings.ble.readCharacteristic(
-        	//app.connectedDevice,
-        	//characteristic,
-        	//function(data) {
-			//callback(data);
-		//},
-		//function(error) {
-			//console.log('getack error');
-			//app.miscRadioAdvErrorBar.show({
-				//html: 'Error getting radio settings (Acknowledgement): ' + error,
-			//});
-		//}
-	//);
 };
 
 
@@ -556,7 +389,6 @@ app.ui.getAcknowledgementRequested = function() {
 
 app.writeAcknowledgementRequested = function(callback)
 {
-	//console.log('writeack');
 	var ack = app.ui.getAcknowledgementRequested();
 	app.writeProperty('acknowledgementrequested', ack.toString(), 
 		callback,
@@ -566,38 +398,15 @@ app.writeAcknowledgementRequested = function(callback)
 			});
 		}
 	);
-	
-	//var ack = app.ui.getAcknowledgementRequested();
-	//var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.radioAcknowledgementCharacteristic);
-	//evothings.ble.writeCharacteristic(
-		//app.connectedDevice,
-		//characteristic,
-		//new Uint8Array([ack]),
-		//callback,
-		//function(error) {
-			//app.miscRadioAdvErrorBar.show({
-				//html: 'Error saving radio setting (Acknowledgement): ' + error,
-			//});
-		//}
-	//);
-
 };
 
 app.ui.displayAcknowledgementRequested = function(acknowledgement)
 {
-	//console.log("displayAcknowledgementRequested");
-	var raw = 0;
-	if (typeof acknowledgement === 'number') {
-		raw = acknowledgement;
-	} else {
-		raw = new DataView(acknowledgement).getUint8(0, true);
-	}
+	var raw = parseInt(acknowledgement);
 	app.ui.radio.acknowledgementRequested = raw;
-	//console.log('ack: ' + raw);
     $('#acknowledgement').checkboxradio();
 	$('#acknowledgement').prop("checked",raw != 0).checkboxradio("refresh");
-	app.ui.displayWarningNotes(app.ui.chip, raw != 0, null, null);
+	app.ui.displayWarningNotes(app.ui.chip, acknowledgement, null, null);
 	app.ui.updateBackgroundColor();
 };
 
@@ -607,12 +416,7 @@ app.ui.displayAcknowledgementRequested = function(acknowledgement)
 app.ui.displayPower = function(power)
 {
 	//console.log("displayPower");
-	var raw = 1;
-	if (typeof power === 'number') {
-		raw = power;
-	} else {
-		raw = new DataView(power).getUint8(0, true);
-	}
+	var raw = parseInt(power);
 	app.ui.radio.power = raw;
 	
 	if (app.ui.chip == 'RF1276T' && raw > 0x07) {
@@ -639,7 +443,6 @@ app.ui.displayPower = function(power)
 
 app.getPower = function(callback)
 {
-	//console.log('getPower');
 	app.writeProperty('power', null, 
 		callback,
 		function(error) {
@@ -648,20 +451,6 @@ app.getPower = function(callback)
 			});
 		}
 	);
-	//var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.radioPowerCharacteristic);
-	//evothings.ble.readCharacteristic(
-        	//app.connectedDevice,
-        	//characteristic,
-        	//function(data) {
-			//callback(data);
-		//},
-		//function(error) {
-			//app.radioErrorBar.show({
-				//html: 'Error getting radio setting (Power): ' + error
-			//});
-		//}
-	//);
 };
 
 app.ui.getPower = function() {
@@ -671,7 +460,6 @@ app.ui.getPower = function() {
 
 app.writePower = function(callback)
 {
-    //console.log('writePower');
     var power = app.ui.getPower();
 	app.writeProperty('power', power, 
 		callback,
@@ -681,35 +469,13 @@ app.writePower = function(callback)
 			});
 		}
 	);
-	
-	//var power = parseInt(app.ui.getPower());
-	//var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.radioPowerCharacteristic);
-	//evothings.ble.writeCharacteristic(
-		//app.connectedDevice,
-		//characteristic,
-		//new Uint8Array([power]),
-		//callback,
-		//function(error) {
-			//console.log('writepower error: ' + error);
-			//app.radioErrorBar.show({
-				//html: 'Error saving radio setting (Power): ' + error
-			//});
-		//}
-	//);
 };
 
 //-- Range
 
-app.ui.displayRange = function(range)
+app.ui.displayRange = function(rangeString)
 {
 	//console.log("displayRange");
-	var rangeString = '';
-	if (typeof range === 'string') {
-		rangeString = range;
-	} else {
-		rangeString = new TextDecoder("utf-8").decode(range);
-	}
 	app.ui.radio.range = rangeString;
 	
 	$(".datarate-" + app.ui.chip + " [type='radio'][value = '" + rangeString + "']").prop("checked", true).checkboxradio("refresh");
@@ -728,22 +494,6 @@ app.getRange = function(callback)
 			});
 		}
 	);
-	
-	
-	//var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.radioRangeCharacteristic);
-	//evothings.ble.readCharacteristic(
-        	//app.connectedDevice,
-        	//characteristic,
-        	//function(data) {
-			//callback(data);
-		//},
-		//function(error) {
-			//app.radioErrorBar.show({
-				//html: 'Error getting radio setting (Range): ' + error
-			//});
-		//}
-	//);
 };
 
 app.ui.getRange = function() {
@@ -753,7 +503,6 @@ app.ui.getRange = function() {
 
 app.writeRange = function(callback)
 {
-    //console.log('writeRange');
     app.writeProperty('lorarange', app.ui.getRange(), 
 		callback,
 		function(error) {
@@ -762,25 +511,6 @@ app.writeRange = function(callback)
 			});
 		}
 	);
-    
-	//var range = app.ui.getRange();
-	//var te = new TextEncoder("utf-8").encode(range);
-	//var rangeArray = new Uint8Array(te);
-	
-	//var service = evothings.ble.getService(app.connectedDevice, app.radioService2);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.radioRangeCharacteristic);
-	//evothings.ble.writeCharacteristic(
-		//app.connectedDevice,
-		//characteristic,
-		//rangeArray,
-		//callback,
-		//function(error) {
-			//console.log('writerange error: ' + error);
-			//app.radioErrorBar.show({
-				//html: 'Error saving radio setting (Range): ' + error
-			//});
-		//}
-	//);
 };
 
 //-- Update WiRoc Python
@@ -1010,15 +740,7 @@ app.writeUpdateWiRocPython = function(callback)
 {
     console.log('writeUpdateWiRocPython');
 	var version = app.ui.getUpdateWiRocPython();
-	console.log('version: '+version);
-	var te = new TextEncoder("utf-8").encode('wirocpython;' + version);
-	var typeAndVersionArray = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.deviceStatusService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.deviceStatusUpgradeCharacteristic);
-	evothings.ble.writeCharacteristic(
-		app.connectedDevice,
-		characteristic,
-		typeAndVersionArray,
+    app.writeCommand('upgradewirocpython', version, 
 		callback,
 		function(error) {
 			console.log('writeWiRocPython error: ' + error);
@@ -1259,15 +981,8 @@ app.ui.getUpdateWiRocBLE = function() {
 app.writeUpdateWiRocBLE = function(callback)
 {
     console.log('writeWiRocBLE');
-	var version = app.ui.getUpdateWiRocBLE();
-	var te = new TextEncoder("utf-8").encode('wirocble;' + version);
-	var typeAndVersionArray = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.deviceStatusService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.deviceStatusUpgradeCharacteristic);
-	evothings.ble.writeCharacteristic(
-		app.connectedDevice,
-		characteristic,
-		typeAndVersionArray,
+    var version = app.ui.getUpdateWiRocBLE();
+    app.writeCommand('upgradewirocble', version, 
 		callback,
 		function(error) {
 			console.log('writeWiRocBLE error: ' + error);
@@ -1280,7 +995,7 @@ app.writeUpdateWiRocBLE = function(callback)
 
 
 //---- one-way
-app.ui.enableDisableForce4800 = function(oneWayChecked) 
+app.ui.enableDisableForce4800 = function() 
 {
   app.ui.enableDisableForce4800WithParam(this.checked);
 };
@@ -1299,16 +1014,9 @@ app.ui.enableDisableForce4800WithParam = function(oneWayChecked)
 app.getOneWay = function(callback)
 {
 	//console.log('getOneWay');
-	var service = evothings.ble.getService(app.connectedDevice, app.sportIdentService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.sportIdentOneWayCharacteristic);
-	evothings.ble.readCharacteristic(
-        	app.connectedDevice,
-        	characteristic,
-        	function(data) {
-			callback(data);
-		},
+	app.writeProperty('onewayreceive', null, 
+		callback,
 		function(error) {
-			console.log('getOneWay error');
 			app.miscSportIdentErrorBar.show({
 				html: 'Error getting one-way: ' + error,
 			});
@@ -1323,7 +1031,6 @@ app.ui.getOneWay = function() {
 
 app.writeOneWay = function(callback)
 {
-	//console.log('writeOneWay');
 	var oneway = app.ui.getOneWay();
 	app.writeProperty('onewayreceive', oneway.toString(), 
 		callback,
@@ -1333,39 +1040,17 @@ app.writeOneWay = function(callback)
 			});
 		}
 	);
-	
-	//var oneway = app.ui.getOneWay();
-	//var service = evothings.ble.getService(app.connectedDevice, app.sportIdentService);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.sportIdentOneWayCharacteristic);
-	//evothings.ble.writeCharacteristic(
-		//app.connectedDevice,
-		//characteristic,
-		//new Uint8Array([oneway]),
-		//callback,
-		//function(error) {
-			//app.miscSportIdentErrorBar.show({
-				//html: 'Error saving one-way: ' + error,
-			//});
-		//}
-	//);
 };
 
 app.ui.displayOneWay = function(oneway)
 {
-	//console.log("displayOneWay");
-	var raw = 0;
-	if (typeof oneway === 'number') {
-		raw = oneway;
-	} else {
-		raw = new DataView(oneway).getUint8(0, true);
-	}
+	var raw = parseInt(oneway);
 	app.ui.sportident.oneway = raw;
-	//console.log('ack: ' + raw);
     $('#sportident-oneway').checkboxradio();
 	$('#sportident-oneway').prop("checked",raw != 0).checkboxradio("refresh");
 	app.ui.enableDisableForce4800WithParam(raw != 0);
 	
-	app.ui.displayWarningNotes(app.ui.chip, null, null, raw == 1);
+	app.ui.displayWarningNotes(app.ui.chip, null, null, oneway);
 	
 	app.ui.updateBackgroundColor();
 };
@@ -1375,17 +1060,9 @@ app.ui.displayOneWay = function(oneway)
 
 app.getForce4800 = function(callback)
 {
-	//console.log('getForce4800');
-	var service = evothings.ble.getService(app.connectedDevice, app.sportIdentService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.sportIdentForce4800BaudRateCharacteristic);
-	evothings.ble.readCharacteristic(
-        	app.connectedDevice,
-        	characteristic,
-        	function(data) {
-			callback(data);
-		},
+	app.writeProperty('force4800baudrate', null, 
+		callback,
 		function(error) {
-			console.log('getForce4800 error');
 			app.miscSportIdentErrorBar.show({
 				html: 'Error getting force 4800: ' + error,
 			});
@@ -1400,7 +1077,6 @@ app.ui.getForce4800 = function() {
 
 app.writeForce4800 = function(callback)
 {
-	//console.log('writeForce4800');
 	var force4800 = app.ui.getForce4800();
 	app.writeProperty('force4800baudrate', force4800.toString(), 
 		callback,
@@ -1410,34 +1086,12 @@ app.writeForce4800 = function(callback)
 			});
 		}
 	);
-	
-	//var force4800 = app.ui.getForce4800();
-	//var service = evothings.ble.getService(app.connectedDevice, app.sportIdentService);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.sportIdentForce4800BaudRateCharacteristic);
-	//evothings.ble.writeCharacteristic(
-		//app.connectedDevice,
-		//characteristic,
-		//new Uint8Array([force4800]),
-		//callback,
-		//function(error) {
-			//app.miscSportIdentErrorBar.show({
-				//html: 'Error saving force4800: ' + error,
-			//});
-		//}
-	//);
 };
 
 app.ui.displayForce4800 = function(oneway)
 {
-	//console.log("displayForce4800");
-	var raw = 0;
-	if (typeof oneway === 'number') {
-		raw = oneway;
-	} else {
-		raw = new DataView(oneway).getUint8(0, true);
-	}
+	var raw = parseInt(oneway);
 	app.ui.sportident.force4800 = raw;
-	//console.log('ack: ' + raw);
     $('#force-4800-bps').checkboxradio();
 	$('#force-4800-bps').prop("checked",raw != 0).checkboxradio("refresh");
 	app.ui.updateBackgroundColor();
@@ -1461,15 +1115,14 @@ app.ui.onApplySportIdentButton = function() {
 };
 
 app.readSportIdentSettings = function() {
-	app.getOneWay(app.ui.displayOneWay);
-	app.getForce4800(app.ui.displayForce4800);
+	app.getOneWay();
+	app.getForce4800();
 };
 
 //-- Battery
 
 app.getBatteryLevel = function(callback)
 {
-	//console.log('getBatteryLevel');
 	var service = evothings.ble.getService(app.connectedDevice, app.batteryService);
 	var characteristic = evothings.ble.getCharacteristic(service, app.batteryLevelCharacteristic);
 	evothings.ble.readCharacteristic(
@@ -1490,14 +1143,8 @@ app.getBatteryLevel = function(callback)
 
 app.ui.displayBatteryLevel = function(batteryLevel)
 {
-	var rawBatteryLevel = 0;
-	//console.log('typeof batterylevel:' + batteryLevel + ' type: ' + (typeof batteryLevel));
-	if (typeof batteryLevel === 'number') {
-		rawBatteryLevel = batteryLevel;
-	} else {
-		var dv = new DataView(batteryLevel, 0);
-		rawBatteryLevel = dv.getUint8(0);
-	}
+	var rawBatteryLevel = parseint(batteryLevel);
+	
 	var levelBar = $('.level');
 	levelBar.removeClass('high');
 	levelBar.removeClass('med');
@@ -1519,18 +1166,9 @@ app.ui.displayBatteryLevel = function(batteryLevel)
 
 app.getIsCharging = function(callback)
 {
-	//console.log('getIsCharging');
-	var service = evothings.ble.getService(app.connectedDevice, app.deviceStatusService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.deviceStatusBatteryCharacteristic);
-
-	evothings.ble.readCharacteristic(
-		app.connectedDevice,
-		characteristic,
-		function(data) {
-			callback(data);
-		},
+	app.writeProperty('ischarging', null, 
+		callback,
 		function(error) {
-			console.log('getIsCharging error: ' + error);
 			app.batteryErrorBar.show({
 				html: 'Error getting if charging'
 			});
@@ -1541,30 +1179,20 @@ app.getIsCharging = function(callback)
 
 app.ui.displayIsCharging = function(isCharging)
 {
-	//console.log("displayIsCharging: " + isCharging + ' type: ' + (typeof isCharging));
-	var rawIsCharging = 0;
-	if (typeof isCharging === 'number') {
-		rawIsCharging = isCharging;
-	} else {
-		var dv = new DataView(isCharging, 0);
-		rawIsCharging = dv.getUint8(0);
-	}
-	//console.log('IsCharging: ' + rawIsCharging);
+	var rawIsCharging = parseInt(isCharging);
 
 	var levelBar = $('.level');
 	if (rawIsCharging > 0) {
-	  levelBar.addClass('charging');
-        } else {
-          levelBar.removeClass('charging');
-        }
+		levelBar.addClass('charging');
+	} else {
+		levelBar.removeClass('charging');
+	}
 };
-
 
 
 //-- Send to Sirap enabled
 app.getSendToSirapEnabled = function(callback)
 {
-	//console.log('getSendToSirapEnabled');
 	app.writeProperty('sendtosirapenabled', null, 
 		callback,
 		function(error) {
@@ -1573,21 +1201,6 @@ app.getSendToSirapEnabled = function(callback)
 			});
 		}
 	);
-	
-	//var service = evothings.ble.getService(app.connectedDevice, app.sirapService);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.sendToSirapEnabledCharacteristic);
-	//evothings.ble.readCharacteristic(
-        	//app.connectedDevice,
-        	//characteristic,
-        	//function(data) {
-			//callback(data);
-		//},
-		//function(error) {
-			//app.sirapErrorBar.show({
-				//html: 'Error getting Sirap settings (Enabled): ' + error
-			//});
-		//}
-	//);
 };
 
 app.ui.getSendToSirapEnabled = function() {
@@ -1597,7 +1210,6 @@ app.ui.getSendToSirapEnabled = function() {
 
 app.writeSendToSirapEnabled = function(callback)
 {
-	//console.log('write send to sirap enabled');
 	var sirapEnabled = app.ui.getSendToSirapEnabled();
 	app.writeProperty('sendtosirapenabled', sirapEnabled.toString(), 
 		callback,
@@ -1607,35 +1219,12 @@ app.writeSendToSirapEnabled = function(callback)
 			});
 		}
 	);
-	
-	//var sirapEnabled = app.ui.getSendToSirapEnabled();
-	//var service = evothings.ble.getService(app.connectedDevice, app.sirapService);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.sendToSirapEnabledCharacteristic);
-
-	//evothings.ble.writeCharacteristic(
-		//app.connectedDevice,
-		//characteristic,
-		//new Uint8Array([sirapEnabled]),
-		//callback,
-		//function(error) {
-			//app.sirapErrorBar.show({
-				//html: 'Error saving Sirap settings (Enabled): ' + error
-			//});
-		//}
-	//);
 };
 
 app.ui.displaySendToSirapEnabled = function(sirapEnabled)
 {
-	//console.log("displaySendToSirapEnabled");
-	var raw = false;
-	if (typeof sirapEnabled === 'number') {
-		raw = sirapEnabled;
-	} else {
-		raw = new DataView(sirapEnabled).getUint8(0, true);
-	}
+	var raw = parseInt(sirapEnabled);
 	app.ui.sirap.sendToSirapEnabled = raw;
-	//console.log('send to sirap enabled: ' + raw);
 	$('#sendtosirapenabled').prop("checked",raw != 0).checkboxradio("refresh");
 	app.ui.updateBackgroundColor();
 };
@@ -1658,7 +1247,6 @@ app.validateIPaddress = function(ipaddress)
 //-- Send to Sirap ip
 app.getSendToSirapIP = function(callback)
 {
-	//console.log('getSendToSirapIP');
 	app.writeProperty('sendtosirapip', null, 
 		callback,
 		function(error) {
@@ -1667,21 +1255,6 @@ app.getSendToSirapIP = function(callback)
 			});
 		}
 	);
-		
-	//var service = evothings.ble.getService(app.connectedDevice, app.sirapService);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.sendToSirapIPCharacteristic);
-	//evothings.ble.readCharacteristic(
-        	//app.connectedDevice,
-        	//characteristic,
-        	//function(data) {
-			//callback(data);
-		//},
-		//function(error) {
-			//app.sirapErrorBar.show({
-				//html: 'Error getting Sirap settings (IP): ' + error
-			//});
-		//}
-	//);
 };
 
 app.ui.getSendToSirapIP = function() {
@@ -1691,7 +1264,6 @@ app.ui.getSendToSirapIP = function() {
 
 app.writeSendToSirapIP = function(callback)
 {
-	//console.log('write sirap ip');
 	var sirapIP = app.ui.getSendToSirapIP();
 	if (!app.validateIPaddress(sirapIP)) {
 		app.sirapErrorBar.show({
@@ -1706,36 +1278,12 @@ app.writeSendToSirapIP = function(callback)
 				});
 			}
 		);
-		
-		//var te = new TextEncoder("utf-8").encode(sirapIP);
-		//var sirapIPArray = new Uint8Array(te);
-		//var service = evothings.ble.getService(app.connectedDevice, app.sirapService);
-		//var characteristic = evothings.ble.getCharacteristic(service, app.sendToSirapIPCharacteristic);
-		//evothings.ble.writeCharacteristic(
-			//app.connectedDevice,
-			//characteristic,
-			//sirapIPArray,
-			//callback,
-			//function(error) {
-				//app.sirapErrorBar.show({
-					//html: 'Error saving Sirap settings (IP): ' + error
-				//});
-			//}
-		//);
 	}
 };
 
-app.ui.displaySendToSirapIP = function(sirapIP)
+app.ui.displaySendToSirapIP = function(sirapIPString)
 {
-	//console.log("displaySendToSirapIP");
-	var sirapIPString = '';
-	if (typeof sirapIP === 'string') {
-		sirapIPString = sirapIP;
-	} else {
-		sirapIPString = new TextDecoder("utf-8").decode(sirapIP);
-	}
 	app.ui.sirap.sendToSirapIP = sirapIPString;
-	//console.log('sirap ip: ' + sirapIPString);
 	$("#sendtosirapip").val(sirapIPString);
 	app.ui.updateBackgroundColor();
 };
@@ -1752,21 +1300,6 @@ app.getSendToSirapIPPort = function(callback)
 			});
 		}
 	);
-		
-	//var service = evothings.ble.getService(app.connectedDevice, app.sirapService);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.sendToSirapIPPortCharacteristic);
-	//evothings.ble.readCharacteristic(
-        	//app.connectedDevice,
-        	//characteristic,
-        	//function(data) {
-			//callback(data);
-		//},
-		//function(error) {
-			//app.sirapErrorBar.show({
-				//html: 'Error getting Sirap settings (Port): ' + error
-			//});
-		//}
-	//);
 };
 
 
@@ -1774,18 +1307,16 @@ app.getSendToSirapIPPort = function(callback)
 app.ui.getSendToSirapIPPort = function() {
 	var sirapIPPort = $("#sendtosirapipport").val();
 	var sirapIPPortInteger = parseInt(sirapIPPort);
-	//console.log("sirapIPPortInteger: " + sirapIPPortInteger);
 	if (app.isNumber(sirapIPPortInteger)) {
-		return sirapIPPortInteger;
+		return sirapIPPort;
 	}
-	return 0;
+	return '';
 };
 
 app.writeSendToSirapIPPort = function(callback, errorCallback)
 {
-	//console.log('write sirap ip port');
 	var sirapIPPort = app.ui.getSendToSirapIPPort();
- 	if (sirapIPPort == 0) {
+ 	if (sirapIPPort == '') {
 		app.sirapErrorBar.show({
 			html: 'Sirap Port must be an integer'
 		});
@@ -1799,34 +1330,13 @@ app.writeSendToSirapIPPort = function(callback, errorCallback)
 				});
 			}
 		);
-
-		//var service = evothings.ble.getService(app.connectedDevice, app.sirapService);
-		//var characteristic = evothings.ble.getCharacteristic(service, app.sendToSirapIPPortCharacteristic);
-		//evothings.ble.writeCharacteristic(
-			//app.connectedDevice,
-			//characteristic,
-			//new Uint16Array([sirapIPPort]),
-			//callback,
-			//function(error) {
-				//app.sirapErrorBar.show({
-					//html: 'Error saving Sirap settings (Port): ' + error
-				//});
-			//}
-		//);
 	}
 };
 
 app.ui.displaySendToSirapIPPort = function(sirapIPPort)
 {
-	//console.log("displaySendToSirapIPPort");
-	var rawSirapIPPort = 0;
-	if (typeof sirapIPPort === 'number') {
-		rawSirapIPPort = sirapIPPort;
-	} else {
-		rawSirapIPPort = new DataView(sirapIPPort).getUint16(0, true);
-	}
-	app.ui.sirap.sendToSirapIPPort = rawSirapIPPort;
-	//console.log('sirap ip port: ' + rawSirapIPPort);
+	var rawSirapIPPort = parseInt(sirapIPPort);
+	app.ui.sirap.sendToSirapIPPort = sirapIPPort;
 	$("#sendtosirapipport").val(rawSirapIPPort);
 	app.ui.updateBackgroundColor();
 };
@@ -1834,15 +1344,8 @@ app.ui.displaySendToSirapIPPort = function(sirapIPPort)
 // get all
 app.getAll = function(callback)
 {
-	//console.log('getAll');
-	var service = evothings.ble.getService(app.connectedDevice, app.miscService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.miscAllCharacteristic);
-	evothings.ble.readCharacteristic(
-        	app.connectedDevice,
-        	characteristic,
-        	function(data) {
-			callback(data);
-		},
+	app.writeCommand('getall', null, 
+		callback, 
 		function(error) {
 			console.log('getAll error: ' + error);
 			app.radioErrorBar.show({
@@ -1855,15 +1358,8 @@ app.getAll = function(callback)
 //-- Get Wifi networks
 app.getNetworkWifiList = function(callback)
 {
-	//console.log('getNetworkWifiList');
-	var service = evothings.ble.getService(app.connectedDevice, app.networkService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.networkListWifiCharacteristic);
-	evothings.ble.readCharacteristic(
-		app.connectedDevice,
-		characteristic,
-		function(data) {
-			callback(data);
-		},
+	app.writeCommand('listwifi', null, 
+		callback, 
 		function(error) {
 			app.networkErrorBar.show({
 			    html: 'Error getting wifi list: ' + error
@@ -1872,11 +1368,10 @@ app.getNetworkWifiList = function(callback)
 	);
 };
 
-app.ui.displayNetworkWifiList = function(wifiList)
+app.ui.displayNetworkWifiList = function(wifiListString)
 {
-	var rawWifiList = new TextDecoder("utf-8").decode(wifiList);
 	//console.log('wifi list: ' + rawWifiList);
-	var rowList = rawWifiList.split(/\r?\n/);
+	var rowList = wifiListString.split(/\r?\n/);
 	var table = $('<table style="border:0px;padding:0px;width:100%;table-layout:fixed"></table>');
 	$('#wifi-networks').html(table);
 	for (var i = 0; i < rowList.length; i += 3) {
@@ -1911,7 +1406,7 @@ app.ui.onWifiConnectButton = function(event) {
 		app.writeDisconnectWifi(networkName, function() {
 			app.networkInfoBar.settings.autohide = true;
 			app.networkInfoBar.settings.onHide = function() {
-			        app.getNetworkWifiList(app.ui.displayNetworkWifiList);
+			        app.getNetworkWifiList();
     			};
 			app.networkInfoBar.show({
 				html: 'Disconnecting Wifi'
@@ -1927,7 +1422,7 @@ app.ui.onWifiPasswordConnectButton = function(event) {
 	$('#popupWifiLogin').popup('close');
 	app.networkInfoBar.settings.autohide = false;
 	app.networkInfoBar.settings.onHide = function() {
-	        app.getNetworkWifiList(app.ui.displayNetworkWifiList);
+	        app.getNetworkWifiList();
 	};
 	app.networkInfoBar.show({
 		html: 'Connecting Wifi'
@@ -1943,17 +1438,8 @@ app.ui.onWifiPasswordConnectButton = function(event) {
 
 app.writeConnectWifi = function(networkName, password, callback)
 {
-	//console.log('writeConnectWifi: ' + networkName);
-	var te = new TextEncoder("utf-8").encode(networkName + '\n' + password);
-	var networkNameArray = new Uint8Array(te);
-	console.log('writeConnectWifi 2: ' + networkNameArray);
-	var service = evothings.ble.getService(app.connectedDevice, app.networkService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.networkConnectWifiCharacteristic);
-	evothings.ble.writeCharacteristic(
-		app.connectedDevice,
-		characteristic,
-		networkNameArray,
-		callback,
+	app.writeCommand('connectwifi', networkName + '\n' + password, 
+		callback, 
 		function(error) {
 			app.networkErrorBar.show({
 			    html: 'Error connecting to wifi: ' + error
@@ -1966,16 +1452,8 @@ app.writeConnectWifi = function(networkName, password, callback)
 //-- Wifi disconnect
 app.writeDisconnectWifi = function(networkName, callback)
 {
-	//console.log('writeDisconnectWifi: ' + networkName);
-	var te = new TextEncoder("utf-8").encode(networkName);
-	var networkNameArray = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.networkService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.networkDisconnectWifiCharacteristic);
-	evothings.ble.writeCharacteristic(
-		app.connectedDevice,
-		characteristic,
-		networkNameArray,
-		callback,
+	app.writeCommand('disconnectwifi', null, 
+		callback, 
 		function(error) {
 			app.networkErrorBar.show({
 			    html: 'Error disconnecting wifi: ' + error
@@ -1987,15 +1465,8 @@ app.writeDisconnectWifi = function(networkName, callback)
 //-- get IP
 app.getIPAddress = function(callback)
 {
-	//console.log('getIPAddress');
-	var service = evothings.ble.getService(app.connectedDevice, app.networkService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.networkRenewIPCharacteristic);
-	evothings.ble.readCharacteristic(
-        	app.connectedDevice,
-        	characteristic,
-        	function(data) {
-			callback(data);
-		},
+	app.writeCommand('getip', null, 
+		callback, 
 		function(error) {
 			console.log('getipaddress error');
 			app.networkErrorBar.show({
@@ -2005,76 +1476,40 @@ app.getIPAddress = function(callback)
 	);
 };
 
-app.ui.displayIPAddress = function(IPAddress)
+app.ui.displayIPAddress = function(IPAddressString)
 {
-	var rawIPAddress = '';
-	if (typeof IPAddress === 'string') {
-		rawIPAddress = IPAddress;
-	} else {
-		rawIPAddress = new TextDecoder("utf-8").decode(IPAddress);
-	}
-	//console.log('ip address: ' + rawIPAddress);
-	$("#ipaddress").text(rawIPAddress);
+	$("#ipaddress").text(IPAddressString);
 };
 
 
 //-- Renew IP
 app.ui.onRenewIPWifi = function(event)
 {
-	//console.log('onRenewIPWifi');
-	var te = new TextEncoder("utf-8").encode('wifi');
-	var networkType = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.networkService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.networkRenewIPCharacteristic);
-	evothings.ble.writeCharacteristic(
-		app.connectedDevice,
-		characteristic,
-		networkType,
-		function() {
-				console.log('IP renewed');
-				app.networkInfoBar.settings.autohide = true;
-				app.networkInfoBar.show({
-				    html: 'Renew IP command issued'
-				});
-			},
+	app.writeCommand('renewip', 'wifi', 
+		callback, 
 		function(error) {
 			console.log('Renewing IP failed: ' + error);
 			app.networkErrorBar.show({
 			    html: 'Renewing IP failed'
 			});
 		}
-	);
+	)
 };
 
 app.ui.onRenewIPEthernet = function(event)
 {
-	//console.log('onRenewIPEthernet');
-	var te = new TextEncoder("utf-8").encode('ethernet');
-	var networkType = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.networkService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.networkRenewIPCharacteristic);
-	evothings.ble.writeCharacteristic(
-		app.connectedDevice,
-		characteristic,
-		networkType,
-		function() {
-				console.log('IP renewed');
-				app.networkInfoBar.settings.autohide = true;
-				app.networkInfoBar.show({
-				    html: 'Renew IP command issued'
-				});
-			},
+	app.writeCommand('renewip', 'ethernet', 
+		callback, 
 		function(error) {
 			console.log('Renewing IP failed: ' + error);
 			app.networkErrorBar.show({
 			    html: 'Renewing IP failed'
 			});
 		}
-	);
+	)
 };
 
-app.ui.displayAll = function(data) {
-	var allString = new TextDecoder("utf-8").decode(data);
+app.ui.displayAll = function(allString) {
 	console.log(allString);
 	var all = allString.split('¤');
 	//     0             1                2               3            4                       5                 6        7        8         9       10    11   12            13               14             15         16
@@ -2083,39 +1518,38 @@ app.ui.displayAll = function(data) {
 		app.ui.displayChip(all[11]);
 		app.ui.displayRange(all[12]);
 	}
-	app.ui.displayIsCharging(parseInt(all[0]));
+	app.ui.displayIsCharging(all[0]);
 	app.ui.displayWiRocDeviceName(all[1]);
-	app.ui.displaySendToSirapIPPort(parseInt(all[2]));
+	app.ui.displaySendToSirapIPPort(all[2]);
 	app.ui.displaySendToSirapIP(all[3]);
-	app.ui.displaySendToSirapEnabled(parseInt(all[4]));
-	app.ui.displayAcknowledgementRequested(parseInt(all[5]));
-	app.ui.displayChannel(parseInt(all[7]));
-	app.ui.displayBatteryLevel(parseInt(all[8]));
+	app.ui.displaySendToSirapEnabled(all[4]);
+	app.ui.displayAcknowledgementRequested(all[5]);
+	app.ui.displayChannel(all[7]);
+	app.ui.displayBatteryLevel(all[8]);
 	app.ui.displayIPAddress(all[9]);
-	app.ui.displayPower(parseInt(all[10]));
+	app.ui.displayPower(all[10]);
 	if (all.length > 14) {
 		app.ui.displayUpdateWiRocPython('v' + all[13]);
 		app.ui.displayUpdateWiRocBLE('v' + all[14]);
 	}
 	if (all.length > 16) {
-		app.ui.displayWarningNotes(all[11], all[5] == '1', parseInt(all[10]), all[16] == '1');
+		app.ui.displayWarningNotes(all[11], all[5], all[10], all[16]);
 	}
 };
 
 app.readAndDisplayAll = function(callback) {
-	app.getAll(function(data) { 
-		app.ui.displayAll(data);
+	app.getAll(function() { 
 		callback();
 	});
 };
 
 app.readBasicSettings = function() {
 	app.getBatteryLevel(app.ui.displayBatteryLevel);
-	app.getIsCharging(app.ui.displayIsCharging);
-	app.getRange(app.ui.displayRange);
+	app.getIsCharging();
+	app.getRange();
 	app.getChannel();
-	app.getAcknowledgementRequested(app.ui.displayAcknowledgementRequested);
-	app.getIPAddress(app.ui.displayIPAddress);
+	app.getAcknowledgementRequested();
+	app.getIPAddress();
 };
 
 app.ui.onReadBasicButton = function() {
@@ -2123,17 +1557,15 @@ app.ui.onReadBasicButton = function() {
 };
 
 app.ui.onApplyBasicButton = function() {
-    //console.log('onApplyBasicButton');
 	app.writeChannel(function() {
-        //console.log('writeChannel2');
         var displayRadioSettings = function() {
 			app.radioSuccessBar.show({
 		    		html: 'Radio settings saved'
 			});
 
-			app.getRange(app.ui.displayRange);
-			app.getChannel(app.ui.displayChannel);
-			app.getAcknowledgementRequested(app.ui.displayAcknowledgementRequested);
+			app.getRange();
+			app.getChannel();
+			app.getAcknowledgementRequested();
 		};
 		
 		app.writeRange(displayRadioSettings);
@@ -2146,7 +1578,6 @@ app.ui.onReadRadioAdvButton = function() {
 };
 
 app.ui.onApplyRadioAdvButton = function() {
-    //console.log('onApplyRadioAdvButton');
     app.writeAcknowledgementRequested(function() {
 		app.writePower(function() {
 			app.miscRadioAdvSuccessBar.show({
@@ -2158,17 +1589,17 @@ app.ui.onApplyRadioAdvButton = function() {
 };
 
 app.readRadioAdvSettings = function() {
-	app.getAcknowledgementRequested(app.ui.displayAcknowledgementRequested);
-	app.getPower(app.ui.displayPower);
+	app.getAcknowledgementRequested();
+	app.getPower();
 };
 
 // Sirap
 
 app.readSirapSettings = function() {
 	app.getBatteryLevel(app.ui.displayBatteryLevel);
-	app.getSendToSirapEnabled(app.ui.displaySendToSirapEnabled);
-	app.getSendToSirapIP(app.ui.displaySendToSirapIP);
-	app.getSendToSirapIPPort(app.ui.displaySendToSirapIPPort);
+	app.getSendToSirapEnabled();
+	app.getSendToSirapIP();
+	app.getSendToSirapIPPort();
 };
 
 app.ui.onReadSirapButton = function() {
@@ -2182,13 +1613,13 @@ app.ui.onApplySirapButton = function() {
 				app.sirapSuccessBar.show({
 			    		html: 'Sirap settings saved'
 				});
-				app.getSendToSirapEnabled(app.ui.displaySendToSirapEnabled);
-				app.getSendToSirapIP(app.ui.displaySendToSirapIP);
-				app.getSendToSirapIPPort(app.ui.displaySendToSirapIPPort);
+				app.getSendToSirapEnabled();
+				app.getSendToSirapIP();
+				app.getSendToSirapIPPort();
 			}, function() {
-				app.getSendToSirapEnabled(app.ui.displaySendToSirapEnabled);
-				app.getSendToSirapIP(app.ui.displaySendToSirapIP);
-				app.getSendToSirapIPPort(app.ui.displaySendToSirapIPPort);
+				app.getSendToSirapEnabled();
+				app.getSendToSirapIP();
+				app.getSendToSirapIPPort();
 			});
 		});
 	});
@@ -2197,7 +1628,7 @@ app.ui.onApplySirapButton = function() {
 
 
 app.ui.onGetNetworkWifiListButton = function() {
-	app.getNetworkWifiList(app.ui.displayNetworkWifiList);
+	app.getNetworkWifiList();
 };
 
 app.getDeviceFromBackend = function(btAddress, callback) {
@@ -2288,22 +1719,16 @@ app.ui.onApplyDeviceNameButton = function()
 				app.saveDeviceToBackend(backendJsonDevice);
 			}
 		});
-		app.getWiRocDeviceName(app.ui.displayWiRocDeviceName);
+		app.getWiRocDeviceName();
 	});
 };
 
 app.getWiRocDeviceName = function(callback) {
 	console.log('getWiRocDeviceName');
-	var service = evothings.ble.getService(app.connectedDevice, app.deviceStatusService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.deviceStatusDeviceNameCharacteristic);
-	evothings.ble.readCharacteristic(
-        	app.connectedDevice,
-        	characteristic,
-        	function(data) {
-			callback(data);
-		},
+	
+	app.writeProperty('wirocdevicename', null, 
+		callback,
 		function(error) {
-			console.log('getWiRocDeviceName error');
 			app.miscDeviceNameErrorBar.show({
 				html: 'Error getting device name: ' + error
 			});
@@ -2312,17 +1737,10 @@ app.getWiRocDeviceName = function(callback) {
 };
 
 app.ui.displayWiRocDeviceName = function(deviceName) {
-	var raw = '';
-	if (typeof deviceName === 'string') {
-		raw = deviceName;
-	} else {
-		raw = new TextDecoder("utf-8").decode(deviceName);
-	}
-	app.ui.misc.deviceName = raw;
-	//console.log('device name: ' + raw);
-	$('#wirocdevicename').val(raw);
-	$('#device-name').text(raw);
-	$('#device-name2').text(raw);
+	app.ui.misc.deviceName = deviceName;
+	$('#wirocdevicename').val(deviceName);
+	$('#device-name').text(deviceName);
+	$('#device-name2').text(deviceName);
 	app.ui.updateBackgroundColor();
 };
 
@@ -2334,7 +1752,6 @@ app.ui.getWiRocDeviceName = function()
 
 app.writeWiRocDeviceName = function(callback)
 {
-	//console.log('write device name');
 	var deviceName = app.ui.getWiRocDeviceName();
 	if (!app.validateDeviceName(deviceName)) {
 		app.miscDeviceNameErrorBar.show({
@@ -2349,22 +1766,6 @@ app.writeWiRocDeviceName = function(callback)
 				});
 			}
 		);
-		//var te = new TextEncoder("utf-8").encode(deviceName);
-		//var deviceNameArray = new Uint8Array(te);
-		//var service = evothings.ble.getService(app.connectedDevice, app.deviceStatusService);
-		//var characteristic = evothings.ble.getCharacteristic(service, app.deviceStatusDeviceNameCharacteristic);
-
-		//evothings.ble.writeCharacteristic(
-		//	app.connectedDevice,
-		//	characteristic,
-		//	deviceNameArray,
-		//	callback,
-		//	function(error) {
-		//		app.miscDeviceNameErrorBar.show({
-		//			html: 'Error saving device name: ' + error
-		//		});
-		//	}
-		//);
 	}
 };
 
@@ -2382,65 +1783,26 @@ app.validateDeviceName = function(deviceName) {
 
 app.ui.onReadDeviceNameButton = function()
 {
-	app.getWiRocDeviceName(app.ui.displayWiRocDeviceName);
+	app.getWiRocDeviceName();
 };
 
 // Status
-app.writeWiRocStatus = function(offset, callback)
-{
-	console.log('writeWiRocStatus: ' + offset);
-	var te = new TextEncoder("utf-8").encode(offset+'');
-	var offsetArr = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.deviceStatusService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.deviceStatusStatusCharacteristic);
-	evothings.ble.writeCharacteristic(
-		app.connectedDevice,
-		characteristic,
-		offsetArr,
-		callback,
-		function(error) {
-			app.miscStatusErrorBar.show({
-			    html: 'Error getting status 1: ' + error
-			});
-		}
-	);
-};
 
 app.wiRocStatus = '';
 
 app.getWiRocStatus = function(callback) {
 	console.log('getStatus');
-	var readWiRocStatus = function() {
-	  var service = evothings.ble.getService(app.connectedDevice, app.deviceStatusService);
-	  var characteristic = evothings.ble.getCharacteristic(service, app.deviceStatusStatusCharacteristic);
-	  evothings.ble.readCharacteristic(
-        	app.connectedDevice,
-        	characteristic,
-        	function(data) {
-			var rawStatus = new TextDecoder("utf-8").decode(data);
-			app.wiRocStatus += rawStatus;
-			if (rawStatus.length == 600) {
-				app.writeWiRocStatus(rawStatus.length, readWiRocStatus);
-			} else {
-				callback(app.wiRocStatus);
-			}
-		},
+	app.writeProperty('status', null, 
+		callback, 
 		function(error) {
-			console.log('getStatus error');
 			app.miscStatusErrorBar.show({
 				html: 'Error getting status 2: ' + error
 			});
 		}
-	  );
-        };
-
-	app.wiRocStatus = '';
-	app.writeWiRocStatus(0, readWiRocStatus);
+	);
 };
 
 app.ui.displayWiRocStatus = function(status) {
-	//console.log(status);
-	//console.log(status.length);
 	var statusObj = JSON.parse(status);
 	var html = "<h2>Input:</h2><table width=\"100%\" border=1><thead>";
 	html += "<tr><th align=\"left\">Type</th><th align=\"left\">Instance</th></tr></thead><tbody>";
@@ -2462,20 +1824,14 @@ app.ui.displayWiRocStatus = function(status) {
 
 app.ui.onRefreshStatusButton = function() {
 	$('#wiroc-status-content').html('');
-	app.getWiRocStatus(app.ui.displayWiRocStatus);
+	app.getWiRocStatus();
 };
 
 // Services
 app.getServices = function(callback) {
 	console.log('getServices');
-	var service = evothings.ble.getService(app.connectedDevice, app.deviceStatusService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.deviceStatusServicesCharacteristic);
-	evothings.ble.readCharacteristic(
-        	app.connectedDevice,
-        	characteristic,
-        	function(data) {
-			callback(data);
-		},
+	app.writeCommand('getservices', null, 
+		callback, 
 		function(error) {
 			console.log('getServices error');
 			app.miscServicesErrorBar.show({
@@ -2487,8 +1843,7 @@ app.getServices = function(callback) {
 
 
 app.ui.displayServices = function(services) {
-	var rawServices = new TextDecoder("utf-8").decode(services);
-	var servicesObj = JSON.parse(rawServices);
+	var servicesObj = JSON.parse(services);
 	var html = "<table width=\"100%\" border=1><thead>";
 	html += "<tr><th align=\"left\">Name</th><th align=\"left\">Status</th></tr></thead><tbody>";
 	for (var i = 0; i < servicesObj.services.length; i++) {
@@ -2502,11 +1857,23 @@ app.ui.displayServices = function(services) {
 
 app.ui.onRefreshServicesButton = function() {
 	$('#wiroc-services-content').html('');
-	app.getServices(app.ui.displayServices);
+	app.getServices();
 };
 
 
 // Settings
+app.getWiRocSettings = function(callback)
+{
+	app.writeProperty('settings', null, 
+		callback,
+		function(error) {
+			app.miscSettingsErrorBar.show({
+				html: 'Error getting settings: ' + error
+			});
+		}
+	);
+};	
+
 app.writeWiRocSetting = function(key, value, callback, errorCallback)
 {
 	console.log('write setting');
@@ -2524,88 +1891,69 @@ app.writeWiRocSetting = function(key, value, callback, errorCallback)
 		callback,
 		errorCB
 	);
-	
-	//var te = new TextEncoder("utf-8").encode(key+';'+value);
-	//var settingArray = new Uint8Array(te);
-	//var service = evothings.ble.getService(app.connectedDevice, app.deviceStatusService);
-	//var characteristic = evothings.ble.getCharacteristic(service, app.deviceStatusSettingsCharacteristic);
-	//evothings.ble.writeCharacteristic(
-		//app.connectedDevice,
-		//characteristic,
-		//settingArray,
-		//callback,
-		//errorCB
-	//);
 };
-
-app.subscribeWiRocSettings = function() {
-	console.log("subscribeWiRocSettings");
-	var service = evothings.ble.getService(app.connectedDevice, app.deviceStatusService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.deviceStatusSettingsCharacteristic);
-	evothings.ble.enableNotification(
-			app.connectedDevice,
-			characteristic,
-			function(data) {
-				console.log('subscribeWiRocSettings data');
-				app.ui.displayWiRocSettings(data);
-			},
-			function(error) {
-				console.log('subscribeWiRocSettings error');
-				app.miscSettingsErrorBar.show({
-					html: 'Error subscribeWiRocSettings: ' + error
-				});
-			}
-		);
-};
-
 
 app.ui.displayWiRocSettings = function(settings) {
-	console.log('displayWiRocSettings');
-	if (app.wirocSettings == null) {
-		app.wirocSettings = settings;
-	} else {
-		app.wirocSettings = app.appendBuffer(app.wirocSettings, settings);
-	}
-	if (settings.byteLength < 20) {
-		// we received all data
-		var service = evothings.ble.getService(app.connectedDevice, app.deviceStatusService);
-		var characteristic = evothings.ble.getCharacteristic(service, app.deviceStatusSettingsCharacteristic);
-		evothings.ble.disableNotification(
-			app.connectedDevice,
-			characteristic,
-			function(data) {
-				console.log('unsubscribe settings');
-			},
-			function(error) {
-				console.log('unsubscribe settings error');
-				app.miscSettingsErrorBar.show({
-					html: 'Error unsubscribeSettings: ' + error
-				});
-			}
-		);
+	console.log('displayWiRocSettings: ' + settings);
+	var settingsObj = JSON.parse(settings);
+	var table = $("<table width=\"100%\" border=1><thead><tr><th align=\"left\">Key</th><th align=\"left\">Value</th><th></td></tr></thead><tbody></tbody></table>");
+	for (var i = 0; i < settingsObj.settings.length; i++) {
+		var setting = settingsObj.settings[i];
+		var element = $('<tr><td>' + setting.Key + '</td><td>' + setting.Value + '</td><td><a href="javascript:void(0)" class="edit-setting">Edit</a></td></tr>');
 		
-		var rawSettings =  evothings.ble.fromUtf8(app.wirocSettings);
-		app.wirocSettings = null; // reset buffer
-		console.log('displayWiRocSettings: ' + rawSettings);
-		var settingsObj = JSON.parse(rawSettings);
-		var table = $("<table width=\"100%\" border=1><thead><tr><th align=\"left\">Key</th><th align=\"left\">Value</th><th></td></tr></thead><tbody></tbody></table>");
-		for (var i = 0; i < settingsObj.settings.length; i++) {
-			var setting = settingsObj.settings[i];
-			var element = $('<tr><td>' + setting.Key + '</td><td>' + setting.Value + '</td><td><a href="javascript:void(0)" class="edit-setting">Edit</a></td></tr>');
-			
-			element.find('a.edit-setting').bind("click",
-				{Key: setting.Key, Value: setting.Value},
-				app.ui.onEditSetting);
-			table.append(element);
-		}
-		$('#wiroc-settings-content').append(table);
-		app.ui.updateBackgroundColor();
+		element.find('a.edit-setting').bind("click",
+			{Key: setting.Key, Value: setting.Value},
+			app.ui.onEditSetting);
+		table.append(element);
 	}
+	$('#wiroc-settings-content').append(table);
+	app.ui.updateBackgroundColor();
+	
+	//if (app.wirocSettings == null) {
+		//app.wirocSettings = settings;
+	//} else {
+		//app.wirocSettings = app.appendBuffer(app.wirocSettings, settings);
+	//}
+	//if (settings.byteLength < 20) {
+		// we received all data
+		//var service = evothings.ble.getService(app.connectedDevice, app.deviceStatusService);
+		//var characteristic = evothings.ble.getCharacteristic(service, app.deviceStatusSettingsCharacteristic);
+		//evothings.ble.disableNotification(
+			//app.connectedDevice,
+			//characteristic,
+			//function(data) {
+				//console.log('unsubscribe settings');
+			//},
+			//function(error) {
+				//console.log('unsubscribe settings error');
+				//app.miscSettingsErrorBar.show({
+					//html: 'Error unsubscribeSettings: ' + error
+				//});
+			//}
+		//);
+		
+		//var rawSettings =  evothings.ble.fromUtf8(app.wirocSettings);
+		//app.wirocSettings = null; // reset buffer
+		//console.log('displayWiRocSettings: ' + rawSettings);
+		//var settingsObj = JSON.parse(rawSettings);
+		//var table = $("<table width=\"100%\" border=1><thead><tr><th align=\"left\">Key</th><th align=\"left\">Value</th><th></td></tr></thead><tbody></tbody></table>");
+		//for (var i = 0; i < settingsObj.settings.length; i++) {
+			//var setting = settingsObj.settings[i];
+			//var element = $('<tr><td>' + setting.Key + '</td><td>' + setting.Value + '</td><td><a href="javascript:void(0)" class="edit-setting">Edit</a></td></tr>');
+			
+			//element.find('a.edit-setting').bind("click",
+				//{Key: setting.Key, Value: setting.Value},
+				//app.ui.onEditSetting);
+			//table.append(element);
+		//}
+		//$('#wiroc-settings-content').append(table);
+		//app.ui.updateBackgroundColor();
+	//}
 };
 
 app.ui.onRefreshSettingsButton = function() {
 	$('#wiroc-settings-content').html('');
-	app.subscribeWiRocSettings();
+	app.getWiRocSettings(function() {});
 };
 
 app.ui.onAddSetting = function(event)
@@ -2718,23 +2066,10 @@ app.ui.onSubscribePunchesButton = function() {
 };
 
 // Delete Punches
-app.deletePunches = function() {
+app.deletePunches = function(callback) {
 	console.log('Delete punches');
-	var te = new TextEncoder("utf-8").encode('deletepunches');
-	var operationName = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.debugService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.debugDatabaseCharacteristic);
-	evothings.ble.writeCharacteristic(
-		app.connectedDevice,
-		characteristic,
-		operationName,
-		function() {
-			console.log('Punches deleted');
-			app.miscDatabaseSuccessBar.settings.autohide = true;
-			app.miscDatabaseSuccessBar.show({
-			    html: 'Punches deleted'
-			});
-		},
+	app.writeCommand('database', 'deletepunches', 
+		callback, 
 		function(error) {
 			app.miscDatabaseErrorBar.show({
 			    html: 'Error when deleting punches: ' + error
@@ -2749,23 +2084,10 @@ app.ui.onDeletePunchesButton = function() {
 };
 
 // Drop tables
-app.dropAllTables = function() {
+app.dropAllTables = function(callback) {
 	console.log('Drop all tables');
-	var te = new TextEncoder("utf-8").encode('dropalltables');
-	var operationName = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.debugService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.debugDatabaseCharacteristic);
-	evothings.ble.writeCharacteristic(
-		app.connectedDevice,
-		characteristic,
-		operationName,
-		function() {
-			console.log('Tables dropped');
-			app.miscDatabaseAdvSuccessBar.settings.autohide = true;
-			app.miscDatabaseAdvSuccessBar.show({
-			    html: 'Tables dropped'
-			});
-		},
+	app.writeCommand('dropalltables', null, 
+		callback, 
 		function(error) {
 			app.miscDatabaseAdvErrorBar.show({
 			    html: 'Error when dropping tables: ' + error
@@ -2781,23 +2103,10 @@ app.ui.onDropAllTablesButton = function() {
 
 
 // Upload database and logs
-app.uploadDatabaseAndLogs = function() {
+app.uploadDatabaseAndLogs = function(callback) {
 	console.log('Upload database and logs');
-	var te = new TextEncoder("utf-8").encode('upload');
-	var operationName = new Uint8Array(te);
-	var service = evothings.ble.getService(app.connectedDevice, app.debugService);
-	var characteristic = evothings.ble.getCharacteristic(service, app.debugLogArchivesCharacteristic);
-	evothings.ble.writeCharacteristic(
-		app.connectedDevice,
-		characteristic,
-		operationName,
-		function() {
-			console.log('zip file uploaded');
-			app.miscDatabaseAdvSuccessBar.settings.autohide = true;
-			app.miscDatabaseAdvSuccessBar.show({
-			    html: 'Zip with database and logs uploaded'
-			});
-		},
+	app.writeCommand('uploadlogarchive', null, 
+		callback, 
 		function(error) {
 			app.miscDatabaseAdvErrorBar.show({
 			    html: 'Error when uploading: ' + error
@@ -3013,6 +2322,77 @@ app.ui.onSendTestPunchesButton = function(event) {
 	);
 };
 
+// COMMAND functions
+app.enableCommandNotification = function()
+{
+	var service = evothings.ble.getService(app.connectedDevice, app.miscService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.commandCharacteristic);
+	evothings.ble.enableNotification(
+		app.connectedDevice,
+		characteristic,
+		function(data) {
+			if (app.commandResponse == null) {
+				app.commandResponse = data;
+			} else {
+				app.commandResponse = app.appendBuffer(app.commandResponse, data);
+			}
+			if (data.byteLength < 20) {
+				// we received all data
+				var commandAndResponseString = new TextDecoder("utf-8").decode(app.commandResponse);
+				app.commandResponse = null;
+				app.radioErrorBar.show({
+					html: 'cmd:' + commandAndResponseString
+				});
+				app.ui.displayProperty(commandAndResponseString);
+			}
+		},
+		function(error) {
+			app.radioErrorBar.show({
+				html: 'Error subscribe command: ' + error
+			});
+		}
+	);
+};
+
+app.disableCommandNotification = function()
+{
+	var service = evothings.ble.getService(app.connectedDevice, app.miscService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.commandCharacteristic);
+	evothings.ble.disableNotification(
+		app.connectedDevice,
+		characteristic,
+		function(data) {
+			console.log('unsubscribe command data received');
+		},
+		function(error) {
+			console.log('unsubscribe command error');
+			app.radioErrorBar.show({
+				html: 'Error unsubscribe command: ' + error
+			});
+		}
+	);
+};
+
+app.writeCommand = function(commandName, commandValue, successCallback, errorCallback)
+{
+	var commandNameAndValue = commandName + ';' + (commandValue == null ? '' : commandValue);
+	var te = new TextEncoder("utf-8").encode(commandNameAndValue);
+	var parameters = new Uint8Array(te);
+	var service = evothings.ble.getService(app.connectedDevice, app.miscService);
+	var characteristic = evothings.ble.getCharacteristic(service, app.commandCharacteristic);
+	evothings.ble.writeCharacteristic(
+		app.connectedDevice,
+		characteristic,
+		parameters,
+		function() { 
+			if (successCallback != null) {
+				successCallback();
+			}
+		},
+		errorCallback
+	);
+};
+
 // PROPERTY functions
 app.enablePropertyNotification = function()
 {
@@ -3022,10 +2402,20 @@ app.enablePropertyNotification = function()
 		app.connectedDevice,
 		characteristic,
 		function(data) {
-			console.log('property data received');
-			var propAndValueString = new TextDecoder("utf-8").decode(data);
-			console.log(propAndValueString);
-			app.ui.displayProperty(propAndValueString);
+			if (app.propertyResponse == null) {
+				app.propertyResponse = data;
+			} else {
+				app.propertyResponse = app.appendBuffer(app.propertyResponse, data);
+			}
+			if (data.byteLength < 20) {
+				// we received all data
+				var propertyResponseString = new TextDecoder("utf-8").decode(app.propertyResponse);
+				app.propertyResponse = null;
+				app.radioErrorBar.show({
+					html: 'prp:' + propertyResponseString
+				});
+				app.ui.displayProperty(propertyResponseString);
+			}
 		},
 		function(error) {
 			console.log('subscribe property error');
@@ -3066,19 +2456,29 @@ app.writeProperty = function(propName, propValue, successCallback, errorCallback
 		app.connectedDevice,
 		characteristic,
 		parameters,
-		successCallback,
+		function() { 
+			if (successCallback != null) {
+				successCallback();
+			}
+		},
 		errorCallback
 	);
 };
 
 app.ui.displayProperty = function(propAndValueStrings)
 {
-	var propAndValuesArray = data.split('¤');
-	propAndValuesArray.forEach(propAndValue => {
+	var propAndValuesArray = propAndValueStrings.split('|');
+	for (var i = 0; i < propAndValuesArray.length; i++) {
+		var propAndValue = propAndValuesArray[i];
 		console.log(propAndValue);
-		propAndValArr = propAndValue.split(';');
-		var propName = propAndValArr[0];
-		var propValue = propAndValArr[1];
+		$('#wiroc-status-content').html(propAndValue);
+		var idx = propAndValue.indexOf(';');
+		var propName = propAndValue;
+		var propValue = '';
+		if (idx > 0) {
+			propName = propAndValue.substring(0, idx);
+			propValue = propAndValue.substring(idx+1);
+		}
 		switch(propName) {
 			case 'wirocdevicename':
 				app.ui.displayWiRocDeviceName(propValue);
@@ -3104,13 +2504,79 @@ app.ui.displayProperty = function(propAndValueStrings)
 			case 'sendtosirapipport':
 				app.ui.displaySendToSirapIPPort(propValue);
 				break;	
-
-		
+			case 'force4800baudrate':
+				app.ui.displayForce4800(propValue);
+				break;	
+			case 'status':
+				$('#wiroc-status-content').html(propValue);
+				app.ui.displayWiRocStatus(propValue);
+				break;	
+			case 'settings':
+				app.ui.displayWiRocSettings(propValue);
+				break;
+			case 'ischarging':
+				app.ui.displayIsCharging(propValue);
+				break;
+			case 'listwifi':
+				app.ui.displayNetworkWifiList(propValue);
+				break;
+		    case 'connectwifi':
+		       	// do nothing...
+			    break;
+			case 'disconnectwifi':
+			    // do nothing...
+			    break;
+			case 'getip':
+		       	app.ui.displayIPAddress(propValue);
+			    break;
+			case 'renewip':
+		       	console.log('IP renewed');
+				app.networkInfoBar.settings.autohide = true;
+				app.networkInfoBar.show({
+				    html: 'Renew IP command issued'
+				});
+			    break;
+			case 'deletepunches':
+		        console.log('Punches deleted');
+			    app.miscDatabaseSuccessBar.settings.autohide = true;
+			    app.miscDatabaseSuccessBar.show({
+			       html: 'Punches deleted'
+			    });
+			    break;
+			case 'dropalltables':
+			    console.log('Tables dropped');
+			    app.miscDatabaseAdvSuccessBar.settings.autohide = true;
+			    app.miscDatabaseAdvSuccessBar.show({
+			       html: 'Tables dropped'
+			    });
+			    break;
+			case 'getall':
+			    app.ui.displayAll(propValue);
+			    break;
+			case 'uploadlogarchive':
+    			console.log('zip file uploaded');
+				app.miscDatabaseAdvSuccessBar.settings.autohide = true;
+				app.miscDatabaseAdvSuccessBar.show({
+					html: 'Zip with database and logs uploaded'
+				});
+				break;
+			case 'upgradewirocpython':
+			    // do nothing...    
+    			break;
+			case 'upgradewirocpython':
+				// do nothing...
+				break;	
+			case 'getservices':
+				app.ui.displayServices(propValue);
+				break;
+			case 'onewayreceive':
+				app.ui.displayOneWay(propValue);
+				break;				
 			default:
 				// code block
 				console.log('error displayProperty, propName not found');
 		}
-	});
+	};
 };
 
 
@@ -3137,11 +2603,12 @@ app.connect = function(device)
 		{
             console.log('connect('+device.address+')');
 			evothings.ble.connectToDevice(
-			device,
-			app.onConnected,
-			app.onDisconnected,
-			app.onConnectError,
-			{ discoverServices: false });
+				device,
+				app.onConnected,
+				app.onDisconnected,
+				app.onConnectError,
+				{ discoverServices: false }
+			);
 		},
 	600);      
 };
@@ -3161,26 +2628,13 @@ app.onConnected = function(device)
 		app.connectedDevice,
 		function readServicesSuccess(services)
 		{
+			app.searchDevicesErrorBar.show({ html: 'services read' });
 			$(":mobile-pagecontainer").pagecontainer( "change", "#page-basic-config", { } );
-			var miscServiceObj = services.find(obj => {  return obj.uuid === app.miscService; });
-			if (miscServiceObj.characteristics.length > 2) {
-				// if miscService contains more than 1 ( the getAll characteristics)
-				// then assume it is an old version that contains all the punches, 
-				// debug , sportident and devicestatus characteristics
-				app.punchesService = app.miscService;
-				app.debugService = app.miscService;
-				app.sportIdentService = app.miscService;
-				app.deviceStatusService = app.miscService;
-			}
-			
+			app.enablePropertyNotification();
+			app.enableCommandNotification();
 			app.readAndDisplayAll(function() {
-				//$('#device-name').text(device.name);
-				//$('#device-name2').text(device.name);
 				$('#tab-radio').css('ui-btn-active');
 				$('#tab-radio').trigger('click');
-				//app.discoverServices(); only last readServiceData remembered :-( and reading one is as slow as reading all
-				
-				app.enablePropertyNotification();				
 			});
 		},
 		function error() {
