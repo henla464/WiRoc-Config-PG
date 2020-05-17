@@ -948,9 +948,12 @@ app.ui.enableDisableForce4800 = function()
 app.ui.enableDisableForce4800WithParam = function(oneWayChecked) 
 {
   if (oneWayChecked) {
+	$('#force-4800-bps').checkboxradio();
     $("#force-4800-bps").removeAttr("disabled");
-    $('#force-4800-bps').prop("checked", false).checkboxradio("refresh");
+	$('#force-4800-bps').prop("checked", false);
+    $('#force-4800-bps').checkboxradio('refresh');
   } else {
+	$('#force-4800-bps').checkboxradio();
     $("#force-4800-bps").attr("disabled", true);
     $('#force-4800-bps').prop("checked", false).checkboxradio("refresh");
   }
@@ -993,7 +996,6 @@ app.ui.displayOneWay = function(oneway)
     $('#sportident-oneway').checkboxradio();
 	$('#sportident-oneway').prop("checked",raw != 0).checkboxradio("refresh");
 	app.ui.enableDisableForce4800WithParam(raw != 0);
-	
 	app.ui.displayWarningNotes(app.ui.chip, null, null, oneway);
 	
 	app.ui.updateBackgroundColor();
@@ -1032,11 +1034,13 @@ app.writeForce4800 = function(callback)
 	);
 };
 
-app.ui.displayForce4800 = function(oneway)
+app.ui.displayForce4800 = function(force4800)
 {
-	var raw = parseInt(oneway);
+	var raw = parseInt(force4800);
 	app.ui.sportident.force4800 = raw;
+
     $('#force-4800-bps').checkboxradio();
+    $("#force-4800-bps").removeAttr("disabled");
 	$('#force-4800-bps').prop("checked",raw != 0).checkboxradio("refresh");
 	app.ui.updateBackgroundColor();
 };
@@ -1415,34 +1419,34 @@ app.ui.displayIPAddress = function(IPAddressString)
 
 
 //-- Renew IP
-app.ui.onRenewIPWifi = function(event)
+app.ui.onRenewIPWifi = function()
 {
 	app.writeCommand('renewip', 'wifi', 
-		callback, 
+		null, 
 		function(error) {
 			app.networkErrorBar.show({
 			    html: 'Renewing IP failed'
 			});
 		}
-	)
+	);
 };
 
-app.ui.onRenewIPEthernet = function(event)
+app.ui.onRenewIPEthernet = function()
 {
 	app.writeCommand('renewip', 'ethernet', 
-		callback, 
+		null, 
 		function(error) {
 			app.networkErrorBar.show({
 			    html: 'Renewing IP failed'
 			});
 		}
-	)
+	);
 };
 
 app.ui.displayAll = function(allString) {
 	var all = allString.split('¤');
-	//     0             1                2               3            4                       5                 6        7        8         9       10    11   12            13               14             15         16
-	// isCharging¤wirocDeviceName¤sentToSirapIPPort¤sendToSirapIP¤sentToSirapEnabled¤acknowledgementRequested¤dataRate¤channel¤intPercent¤ipAddress¤power¤chip¤range¤wirocPythonVersion¤wirocBLEVersion¤wirocHWVersion¤SIOneWay
+	//     0             1                2               3            4                       5                 6        7        8         9       10    11   12            13               14             15         16            17
+	// isCharging¤wirocDeviceName¤sentToSirapIPPort¤sendToSirapIP¤sentToSirapEnabled¤acknowledgementRequested¤dataRate¤channel¤intPercent¤ipAddress¤power¤chip¤range¤wirocPythonVersion¤wirocBLEVersion¤wirocHWVersion¤SIOneWay¤force4800baudrate
 	if (all.length > 11) {
 		app.ui.displayChip(all[11]);
 		app.ui.displayRange(all[12]);
@@ -1457,13 +1461,11 @@ app.ui.displayAll = function(allString) {
 	app.ui.displayBatteryLevel(all[8]);
 	app.ui.displayIPAddress(all[9]);
 	app.ui.displayPower(all[10]);
-	if (all.length > 14) {
-		app.ui.displayUpdateWiRocPython('v' + all[13]);
-		app.ui.displayUpdateWiRocBLE('v' + all[14]);
-	}
-	if (all.length > 16) {
-		app.ui.displayWarningNotes(all[11], all[5], all[10], all[16]);
-	}
+    app.ui.displayUpdateWiRocPython('v' + all[13]);
+	app.ui.displayUpdateWiRocBLE('v' + all[14]);
+    app.ui.displayWarningNotes(all[11], all[5], all[10], all[16]);
+	app.ui.displayOneWay(all[16]);
+	app.ui.displayForce4800(all[17]);
 };
 
 app.readAndDisplayAll = function(callback) {
@@ -1503,6 +1505,9 @@ app.ui.onApplyBasicButton = function() {
 
 
 app.ui.onReadRadioAdvButton = function() {
+	app.miscRadioAdvSuccessBar.show({
+				html: 'onreadradioadvb'
+			});
 	app.readRadioAdvSettings();	
 };
 
@@ -1512,12 +1517,14 @@ app.ui.onApplyRadioAdvButton = function() {
 			app.miscRadioAdvSuccessBar.show({
 				html: 'Radio adv saved'
 			});
-			app.readRadioAdvSettings();
 		});
 	});
 };
 
 app.readRadioAdvSettings = function() {
+	app.miscRadioAdvSuccessBar.show({
+				html: 'read radio adv'
+			});
 	app.getAcknowledgementRequested();
 	app.getPower();
 };
@@ -1665,7 +1672,7 @@ app.ui.displayWiRocDeviceName = function(deviceName) {
 
 app.ui.getWiRocDeviceName = function()
 {
-	var devName = $('#wirocdevicename').val();
+	var devName = $('#wirocdevicename').val().trim();
 	return devName;
 };
 
@@ -1933,7 +1940,7 @@ app.ui.onSubscribePunchesButton = function() {
 
 // Delete Punches
 app.deletePunches = function(callback) {
-	app.writeCommand('database', 'deletepunches', 
+	app.writeProperty('deletepunches', null, 
 		callback, 
 		function(error) {
 			app.miscDatabaseErrorBar.show({
@@ -2306,7 +2313,7 @@ app.ui.displayProperty = function(propAndValueStrings)
 		var propValue = '';
 		if (idx > 0) {
 			propName = propAndValue.substring(0, idx);
-			propValue = propAndValue.substring(idx+1);
+			propValue = propAndValue.substring(idx+1).trim();
 		}
 		switch(propName) {
 			case 'wirocdevicename':

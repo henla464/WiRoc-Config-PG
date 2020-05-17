@@ -521,8 +521,6 @@
 						app.disconnect();
 					} else if (toPageName == "page-advanced-config") 
 					{
-						app.readRadioAdvSettings();	
-						app.readSportIdentSettings();
 						if (app.advancedConfigTab == null) {
 							setTimeout(function(){ $('#tab-devicename').trigger('click'); }, 500);
 						} else {
@@ -589,11 +587,11 @@
 				app.ui.updateBackgroundColor();
 			});
 			
-			$("#wirocpythonversions-select").on( "change", function(event, ui) {
+			$("#update-adv").on( "change", "#wirocpythonversions-select", function(event, ui) {
 				app.ui.updateBackgroundColor();
 			});
 			
-			$("#wirocbleversions-select").on( "change", function(event, ui) {
+			$("#update-adv").on( "change", "#wirocbleversions-select", function(event, ui) {
 				app.ui.updateBackgroundColor();
 			});
 			

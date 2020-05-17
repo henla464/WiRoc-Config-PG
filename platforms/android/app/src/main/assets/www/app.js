@@ -93,9 +93,7 @@ app.initialize = function()
 
 app.onDeviceReady = function()
 {
-	console.log('device ready');
 	$(":mobile-pagecontainer").pagecontainer( "change", "#page-device-scan", { } );
-	//app.ui.showChannelPage();
 };
 
 app.ui.onScanButton = function() {
@@ -107,7 +105,6 @@ app.ui.onScanButton = function() {
 		app.devices = {};
 		app.ui.displayDeviceList();
 		app.ui.displayStatus('Scanning...');
-		console.log(evothings.ble);
 		evothings.ble.startScan(
 			app.ui.deviceFound,
 			app.ui.scanError,
@@ -131,11 +128,6 @@ app.stopScan = function() {
 // Called when a device is found.
 app.ui.deviceFound = function(device) //, errorCode)
 {
-	//console.log("device: " + JSON.stringify(device));
-	//console.log("device.advertisementData" + device.advertisementData);
-	//console.log("device.advertisementData connectable" + device.advertisementData.kCBAdvDataIsConnectable);
-	//console.log("device.advertisementData.kCBAdvDataServiceUUIDs" + device.advertisementData.kCBAdvDataServiceUUIDs);
-	console.log('device:' + JSON.stringify(device));
 	var advertisedServiceUUIDs = device.advertisementData.kCBAdvDataServiceUUIDs;
 	if (advertisedServiceUUIDs && advertisedServiceUUIDs.indexOf(app.apiServiceForFilter) > -1)
 	{
@@ -177,11 +169,6 @@ app.ui.updateBackgroundColor = function()
 		$('#devicename').css('background-color','white');
 	}
 	// radio adv
-	//console.log('updatebackgroundcolor - acknowledgementRequested: ' + app.ui.radio.acknowledgementRequested);
- 	//console.log('updatebackgroundcolor - getAcknowledgementRequested: ' + app.ui.getAcknowledgementRequested());
-	//console.log('updatebackgroundcolor - power: ' + app.ui.radio.power);
- 	//console.log('updatebackgroundcolor - getPower: ' + app.ui.getPower());
-
 	if (app.ui.radio.acknowledgementRequested != app.ui.getAcknowledgementRequested() 
 		|| app.ui.radio.power != app.ui.getPower())
 	{
@@ -289,7 +276,6 @@ app.ui.displayChip = function(chip)
 // Channel
 app.ui.displayChannel = function(channel)
 {
-	//console.log("displayChannel");
 	app.ui.radio.channel = channel;
 
 	// Select the relevant option, de-select any others
@@ -302,7 +288,6 @@ app.ui.displayChannel = function(channel)
 
 app.getChannel = function(callback)
 {
-	//console.log('getchannel');
 	app.writeProperty('channel', null, 
 		callback,
 		function(error) {
@@ -323,7 +308,6 @@ app.writeChannel = function(callback)
 	app.writeProperty('channel', app.ui.getChannel(), 
 		callback,
 		function(error) {
-			console.log('writechannel error: ' + error);
 			app.radioErrorBar.show({
 				html: 'Error saving radio setting (Channel): ' + error
 			});
@@ -408,7 +392,6 @@ app.ui.displayAcknowledgementRequested = function(acknowledgement)
 
 app.ui.displayPower = function(power)
 {
-	//console.log("displayPower");
 	var raw = parseInt(power);
 	app.ui.radio.power = raw;
 	
@@ -468,7 +451,6 @@ app.writePower = function(callback)
 
 app.ui.displayRange = function(rangeString)
 {
-	//console.log("displayRange");
 	app.ui.radio.range = rangeString;
 	
 	$(".datarate-" + app.ui.chip + " [type='radio'][value = '" + rangeString + "']").prop("checked", true).checkboxradio("refresh");
@@ -528,7 +510,6 @@ app.getWiRocPythonVersionsFromGithub = function(callback) {
 			credentials: 'same-origin' },
 		   function (response) {
 			  if (response) {
-				console.log('get python versions: ' + response.data);
 				var versionsJson = JSON.parse(response.data);
 				var versionsArray = [];
 				for (var i = 0; i < 5; i++) {
@@ -540,7 +521,6 @@ app.getWiRocPythonVersionsFromGithub = function(callback) {
 			callback(null);
 		   },
 		   function (error) {
-			  console.log(JSON.stringify(error));
 		   }
 		);
 	} else {
@@ -553,7 +533,6 @@ app.getWiRocPythonVersionsFromGithub = function(callback) {
 			method: "GET"
 		})
 		.then(function(res) { 
-			console.log('get versions');
 			return res.json();
 		}).then(function (versionsJson) {
 			var versionsArray = [];
@@ -562,7 +541,7 @@ app.getWiRocPythonVersionsFromGithub = function(callback) {
 			}
 			return versionsArray;
 		})
-		.catch(function(res){ console.log(res); });
+		.catch(function(res){ });
 	}
 };
 
@@ -577,7 +556,6 @@ app.getWiRocPythonLatestVersionFromGithub = function(callback) {
 			credentials: 'same-origin' },
 		   function (response) {
 			if (response) {
-				console.log('get python latest version: ' + response.data);
 				var latest = JSON.parse(response.data);
 				if (latest.tag_name) {
 					callback(latest.tag_name);
@@ -587,7 +565,6 @@ app.getWiRocPythonLatestVersionFromGithub = function(callback) {
 			callback(null);
 		   },
 		   function (error) {
-			  console.log(JSON.stringify(error));
 		   }
 		);
 	} else {
@@ -600,7 +577,6 @@ app.getWiRocPythonLatestVersionFromGithub = function(callback) {
 			method: "GET"
 		})
 		.then(function(res) { 
-			console.log('get latest');
 			return res.json();
 		}).then(function (versionObj) {
 			if (versionObj.tag_name) {
@@ -608,23 +584,20 @@ app.getWiRocPythonLatestVersionFromGithub = function(callback) {
 			}
 			return null;
 		})
-		.catch(function(res){ console.log(res); });
+		.catch(function(res){ });
 	}
 };
 
 
 app.ui.displayUpdateWiRocPython = function(wirocPythonVersion)
 {
-	console.log("displayWiRocPython");
 	if (wirocPythonVersion != null) {
 	    app.ui.update.wiRocPythonVersion = wirocPythonVersion;
     }
 	// load content
 	if (window.cordova) {
 		app.getWiRocPythonLatestVersionFromGithub(function(latest) {
-			console.log(latest);
 			app.getWiRocPythonVersionsFromGithub(function(versions) {
-				console.log(versions);
 				var versionOptions = [];
 				$.each(versions, function(index, version) {
 					if (version != latest) {
@@ -662,7 +635,6 @@ app.ui.displayUpdateWiRocPython = function(wirocPythonVersion)
 				// jQM refresh
 				if( selectpython.data("mobile-selectmenu") === undefined) {
 					// not initialized yet, lets do so
-					console.log("init selectmenu python");
 					selectpython.selectmenu({ nativeMenu: true });
 				}
 				selectpython.val(app.ui.update.wiRocPythonVersion).attr('selected', true).siblings('option').removeAttr('selected');
@@ -672,10 +644,8 @@ app.ui.displayUpdateWiRocPython = function(wirocPythonVersion)
 	} else {
 		var latestPromise = app.getWiRocPythonLatestVersionFromGithub();
 		latestPromise.then(function(latest) {
-			console.log(latest);
 			var versionsPromise = app.getWiRocPythonVersionsFromGithub();
 			versionsPromise.then(function(versions) {
-				console.log(versions);
 				var versionOptions = [];
 				$.each(versions, function(index, version) {
 					if (version != latest) {
@@ -714,7 +684,6 @@ app.ui.displayUpdateWiRocPython = function(wirocPythonVersion)
 				// jQM refresh
 				if( selectpython.data("mobile-selectmenu") === undefined) {
 					// not initialized yet, lets do so
-					console.log("init selectmenu python");
 					selectpython.selectmenu({ nativeMenu: false });
 				}
 				selectpython.val(app.ui.update.wiRocPythonVersion).attr('selected', true).siblings('option').removeAttr('selected');
@@ -731,12 +700,10 @@ app.ui.getUpdateWiRocPython = function() {
 
 app.writeUpdateWiRocPython = function(callback)
 {
-    console.log('writeUpdateWiRocPython');
 	var version = app.ui.getUpdateWiRocPython();
     app.writeCommand('upgradewirocpython', version, 
 		callback,
 		function(error) {
-			console.log('writeWiRocPython error: ' + error);
 			app.updateErrorBar.show({
 				html: 'Error sending Update: ' + error
 			});
@@ -766,7 +733,6 @@ app.getWiRocBLEVersionsFromGithub = function(callback) {
 			credentials: 'same-origin' },
 		   function (response) {
 			  if (response) {
-				console.log('get ble versions: ' + response.data);
 				var versionsJson = JSON.parse(response.data);
 				var versionsArray = [];
 				for (var i = 0; i < 5; i++) {
@@ -778,7 +744,6 @@ app.getWiRocBLEVersionsFromGithub = function(callback) {
 			callback(null);
 		   },
 		   function (error) {
-			  console.log(JSON.stringify(error));
 		   }
 		);
 	} else {
@@ -791,7 +756,6 @@ app.getWiRocBLEVersionsFromGithub = function(callback) {
 			method: "GET"
 		})
 		.then(function(res) { 
-			console.log('get versions');
 			return res.json();
 		}).then(function (versionsJson) {
 			var versionsArray = [];
@@ -800,7 +764,7 @@ app.getWiRocBLEVersionsFromGithub = function(callback) {
 			}
 			return versionsArray;
 		})
-		.catch(function(res){ console.log(res); });
+		.catch(function(res){ });
 	}
 };
 
@@ -815,7 +779,6 @@ app.getWiRocBLELatestVersionFromGithub = function(callback) {
 			credentials: 'same-origin' },
 		   function (response) {
 			  if (response) {
-				console.log('get latest: ' + response.data);
 				var versionObj = JSON.parse(response.data);
 				if (versionObj.tag_name) {
 					callback(versionObj.tag_name);
@@ -825,7 +788,6 @@ app.getWiRocBLELatestVersionFromGithub = function(callback) {
 			callback(null);
 		   },
 		   function (error) {
-			  console.log(JSON.stringify(error));
 		   }
 		);
 	}
@@ -839,7 +801,6 @@ app.getWiRocBLELatestVersionFromGithub = function(callback) {
 			method: "GET"
 		})
 		.then(function(res) { 
-			console.log('get latest');
 			return res.json();
 		}).then(function (versionObj) {
 			if (versionObj.tag_name) {
@@ -847,21 +808,18 @@ app.getWiRocBLELatestVersionFromGithub = function(callback) {
 			}
 			return null;
 		})
-		.catch(function(){ console.log('error fetching latest ble'); });
+		.catch(function(){ });
 	}
 };
 
 app.ui.displayUpdateWiRocBLE = function(wirocBLEVersion)
 {
-	console.log("displayWiRocBLE");
 	if (wirocBLEVersion != null) {
 		app.ui.update.wiRocBLEVersion = wirocBLEVersion;
 	}
 	if (window.cordova) {
 		app.getWiRocBLELatestVersionFromGithub(function(latest) {
-			console.log(latest);
 			app.getWiRocBLEVersionsFromGithub(function(versions) {
-				console.log(versions);
 				var versionOptions = [];
 				$.each(versions, function(index, version) {
 					if (version != latest) {
@@ -900,7 +858,6 @@ app.ui.displayUpdateWiRocBLE = function(wirocBLEVersion)
 				// jQM refresh
 				if( selectble.data("mobile-selectmenu") === undefined) {
 					// not initialized yet, lets do so
-					console.log("init selectmenu ble");
 					selectble.selectmenu({ nativeMenu: true });
 				}
 				
@@ -913,10 +870,8 @@ app.ui.displayUpdateWiRocBLE = function(wirocBLEVersion)
 		// load content
 		var latestPromise = app.getWiRocBLELatestVersionFromGithub();
 		latestPromise.then(function(latest) {
-			console.log(latest);
 			var versionsPromise = app.getWiRocBLEVersionsFromGithub();
 			versionsPromise.then(function(versions) {
-				console.log(versions);
 				var versionOptions = [];
 				$.each(versions, function(index, version) {
 					if (version != latest) {
@@ -954,7 +909,6 @@ app.ui.displayUpdateWiRocBLE = function(wirocBLEVersion)
 				// jQM refresh
 				if( selectble.data("mobile-selectmenu") === undefined) {
 					// not initialized yet, lets do so
-					console.log("init selectmenu ble");
 					selectble.selectmenu({ nativeMenu: true });
 				}
 				
@@ -973,12 +927,10 @@ app.ui.getUpdateWiRocBLE = function() {
 
 app.writeUpdateWiRocBLE = function(callback)
 {
-    console.log('writeWiRocBLE');
     var version = app.ui.getUpdateWiRocBLE();
     app.writeCommand('upgradewirocble', version, 
 		callback,
 		function(error) {
-			console.log('writeWiRocBLE error: ' + error);
 			app.updateErrorBar.show({
 				html: 'Error sending update: ' + error
 			});
@@ -996,9 +948,12 @@ app.ui.enableDisableForce4800 = function()
 app.ui.enableDisableForce4800WithParam = function(oneWayChecked) 
 {
   if (oneWayChecked) {
+	$('#force-4800-bps').checkboxradio();
     $("#force-4800-bps").removeAttr("disabled");
-    $('#force-4800-bps').prop("checked", false).checkboxradio("refresh");
+	$('#force-4800-bps').prop("checked", false);
+    $('#force-4800-bps').checkboxradio('refresh');
   } else {
+	$('#force-4800-bps').checkboxradio();
     $("#force-4800-bps").attr("disabled", true);
     $('#force-4800-bps').prop("checked", false).checkboxradio("refresh");
   }
@@ -1006,12 +961,11 @@ app.ui.enableDisableForce4800WithParam = function(oneWayChecked)
 
 app.getOneWay = function(callback)
 {
-	//console.log('getOneWay');
 	app.writeProperty('onewayreceive', null, 
 		callback,
 		function(error) {
 			app.miscSportIdentErrorBar.show({
-				html: 'Error getting one-way: ' + error,
+				html: 'Error getting one-way: ' + error
 			});
 		}
 	);
@@ -1029,7 +983,7 @@ app.writeOneWay = function(callback)
 		callback,
 		function(error) {
 			app.miscSportIdentErrorBar.show({
-				html: 'Error saving one-way: ' + error,
+				html: 'Error saving one-way: ' + error
 			});
 		}
 	);
@@ -1042,7 +996,6 @@ app.ui.displayOneWay = function(oneway)
     $('#sportident-oneway').checkboxradio();
 	$('#sportident-oneway').prop("checked",raw != 0).checkboxradio("refresh");
 	app.ui.enableDisableForce4800WithParam(raw != 0);
-	
 	app.ui.displayWarningNotes(app.ui.chip, null, null, oneway);
 	
 	app.ui.updateBackgroundColor();
@@ -1057,7 +1010,7 @@ app.getForce4800 = function(callback)
 		callback,
 		function(error) {
 			app.miscSportIdentErrorBar.show({
-				html: 'Error getting force 4800: ' + error,
+				html: 'Error getting force 4800: ' + error
 			});
 		}
 	);
@@ -1075,17 +1028,19 @@ app.writeForce4800 = function(callback)
 		callback,
 		function(error) {
 			app.miscSportIdentErrorBar.show({
-				html: 'Error saving force4800: ' + error,
+				html: 'Error saving force4800: ' + error
 			});
 		}
 	);
 };
 
-app.ui.displayForce4800 = function(oneway)
+app.ui.displayForce4800 = function(force4800)
 {
-	var raw = parseInt(oneway);
+	var raw = parseInt(force4800);
 	app.ui.sportident.force4800 = raw;
+
     $('#force-4800-bps').checkboxradio();
+    $("#force-4800-bps").removeAttr("disabled");
 	$('#force-4800-bps').prop("checked",raw != 0).checkboxradio("refresh");
 	app.ui.updateBackgroundColor();
 };
@@ -1096,7 +1051,6 @@ app.ui.onReadSportIdentButton = function() {
 };
 
 app.ui.onApplySportIdentButton = function() {
-    //console.log('onApplyRadioAdvButton');
     app.writeOneWay(function() {
 		app.writeForce4800(function() {
 			app.miscSportIdentSuccessBar.show({
@@ -1277,7 +1231,6 @@ app.ui.displaySendToSirapIP = function(sirapIPString)
 //-- Send to Sirap ip port
 app.getSendToSirapIPPort = function(callback)
 {
-	//console.log('getSendToSirapIPPort');
 	app.writeProperty('sendtosirapipport', null, 
 		callback,
 		function(error) {
@@ -1333,7 +1286,6 @@ app.getAll = function(callback)
 	app.writeCommand('getall', null, 
 		callback, 
 		function(error) {
-			console.log('getAll error: ' + error);
 			app.radioErrorBar.show({
 				html: 'Error getting all'
 			});
@@ -1356,7 +1308,6 @@ app.getNetworkWifiList = function(callback)
 
 app.ui.displayNetworkWifiList = function(wifiListString)
 {
-	//console.log('wifi list: ' + rawWifiList);
 	var rowList = wifiListString.split(/\r?\n/);
 	var table = $('<table style="border:0px;padding:0px;width:100%;table-layout:fixed"></table>');
 	$('#wifi-networks').html(table);
@@ -1454,7 +1405,6 @@ app.getIPAddress = function(callback)
 	app.writeCommand('getip', null, 
 		callback, 
 		function(error) {
-			console.log('getipaddress error');
 			app.networkErrorBar.show({
 				html: 'Error getting ip address: ' + error,
 			});
@@ -1469,37 +1419,34 @@ app.ui.displayIPAddress = function(IPAddressString)
 
 
 //-- Renew IP
-app.ui.onRenewIPWifi = function(event)
+app.ui.onRenewIPWifi = function()
 {
 	app.writeCommand('renewip', 'wifi', 
-		callback, 
+		null, 
 		function(error) {
-			console.log('Renewing IP failed: ' + error);
 			app.networkErrorBar.show({
 			    html: 'Renewing IP failed'
 			});
 		}
-	)
+	);
 };
 
-app.ui.onRenewIPEthernet = function(event)
+app.ui.onRenewIPEthernet = function()
 {
 	app.writeCommand('renewip', 'ethernet', 
-		callback, 
+		null, 
 		function(error) {
-			console.log('Renewing IP failed: ' + error);
 			app.networkErrorBar.show({
 			    html: 'Renewing IP failed'
 			});
 		}
-	)
+	);
 };
 
 app.ui.displayAll = function(allString) {
-	console.log(allString);
 	var all = allString.split('¤');
-	//     0             1                2               3            4                       5                 6        7        8         9       10    11   12            13               14             15         16
-	// isCharging¤wirocDeviceName¤sentToSirapIPPort¤sendToSirapIP¤sentToSirapEnabled¤acknowledgementRequested¤dataRate¤channel¤intPercent¤ipAddress¤power¤chip¤range¤wirocPythonVersion¤wirocBLEVersion¤wirocHWVersion¤SIOneWay
+	//     0             1                2               3            4                       5                 6        7        8         9       10    11   12            13               14             15         16            17
+	// isCharging¤wirocDeviceName¤sentToSirapIPPort¤sendToSirapIP¤sentToSirapEnabled¤acknowledgementRequested¤dataRate¤channel¤intPercent¤ipAddress¤power¤chip¤range¤wirocPythonVersion¤wirocBLEVersion¤wirocHWVersion¤SIOneWay¤force4800baudrate
 	if (all.length > 11) {
 		app.ui.displayChip(all[11]);
 		app.ui.displayRange(all[12]);
@@ -1514,13 +1461,11 @@ app.ui.displayAll = function(allString) {
 	app.ui.displayBatteryLevel(all[8]);
 	app.ui.displayIPAddress(all[9]);
 	app.ui.displayPower(all[10]);
-	if (all.length > 14) {
-		app.ui.displayUpdateWiRocPython('v' + all[13]);
-		app.ui.displayUpdateWiRocBLE('v' + all[14]);
-	}
-	if (all.length > 16) {
-		app.ui.displayWarningNotes(all[11], all[5], all[10], all[16]);
-	}
+    app.ui.displayUpdateWiRocPython('v' + all[13]);
+	app.ui.displayUpdateWiRocBLE('v' + all[14]);
+    app.ui.displayWarningNotes(all[11], all[5], all[10], all[16]);
+	app.ui.displayOneWay(all[16]);
+	app.ui.displayForce4800(all[17]);
 };
 
 app.readAndDisplayAll = function(callback) {
@@ -1560,6 +1505,9 @@ app.ui.onApplyBasicButton = function() {
 
 
 app.ui.onReadRadioAdvButton = function() {
+	app.miscRadioAdvSuccessBar.show({
+				html: 'onreadradioadvb'
+			});
 	app.readRadioAdvSettings();	
 };
 
@@ -1569,12 +1517,14 @@ app.ui.onApplyRadioAdvButton = function() {
 			app.miscRadioAdvSuccessBar.show({
 				html: 'Radio adv saved'
 			});
-			app.readRadioAdvSettings();
 		});
 	});
 };
 
 app.readRadioAdvSettings = function() {
+	app.miscRadioAdvSuccessBar.show({
+				html: 'read radio adv'
+			});
 	app.getAcknowledgementRequested();
 	app.getPower();
 };
@@ -1619,22 +1569,18 @@ app.ui.onGetNetworkWifiListButton = function() {
 
 app.getDeviceFromBackend = function(btAddress, callback) {
 	var url = "http://wirelessradioonlinecontrol.tk/api/v1/Devices/LookupDeviceByBTAddress/" + encodeURI(btAddress);
-	console.log(url);
 	if (window.cordova) {
 		// do something cordova style
-		//console.log('getDeviceFromBackend: ' + btAddress);
 		cordovaHTTP.get(
 		   url,
 		   {},
 		   { Authorization: app.backendApiKey },
 		   function (response) {
 			  if (response) {
-				 console.log('getDeviceFromBackend response: ' + response.data);
 				 callback(JSON.parse(response.data));
 			  }
 		   },
 		   function (error) {
-			  console.log(JSON.stringify(error));
 		   }
 		);
 	}
@@ -1652,23 +1598,20 @@ app.getDeviceFromBackend = function(btAddress, callback) {
 		.then(function(res) { 
 			return res.json();
 		})
-		.catch(function(res){ console.log(res); });
+		.catch(function(res){ });
 	}
 };
 
 app.saveDeviceToBackend = function(backendJsonDevice) {
 	if (window.cordova) {
 		// do something cordova style
-		console.log('saveDeviceToBackend');
 		cordovaHTTP.get(
 		   "http://wirelessradioonlinecontrol.tk/api/v1/Devices/" + backendJsonDevice.id + "/UpdateDeviceName/" + backendJsonDevice.name, 
 		   backendJsonDevice,
 		   { Authorization: app.backendApiKey },
 		   function (response) {
-			   console.log(response.data);
 		   },
 		   function (error) {
-			  console.log(JSON.stringify(error));
 		   }
 		);
 	}
@@ -1683,7 +1626,7 @@ app.saveDeviceToBackend = function(backendJsonDevice) {
 			method: "PUT",
 			body: JSON.stringify( backendJsonDevice )
 		})
-		.catch(function(res){ console.log('fetch device: ' + res); });
+		.catch(function(res){ });
 	}
 };
 
@@ -1692,7 +1635,6 @@ app.saveDeviceToBackend = function(backendJsonDevice) {
 app.ui.onApplyDeviceNameButton = function()
 {
 	var devName = app.ui.getWiRocDeviceName();
-	console.log("Device name entered: " + devName);
 	
 	app.writeWiRocDeviceName(function() {
 		app.miscDeviceNameSuccessBar.show({
@@ -1710,8 +1652,6 @@ app.ui.onApplyDeviceNameButton = function()
 };
 
 app.getWiRocDeviceName = function(callback) {
-	console.log('getWiRocDeviceName');
-	
 	app.writeProperty('wirocdevicename', null, 
 		callback,
 		function(error) {
@@ -1732,7 +1672,7 @@ app.ui.displayWiRocDeviceName = function(deviceName) {
 
 app.ui.getWiRocDeviceName = function()
 {
-	var devName = $('#wirocdevicename').val();
+	var devName = $('#wirocdevicename').val().trim();
 	return devName;
 };
 
@@ -1777,7 +1717,6 @@ app.ui.onReadDeviceNameButton = function()
 app.wiRocStatus = '';
 
 app.getWiRocStatus = function(callback) {
-	console.log('getStatus');
 	app.writeProperty('status', null, 
 		callback, 
 		function(error) {
@@ -1815,11 +1754,9 @@ app.ui.onRefreshStatusButton = function() {
 
 // Services
 app.getServices = function(callback) {
-	console.log('getServices');
 	app.writeCommand('getservices', null, 
 		callback, 
 		function(error) {
-			console.log('getServices error');
 			app.miscServicesErrorBar.show({
 				html: 'Error getting services: ' + error
 			});
@@ -1866,7 +1803,7 @@ app.writeWiRocSetting = function(key, value, callback, errorCallback)
 	if (errorCallback == null) {
 		errorCB = function(error) {
 			app.miscSettingsErrorBar.show({
-				html: 'Error saving setting: ' + error,
+				html: 'Error saving setting: ' + error
 			});
 		};
 	}
@@ -1892,47 +1829,6 @@ app.ui.displayWiRocSettings = function(settings) {
 	}
 	$('#wiroc-settings-content').append(table);
 	app.ui.updateBackgroundColor();
-	
-	//if (app.wirocSettings == null) {
-		//app.wirocSettings = settings;
-	//} else {
-		//app.wirocSettings = app.appendBuffer(app.wirocSettings, settings);
-	//}
-	//if (settings.byteLength < 20) {
-		// we received all data
-		//var service = evothings.ble.getService(app.connectedDevice, app.deviceStatusService);
-		//var characteristic = evothings.ble.getCharacteristic(service, app.deviceStatusSettingsCharacteristic);
-		//evothings.ble.disableNotification(
-			//app.connectedDevice,
-			//characteristic,
-			//function(data) {
-				//console.log('unsubscribe settings');
-			//},
-			//function(error) {
-				//console.log('unsubscribe settings error');
-				//app.miscSettingsErrorBar.show({
-					//html: 'Error unsubscribeSettings: ' + error
-				//});
-			//}
-		//);
-		
-		//var rawSettings =  evothings.ble.fromUtf8(app.wirocSettings);
-		//app.wirocSettings = null; // reset buffer
-		//console.log('displayWiRocSettings: ' + rawSettings);
-		//var settingsObj = JSON.parse(rawSettings);
-		//var table = $("<table width=\"100%\" border=1><thead><tr><th align=\"left\">Key</th><th align=\"left\">Value</th><th></td></tr></thead><tbody></tbody></table>");
-		//for (var i = 0; i < settingsObj.settings.length; i++) {
-			//var setting = settingsObj.settings[i];
-			//var element = $('<tr><td>' + setting.Key + '</td><td>' + setting.Value + '</td><td><a href="javascript:void(0)" class="edit-setting">Edit</a></td></tr>');
-			
-			//element.find('a.edit-setting').bind("click",
-				//{Key: setting.Key, Value: setting.Value},
-				//app.ui.onEditSetting);
-			//table.append(element);
-		//}
-		//$('#wiroc-settings-content').append(table);
-		//app.ui.updateBackgroundColor();
-	//}
 };
 
 app.ui.onRefreshSettingsButton = function() {
@@ -1981,7 +1877,6 @@ app.appendBuffer = function(buffer1, buffer2) {
 
 
 app.ui.displayPunches = function(punches) {
-	console.log('displayPunches');
 	if (app.punches == null) {
 		app.punches = punches;
 	} else {
@@ -1991,7 +1886,6 @@ app.ui.displayPunches = function(punches) {
 		// we received all data
 		var rawPunches =  evothings.ble.fromUtf8(app.punches);
 		app.punches = null; // reset buffer
-		console.log('displayPunches: ' + rawPunches);
 		var punchesObj = JSON.parse(rawPunches);
 		var table = $("#wiroc-punches-table tbody");
 		for (var i = 0; i < punchesObj.punches.length; i++) {
@@ -2003,7 +1897,6 @@ app.ui.displayPunches = function(punches) {
 };
 
 app.subscribePunches = function() {
-	console.log("subscribePunches / unsubscribe: '" + $('#btnSubscribePunches').data('subscribe') + "'");
 	var service = evothings.ble.getService(app.connectedDevice, app.apiService);
 	var characteristic = evothings.ble.getCharacteristic(service, app.punchesCharacteristic);
 
@@ -2013,11 +1906,9 @@ app.subscribePunches = function() {
 			app.connectedDevice,
 			characteristic,
 			function(data) {
-				console.log('subscribePunches data');
 				app.ui.displayPunches(data);
 			},
 			function(error) {
-				console.log('subscribePunches error');
 				app.miscPunchesErrorBar.show({
 					html: 'Error subscribePunches: ' + error
 				});
@@ -2031,12 +1922,10 @@ app.subscribePunches = function() {
 			app.connectedDevice,
 			characteristic,
 			function(data) {
-				console.log('unsubscribe punches');
 				$('#btnSubscribePunches').text("Subscribe");
 				$('#btnSubscribePunches').data("subscribe", true);
 			},
 			function(error) {
-				console.log('unsubscribePunches error');
 				app.miscPunchesErrorBar.show({
 					html: 'Error unsubscribePunches: ' + error
 				});
@@ -2051,8 +1940,7 @@ app.ui.onSubscribePunchesButton = function() {
 
 // Delete Punches
 app.deletePunches = function(callback) {
-	console.log('Delete punches');
-	app.writeCommand('database', 'deletepunches', 
+	app.writeProperty('deletepunches', null, 
 		callback, 
 		function(error) {
 			app.miscDatabaseErrorBar.show({
@@ -2069,7 +1957,6 @@ app.ui.onDeletePunchesButton = function() {
 
 // Drop tables
 app.dropAllTables = function(callback) {
-	console.log('Drop all tables');
 	app.writeCommand('dropalltables', null, 
 		callback, 
 		function(error) {
@@ -2088,7 +1975,6 @@ app.ui.onDropAllTablesButton = function() {
 
 // Upload database and logs
 app.uploadDatabaseAndLogs = function(callback) {
-	console.log('Upload database and logs');
 	app.writeCommand('uploadlogarchive', null, 
 		callback, 
 		function(error) {
@@ -2107,7 +1993,6 @@ app.ui.onUploadDatabaseAndLogsButton = function() {
 
 
 app.ui.displayTestPunches = function(testPunches) {
-	console.log('displayTestPunches 1: ' +  evothings.ble.fromUtf8(testPunches));
 	if (app.testPunches == null) {
 		app.testPunches = testPunches;
 	} else {
@@ -2118,7 +2003,6 @@ app.ui.displayTestPunches = function(testPunches) {
 
 		var rawTestPunches =  evothings.ble.fromUtf8(app.testPunches);
 		app.testPunches = null; // reset buffer
-		console.log('displayTestPunches: ' + rawTestPunches);
 		var punchesObj = JSON.parse(rawTestPunches);
 
 		var ackReq = $('#acknowledgement').prop("checked");
@@ -2144,10 +2028,8 @@ app.ui.displayTestPunches = function(testPunches) {
 			var rowElement = $(rowText);
 			if (trs.length > 0) {
 				trs[0].replaceWith(rowElement[0]);
-				console.log("replace");
 			} else {
 				table.append(rowElement);
-				console.log("append");
 			}
 		}
 
@@ -2164,8 +2046,6 @@ app.ui.displayTestPunches = function(testPunches) {
 			for (var j = 0; j < allTrs.length; j++) {
 				noOfSendTries = $(allTrs[j]).find('td').eq(3).html();
 				status = $(allTrs[j]).find('td').eq(4).html();
-				console.log("noOfSendTries: " + noOfSendTries);
-				console.log("status: " + status);
 				if (status == 'Not sent' || status == 'Not acked') {
 					sumNoOfTries += parseInt(noOfSendTries);
 					sumNoOfFailedTries += parseInt(noOfSendTries);
@@ -2194,8 +2074,6 @@ app.ui.displayTestPunches = function(testPunches) {
 		for (var k = 0; k < allTrs.length; k++) {
 			noOfSendTries = $(allTrs[k]).find('td').eq(3).html();
 			status = $(allTrs[k]).find('td').eq(4).html();
-			console.log("noOfSendTries: " + noOfSendTries);
-			console.log("status: " + status);
 			if ((status == 'Acked' && ackReq) || (status =='Not acked' && !ackReq) || 
 				(parseInt(noOfSendTries) > 1 && (status == 'Not sent' || status == 'Not acked'))) {
 				noOfCompletedRows++;
@@ -2203,25 +2081,19 @@ app.ui.displayTestPunches = function(testPunches) {
 		}
 
 		// Check if we received all
-		console.log("No of rows: " + allTrs.length);
-		console.log("No of punches to send: " + app.ui.misc.noOfTestPunchesToSend);
-		console.log("No of completed rows: " + noOfCompletedRows);
 		if (allTrs.length == app.ui.misc.noOfTestPunchesToSend &&
 			app.ui.misc.noOfTestPunchesToSend == noOfCompletedRows)
 		{
-			console.log("we received all");
 			var service = evothings.ble.getService(app.connectedDevice, app.apiService);
 			var characteristic = evothings.ble.getCharacteristic(service, app.testPunchesCharacteristic);
 			evothings.ble.disableNotification(
 				app.connectedDevice,
 				characteristic,
 				function(data) {
-					console.log('unsubscribe test punches');
 					$('#stopTestPunch').addClass('ui-disabled');
 					$('#testPunchLoading').hide();
 				},
 				function(error) {
-					console.log('unsubscribe test punches error');
 					app.miscTestPunchesErrorBar.show({
 						html: 'Error unsubscribe: ' + error
 					});
@@ -2229,7 +2101,6 @@ app.ui.displayTestPunches = function(testPunches) {
 			);
 		}
 	}
-	console.log("displaytestPunches end");
 };
 
 app.ui.onSendTestPunchesStopButton = function(event) {
@@ -2240,12 +2111,10 @@ app.ui.onSendTestPunchesStopButton = function(event) {
 		app.connectedDevice,
 		characteristic,
 		function(data) {
-			console.log('unsubscribe test punches');
 			$('#stopTestPunch').addClass('ui-disabled');
 			$('#testPunchLoading').hide();
 		},
 		function(error) {
-			console.log('unsubscribe test punches error');
 			app.miscTestPunchesErrorBar.show({
 				html: 'Error unsubscribe: ' + error
 			});
@@ -2254,7 +2123,6 @@ app.ui.onSendTestPunchesStopButton = function(event) {
 };
 
 app.ui.onSendTestPunchesButton = function(event) {
-	console.log('onSendTestPunchesButton');
 	app.testPunches = null;
 
 	$("#wiroc-test-punches-table tbody").html('');
@@ -2277,7 +2145,6 @@ app.ui.onSendTestPunchesButton = function(event) {
 		characteristic,
 		parameters,
 		function() {
-			console.log('Sending test punches initiated');
 			app.miscTestPunchesSuccessBar.settings.autohide = true;
 			app.miscTestPunchesSuccessBar.show({
 			    html: 'Sending test punches initiated'
@@ -2286,11 +2153,9 @@ app.ui.onSendTestPunchesButton = function(event) {
 				app.connectedDevice,
 				characteristic,
 				function(data) {
-					console.log('subscribe test punches, data received');
 					app.ui.displayTestPunches(data);
 				},
 				function(error) {
-					console.log('subscribe test punches error');
 					app.miscTestPunchesErrorBar.show({
 						html: 'Error subscribePunches: ' + error
 					});
@@ -2343,10 +2208,8 @@ app.disableCommandNotification = function()
 		app.connectedDevice,
 		characteristic,
 		function(data) {
-			console.log('unsubscribe command data received');
 		},
 		function(error) {
-			console.log('unsubscribe command error');
 			app.radioErrorBar.show({
 				html: 'Error unsubscribe command: ' + error
 			});
@@ -2392,14 +2255,10 @@ app.enablePropertyNotification = function()
 				// we received all data
 				var propertyResponseString = new TextDecoder("utf-8").decode(app.propertyResponse);
 				app.propertyResponse = null;
-				app.radioErrorBar.show({
-					html: 'prp:' + propertyResponseString
-				});
 				app.ui.displayProperty(propertyResponseString);
 			}
 		},
 		function(error) {
-			console.log('subscribe property error');
 			app.radioErrorBar.show({
 				html: 'Error subscribe property: ' + error
 			});
@@ -2415,10 +2274,8 @@ app.disablePropertyNotification = function()
 		app.connectedDevice,
 		characteristic,
 		function(data) {
-			console.log('unsubscribe property data received');
 		},
 		function(error) {
-			console.log('unsubscribe property error');
 			app.radioErrorBar.show({
 				html: 'Error unsubscribe property: ' + error
 			});
@@ -2451,13 +2308,12 @@ app.ui.displayProperty = function(propAndValueStrings)
 	var propAndValuesArray = propAndValueStrings.split('|');
 	for (var i = 0; i < propAndValuesArray.length; i++) {
 		var propAndValue = propAndValuesArray[i];
-		console.log(propAndValue);
 		var idx = propAndValue.indexOf(';');
 		var propName = propAndValue;
 		var propValue = '';
 		if (idx > 0) {
 			propName = propAndValue.substring(0, idx);
-			propValue = propAndValue.substring(idx+1);
+			propValue = propAndValue.substring(idx+1).trim();
 		}
 		switch(propName) {
 			case 'wirocdevicename':
@@ -2496,7 +2352,7 @@ app.ui.displayProperty = function(propAndValueStrings)
 				break;
 			case 'setting':
 				// reload table
-				app.ui.getWiRocSettings();
+				app.getWiRocSettings();
 				break;
 			case 'ischarging':
 				app.ui.displayIsCharging(propValue);
@@ -2514,21 +2370,18 @@ app.ui.displayProperty = function(propAndValueStrings)
 		       	app.ui.displayIPAddress(propValue);
 			    break;
 			case 'renewip':
-		       	console.log('IP renewed');
 				app.networkInfoBar.settings.autohide = true;
 				app.networkInfoBar.show({
 				    html: 'Renew IP command issued'
 				});
 			    break;
 			case 'deletepunches':
-		        console.log('Punches deleted');
 			    app.miscDatabaseSuccessBar.settings.autohide = true;
 			    app.miscDatabaseSuccessBar.show({
 			       html: 'Punches deleted'
 			    });
 			    break;
 			case 'dropalltables':
-			    console.log('Tables dropped');
 			    app.miscDatabaseAdvSuccessBar.settings.autohide = true;
 			    app.miscDatabaseAdvSuccessBar.show({
 			       html: 'Tables dropped'
@@ -2538,7 +2391,6 @@ app.ui.displayProperty = function(propAndValueStrings)
 			    app.ui.displayAll(propValue);
 			    break;
 			case 'uploadlogarchive':
-    			console.log('zip file uploaded');
 				app.miscDatabaseAdvSuccessBar.settings.autohide = true;
 				app.miscDatabaseAdvSuccessBar.show({
 					html: 'Zip with database and logs uploaded'
@@ -2560,8 +2412,6 @@ app.ui.displayProperty = function(propAndValueStrings)
 				app.ui.displayBatteryLevel(propValue);
 				break;
 			default:
-				// code block
-				console.log('error displayProperty, propName not found');
 		}
 	};
 };
@@ -2588,7 +2438,6 @@ app.connect = function(device)
 	setTimeout(
 		function()
 		{
-            console.log('connect('+device.address+')');
 			evothings.ble.connectToDevice(
 				device,
 				app.onConnected,
@@ -2604,7 +2453,6 @@ app.connect = function(device)
 // Called when device is connected.
 app.onConnected = function(device)
 {
-	console.log('Connected to device');
 	app.stopScan();
 	app.devices = {};
 	app.ui.displayDeviceList();
@@ -2615,7 +2463,6 @@ app.onConnected = function(device)
 		app.connectedDevice,
 		function readServicesSuccess(services)
 		{
-			app.searchDevicesErrorBar.show({ html: 'services read' });
 			$(":mobile-pagecontainer").pagecontainer( "change", "#page-basic-config", { } );
 			app.enablePropertyNotification();
 			app.enableCommandNotification();
@@ -2625,7 +2472,7 @@ app.onConnected = function(device)
 			});
 		},
 		function error() {
-			app.radioSuccessBar.show({ html: 'Read misc failed' });
+			app.radioSuccessBar.show({ html: 'Read services failed' });
 		},
 		{ serviceUUIDs: null }
 	);
@@ -2635,13 +2482,12 @@ app.onConnected = function(device)
 // Called if device disconnects.
 app.onDisconnected = function(device)
 {
-	console.log('Disconnected from device');
 	app.stopScan();
 	evothings.ble.close(app.devices[app.btAddressToConnect]);
 	
 	app.connectedDevice = null;
 	$.mobile.pageContainer.pagecontainer("change", "#page-device-scan", { });
-	evothings.ble.reset(function() { console.log('reset success 1'); },function() { console.log('reset fail'); });
+	evothings.ble.reset(function() { },function() { });
 	app.searchDevicesErrorBar.show({
 		html: 'Device disconnected'
 	});
@@ -2652,10 +2498,7 @@ app.onDisconnected = function(device)
 app.onConnectError = function(error)
 {
 	app.stopScan();
-
     app.connectErrorCount++;
-    console.log('Connect error: ' + error);
-  
     
     // If we get Android connect error 133, we wait and try to connect again.
     // This can resolve connect problems on Android when error 133 is seen.
@@ -2668,7 +2511,6 @@ app.onConnectError = function(error)
 		app.searchDevicesErrorBar.show({
 			html: 'Connect error: ' + error + ' | Retrying...'
 		});
-        console.log('Reconnecting...');
         evothings.ble.close(app.devices[app.btAddressToConnect]);
 		setTimeout(
              function() 
@@ -2690,7 +2532,6 @@ app.onConnectError = function(error)
 app.disconnect = function()
 {
 	if (app.connectedDevice) {
-		console.log('disconnect');
 		evothings.ble.close(app.connectedDevice);
 		app.connectedDevice = null;
 		app.servicesDiscovered = false;
