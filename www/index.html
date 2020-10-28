@@ -435,7 +435,7 @@
 			var basicHeaderHeight = $('#page-basic-config div[data-role="header"]').actual('outerHeight', { includeMargin : true });
 			var advHeaderHeight = $('#page-advanced-config div[data-role="header"]').actual('outerHeight', { includeMargin : true });
 			
-        		var deviceNameHeight = $('#device-name').actual('outerHeight', { includeMargin : true });
+			var deviceNameHeight = $('#device-name').actual('outerHeight', { includeMargin : true });
 			var tabHeaderHeight = $('#page-basic-config div[data-role="navbar"]').actual('outerHeight', { includeMargin : true });
 			var advTabHeaderHeight = $('#page-advanced-config div[data-role="navbar"]').actual('outerHeight', { includeMargin : true });
 			var tabControlPaddingHeight = (0.2*16); // 0.2 em, 16px font
@@ -700,7 +700,10 @@
 			</span>
 		</div>
 		<div role="main" class="ui-content" class="page" style="padding:0">
-			<h1 id="device-name" style="font-size:5vw;text-align: center;margin:0"></h1>
+			<div class="ui-grid-a">
+				<div id="device-name" class="ui-block-a" style="font-size:5vw;padding-left:1vw;margin:0"></div>
+				<div id="wirocmode" class="ui-block-b" style="font-size:5vw;margin:0;padding-right:1vw;text-align:right"></div>
+			</div>
 			<div data-role="tabs" id="tabs-main">
 			 	<div data-role="navbar">
 					<ul>
@@ -958,7 +961,10 @@
 		</div>
 		
 		<div role="main" class="ui-content" class="page" style="padding:0">
-			<h1 id="device-name2" style="font-size:5vw;text-align: center;margin:0"></h1>
+			<div class="ui-grid-a">
+				<div id="device-name2" class="ui-block-a" style="font-size:5vw;padding-left:1vw;margin:0"></div>
+				<div id="wirocmode2" class="ui-block-b" style="font-size:5vw;margin:0;padding-right:1vw;text-align:right"></div>
+			</div>
 			<div data-role="tabs" id="tabs-adv">
 			 	<div data-role="navbar">
 					<ul>
@@ -1052,6 +1058,7 @@
 					<div id="acknowledge-div">
 		 				<label><input type="checkbox" id="acknowledgement">Request acknowledgement</label>
 					</div>
+					
 					<div id="radio-adv-RF1276T">
 						<div class="ui-field-contain lorapower-RF1276T">
 							<select name="lorapower" id="lorapower-select-RF1276T" data-native-menu="false">
@@ -1066,6 +1073,17 @@
 						</div>
 					</div>
 					<div id="radio-adv-DRF1268DS">
+						<div id="rx-gain-div">
+							<label><input type="checkbox" id="rxgain">Enable Rx Gain</label>
+						</div>
+						<div class="ui-field-contain coderate">
+							<select name="coderate" id="coderate-select" data-native-menu="false">
+								<option value="0">4/5 (1 ECC bit, 4 data bits)</option>
+								<option value="1">4/6 (2 ECC bits, 4 data bits)</option>
+								<option value="2">4/7 (3 ECC bits, 4 data bits)</option>
+								<option value="3">4/8 (4 ECC bits, 4 data bits)</option>
+							</select>
+						</div>
 						<div class="ui-field-contain lorapower-DRF1268DS">
 							<select name="lorapower" id="lorapower-select-DRF1268DS" data-native-menu="false">
 								<option value="1">1dBm</option>

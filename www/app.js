@@ -59,6 +59,8 @@ app.ui.radio.channel = null;
 app.ui.radio.range = null;
 app.ui.radio.acknowledgementRequested = null;
 app.ui.radio.power = null;
+app.ui.radio.codeRate = null;
+app.ui.radio.rxGain = null;
 app.ui.sirap = {};
 app.ui.sirap.sendToSirapEnabled = null;
 app.ui.sirap.sendToSirapIP = null;
@@ -170,7 +172,9 @@ app.ui.updateBackgroundColor = function()
 	}
 	// radio adv
 	if (app.ui.radio.acknowledgementRequested != app.ui.getAcknowledgementRequested() 
-		|| app.ui.radio.power != app.ui.getPower())
+		|| app.ui.radio.power != app.ui.getPower()
+		|| app.ui.radio.rxGain != app.ui.getRxGain()
+		|| app.ui.radio.codeRate != app.ui.getCodeRate())
 	{
 		$('#radio-adv').css('background-color','#FFEFD5');
 	} else {
@@ -316,7 +320,7 @@ app.writeChannel = function(callback)
 };
 
 //
-app.ui.displayWarningNotes = function(chip, ackReq, power, siOneWay)
+app.ui.displayWarningNotes = function(chip, ackReq, power, siOneWay, rxGain, codeRate)
 {
 	//app.radioErrorBar.show({ html: (chip==null?'null':chip) +':'+(ackReq==null?'null':ackReq) +':'+(power==null?'null':power)+':'+(siOneWay==null?'null':siOneWay) });
 	if (ackReq != null) {
@@ -339,6 +343,20 @@ app.ui.displayWarningNotes = function(chip, ackReq, power, siOneWay)
 			$('#warning-note-si-one-way').show();
 		} else {
 			$('#warning-note-si-one-way').hide();
+		}
+	}
+	if (rxGain != null) {
+		if (rxGain == '1') {
+			$('#warning-note-rx-gain').hide();
+		} else {
+			$('#warning-note-si-one-way').show();
+		}
+	}
+	if (codeRate != null) {
+		if (codeRate == 0) {
+			$('#warning-note-code-rate').hide();
+		} else {
+			$('#warning-note-code-rate').show();
 		}
 	}
 };
@@ -383,10 +401,51 @@ app.ui.displayAcknowledgementRequested = function(acknowledgement)
 	app.ui.radio.acknowledgementRequested = raw;
     $('#acknowledgement').checkboxradio();
 	$('#acknowledgement').prop("checked",raw != 0).checkboxradio("refresh");
-	app.ui.displayWarningNotes(app.ui.chip, acknowledgement, null, null);
+	app.ui.displayWarningNotes(app.ui.chip, acknowledgement, null, null, null, null);
 	app.ui.updateBackgroundColor();
 };
 
+//---- rxGain enabled
+
+app.getRxGain = function(callback)
+{
+	app.writeProperty('rxgainenabled', null, 
+		callback,
+		function(error) {
+			app.miscRadioAdvErrorBar.show({
+				html: 'Error getting radio settings (RxGain): ' + error,
+			});
+		}
+	);
+};
+
+
+app.ui.getRxGain = function() {
+	return $('#rxgain').prop("checked") ? 1 : 0;
+};
+
+app.writeRxGain = function(callback)
+{
+	var ack = app.ui.getRxGain();
+	app.writeProperty('rxgainenabled', ack.toString(), 
+		callback,
+		function(error) {
+			app.miscRadioAdvErrorBar.show({
+				html: 'Error saving radio setting (RxGain): ' + error,
+			});
+		}
+	);
+};
+
+app.ui.displayRxGain = function(rxGain)
+{
+	var raw = parseInt(rxGain);
+	app.ui.radio.rxGain = raw;
+    $('#rxgain').checkboxradio();
+	$('#rxgain').prop("checked",raw != 0).checkboxradio("refresh");
+	app.ui.displayWarningNotes(app.ui.chip, null, null, null, rxGain, null);
+	app.ui.updateBackgroundColor();
+};
 
 //-- Power
 
@@ -411,7 +470,7 @@ app.ui.displayPower = function(power)
 
 	$('#lorapower-select-' + app.ui.chip).selectmenu("refresh", true);
 	
-	app.ui.displayWarningNotes(app.ui.chip, null, raw, null);
+	app.ui.displayWarningNotes(app.ui.chip, null, raw, null, null, null);
 	
 	app.ui.updateBackgroundColor();
 };
@@ -442,6 +501,61 @@ app.writePower = function(callback)
 		function(error) {
 			app.miscRadioAdvErrorBar.show({
 				html: 'Error saving radio setting (Power): ' + error
+			});
+		}
+	);
+};
+
+//-- Code rate
+
+app.ui.displayCodeRate = function(codeRate)
+{
+	var raw = parseInt(codeRate);
+	app.ui.radio.codeRate = raw;
+	
+	// Select the relevant option, de-select any others
+	$('#coderate-select').val(raw).attr('selected', true).siblings('option').removeAttr('selected');
+
+	// jQM refresh
+	var w = $("#coderate-select");
+	if( w.data("mobile-selectmenu") === undefined) {
+		// not initialized yet, lets do so
+		w.selectmenu({ nativeMenu: false });
+	}
+
+	$('#coderate-select').selectmenu("refresh", true);
+	
+	app.ui.displayWarningNotes(app.ui.chip, null, null, null, null, raw);
+	
+	app.ui.updateBackgroundColor();
+};
+
+
+app.getCodeRate = function(callback)
+{
+	app.writeProperty('coderate', null, 
+		callback,
+		function(error) {
+			app.miscRadioAdvErrorBar.show({
+				html: 'Error getting radio setting (CodeRate): ' + error
+			});
+		}
+	);
+};
+
+app.ui.getCodeRate = function() {
+	var value = $('#coderate-select option:selected').val();
+	return value;
+};
+
+app.writeCodeRate = function(callback)
+{
+    var codeRate = app.ui.getCodeRate();
+	app.writeProperty('coderate', codeRate, 
+		callback,
+		function(error) {
+			app.miscRadioAdvErrorBar.show({
+				html: 'Error saving radio setting (CodeRate): ' + error
 			});
 		}
 	);
@@ -996,7 +1110,7 @@ app.ui.displayOneWay = function(oneway)
     $('#sportident-oneway').checkboxradio();
 	$('#sportident-oneway').prop("checked",raw != 0).checkboxradio("refresh");
 	app.ui.enableDisableForce4800WithParam(raw != 0);
-	app.ui.displayWarningNotes(app.ui.chip, null, null, oneway);
+	app.ui.displayWarningNotes(app.ui.chip, null, null, oneway, null, null);
 	
 	app.ui.updateBackgroundColor();
 };
@@ -1445,8 +1559,10 @@ app.ui.onRenewIPEthernet = function()
 
 app.ui.displayAll = function(allString) {
 	var all = allString.split('¤');
-	//     0             1                2               3            4                       5                 6        7        8         9       10    11   12            13               14             15         16            17
-	// isCharging¤wirocDeviceName¤sentToSirapIPPort¤sendToSirapIP¤sentToSirapEnabled¤acknowledgementRequested¤dataRate¤channel¤intPercent¤ipAddress¤power¤chip¤range¤wirocPythonVersion¤wirocBLEVersion¤wirocHWVersion¤SIOneWay¤force4800baudrate
+	//     0             1                2               3            4                       5                 6        7        8         9       10   
+	// isCharging¤wirocDeviceName¤sentToSirapIPPort¤sendToSirapIP¤sentToSirapEnabled¤acknowledgementRequested¤dataRate¤channel¤intPercent¤ipAddress¤power¤
+	//  11   12            13               14             15         16            17            18       19     20
+	// chip¤range¤wirocPythonVersion¤wirocBLEVersion¤wirocHWVersion¤SIOneWay¤force4800baudrate¤wirocMode¤rxGain¤codeRate
 	if (all.length > 11) {
 		app.ui.displayChip(all[11]);
 		app.ui.displayRange(all[12]);
@@ -1463,9 +1579,10 @@ app.ui.displayAll = function(allString) {
 	app.ui.displayPower(all[10]);
     app.ui.displayUpdateWiRocPython('v' + all[13]);
 	app.ui.displayUpdateWiRocBLE('v' + all[14]);
-    app.ui.displayWarningNotes(all[11], all[5], all[10], all[16]);
+    app.ui.displayWarningNotes(all[11], all[5], all[10], all[16], all[19], all[20]);
 	app.ui.displayOneWay(all[16]);
 	app.ui.displayForce4800(all[17]);
+	app.ui.displayWiRocMode(all[18]);
 };
 
 app.readAndDisplayAll = function(callback) {
@@ -1481,6 +1598,7 @@ app.readBasicSettings = function() {
 	app.getChannel();
 	app.getAcknowledgementRequested();
 	app.getIPAddress();
+	app.getWiRocMode();
 };
 
 app.ui.onReadBasicButton = function() {
@@ -1536,6 +1654,7 @@ app.readSirapSettings = function() {
 	app.getSendToSirapEnabled();
 	app.getSendToSirapIP();
 	app.getSendToSirapIPPort();
+	app.getWiRocMode();
 };
 
 app.ui.onReadSirapButton = function() {
@@ -1552,10 +1671,12 @@ app.ui.onApplySirapButton = function() {
 				app.getSendToSirapEnabled();
 				app.getSendToSirapIP();
 				app.getSendToSirapIPPort();
+				app.getWiRocMode();
 			}, function() {
 				app.getSendToSirapEnabled();
 				app.getSendToSirapIP();
 				app.getSendToSirapIPPort();
+				app.getWiRocMode();
 			});
 		});
 	});
@@ -1710,6 +1831,24 @@ app.validateDeviceName = function(deviceName) {
 app.ui.onReadDeviceNameButton = function()
 {
 	app.getWiRocDeviceName();
+};
+
+// WiRoc Mode
+app.getWiRocMode = function(callback) {
+	app.writeProperty('wirocmode', null, 
+		callback,
+		function(error) {
+			app.radioErrorBar.show({
+				html: 'Error getting wiroc mode: ' + error
+			});
+		}
+	);
+};
+
+
+app.ui.displayWiRocMode = function(wirocMode) {
+	$('#wirocmode').text(wirocMode);
+	$('#wirocmode2').text(wirocMode);
 };
 
 // Status
@@ -2411,6 +2550,15 @@ app.ui.displayProperty = function(propAndValueStrings)
 			case 'batterylevel':
 				app.ui.displayBatteryLevel(propValue);
 				break;
+			case 'wirocmode':
+				app.ui.displayWiRocMode(propValue);
+				break;
+			case 'rxgain':
+				app.ui.displayRxGain(propValue);
+				break;
+			case 'coderate':
+				app.ui.displayCodeRate(propValue);
+				break;
 			default:
 		}
 	};
@@ -2548,4 +2696,3 @@ app.disconnect = function()
 };
 
 app.initialize();
-

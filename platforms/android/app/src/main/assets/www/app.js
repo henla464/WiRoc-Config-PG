@@ -1445,8 +1445,8 @@ app.ui.onRenewIPEthernet = function()
 
 app.ui.displayAll = function(allString) {
 	var all = allString.split('¤');
-	//     0             1                2               3            4                       5                 6        7        8         9       10    11   12            13               14             15         16            17
-	// isCharging¤wirocDeviceName¤sentToSirapIPPort¤sendToSirapIP¤sentToSirapEnabled¤acknowledgementRequested¤dataRate¤channel¤intPercent¤ipAddress¤power¤chip¤range¤wirocPythonVersion¤wirocBLEVersion¤wirocHWVersion¤SIOneWay¤force4800baudrate
+	//     0             1                2               3            4                       5                 6        7        8         9       10    11   12            13               14             15         16            17            18
+	// isCharging¤wirocDeviceName¤sentToSirapIPPort¤sendToSirapIP¤sentToSirapEnabled¤acknowledgementRequested¤dataRate¤channel¤intPercent¤ipAddress¤power¤chip¤range¤wirocPythonVersion¤wirocBLEVersion¤wirocHWVersion¤SIOneWay¤force4800baudrate¤wirocMode
 	if (all.length > 11) {
 		app.ui.displayChip(all[11]);
 		app.ui.displayRange(all[12]);
@@ -1466,6 +1466,7 @@ app.ui.displayAll = function(allString) {
     app.ui.displayWarningNotes(all[11], all[5], all[10], all[16]);
 	app.ui.displayOneWay(all[16]);
 	app.ui.displayForce4800(all[17]);
+	app.ui.displayWiRocMode(all[18]);
 };
 
 app.readAndDisplayAll = function(callback) {
@@ -1481,6 +1482,7 @@ app.readBasicSettings = function() {
 	app.getChannel();
 	app.getAcknowledgementRequested();
 	app.getIPAddress();
+	app.getWiRocMode();
 };
 
 app.ui.onReadBasicButton = function() {
@@ -1536,6 +1538,7 @@ app.readSirapSettings = function() {
 	app.getSendToSirapEnabled();
 	app.getSendToSirapIP();
 	app.getSendToSirapIPPort();
+	app.getWiRocMode();
 };
 
 app.ui.onReadSirapButton = function() {
@@ -1552,10 +1555,12 @@ app.ui.onApplySirapButton = function() {
 				app.getSendToSirapEnabled();
 				app.getSendToSirapIP();
 				app.getSendToSirapIPPort();
+				app.getWiRocMode();
 			}, function() {
 				app.getSendToSirapEnabled();
 				app.getSendToSirapIP();
 				app.getSendToSirapIPPort();
+				app.getWiRocMode();
 			});
 		});
 	});
@@ -1710,6 +1715,24 @@ app.validateDeviceName = function(deviceName) {
 app.ui.onReadDeviceNameButton = function()
 {
 	app.getWiRocDeviceName();
+};
+
+// WiRoc Mode
+app.getWiRocMode = function(callback) {
+	app.writeProperty('wirocmode', null, 
+		callback,
+		function(error) {
+			app.radioErrorBar.show({
+				html: 'Error getting wiroc mode: ' + error
+			});
+		}
+	);
+};
+
+
+app.ui.displayWiRocMode = function(wirocMode) {
+	$('#wirocmode').text(wirocMode);
+	$('#wirocmode2').text(wirocMode);
 };
 
 // Status
@@ -2410,6 +2433,9 @@ app.ui.displayProperty = function(propAndValueStrings)
 				break;
 			case 'batterylevel':
 				app.ui.displayBatteryLevel(propValue);
+				break;
+			case 'wirocmode':
+				app.ui.displayWiRocMode(propValue);
 				break;
 			default:
 		}
