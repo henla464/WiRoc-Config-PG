@@ -655,7 +655,7 @@
 <!--<a href="#page-basic-config" data-transition="slide">Slide</a>-->
 			<a href="#" onclick="app.ui.onScanButton()" class="ui-btn ui-btn-inline ui-corner-all scan-button">Start scan</a>
 	
-			<p id="scan-status" class="scan-status">Not scanning</p>
+			<p id="scan-status" class="scan-status">V1 Not scanning</p>
 			<ul id="found-devices" class="dynamic"></ul>
 		</div>
 	</div>
@@ -1058,6 +1058,7 @@
 					<div id="acknowledge-div">
 		 				<label><input type="checkbox" id="acknowledgement">Request acknowledgement</label>
 					</div>
+					
 					<div id="radio-adv-RF1276T">
 						<div class="ui-field-contain lorapower-RF1276T">
 							<select name="lorapower" id="lorapower-select-RF1276T" data-native-menu="false">
@@ -1072,6 +1073,17 @@
 						</div>
 					</div>
 					<div id="radio-adv-DRF1268DS">
+						<div id="rx-gain-div">
+							<label><input type="checkbox" id="rxgain">Enable Rx Gain</label>
+						</div>
+						<div class="ui-field-contain coderate">
+							<select name="coderate" id="coderate-select" data-native-menu="false">
+								<option value="0">4/5 (1 ECC bit, 4 data bits)</option>
+								<option value="1">4/6 (2 ECC bits, 4 data bits)</option>
+								<option value="2">4/7 (3 ECC bits, 4 data bits)</option>
+								<option value="3">4/8 (4 ECC bits, 4 data bits)</option>
+							</select>
+						</div>
 						<div class="ui-field-contain lorapower-DRF1268DS">
 							<select name="lorapower" id="lorapower-select-DRF1268DS" data-native-menu="false">
 								<option value="1">1dBm</option>
