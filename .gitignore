@@ -1,0 +1,3 @@
+**/release-signing.properties
+**/debug-signing.properties
+.gradle/*

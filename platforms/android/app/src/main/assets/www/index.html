@@ -71,6 +71,18 @@
     	}
     	
     	
+    	/* code rate */
+    	#coderate-select-button span {
+    		font-size: 4vw;
+    		font-weight: normal;
+    	}
+    	/* code rate list */
+    	#coderate-select-menu li a {
+    		font-size: 4vw;
+    		padding-top:0.5em;
+    		padding-bottom:0.5em;
+    	}
+    	
     	/* Visible power */
     	#lorapower-select-DRF1268DS-button span {
     		font-size: 4vw;
@@ -134,10 +146,6 @@
 		
 		div.ui-checkbox {
 		    display: inline-block;
-		}
-		
-		#acknowledge-div {
-			text-align:center;
 		}
 		
 		.ui-controlgroup-label {
@@ -571,6 +579,10 @@
 				app.ui.updateBackgroundColor();
 			});
 			
+			$("#coderate-select").on( "change", function(event, ui) {
+				app.ui.updateBackgroundColor();
+			});
+			
 			$("#lorapower-select-DRF1268DS").on( "change", function(event, ui) {
 				app.ui.updateBackgroundColor();
 			});
@@ -655,7 +667,7 @@
 <!--<a href="#page-basic-config" data-transition="slide">Slide</a>-->
 			<a href="#" onclick="app.ui.onScanButton()" class="ui-btn ui-btn-inline ui-corner-all scan-button">Start scan</a>
 	
-			<p id="scan-status" class="scan-status">V1 Not scanning</p>
+			<p id="scan-status" class="scan-status">Not scanning</p>
 			<ul id="found-devices" class="dynamic"></ul>
 		</div>
 	</div>
@@ -776,6 +788,8 @@
 						<a href="#" id="warning-note-req-ack" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Request acknowledgement disabled</a>
 						<a href="#" id="warning-note-radio-power" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Radio power changed</a>
 						<a href="#" id="warning-note-si-one-way" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">SportIdent one-way enabled</a>
+						<a href="#" id="warning-note-rx-gain" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Rx Gain disabled</a>
+						<a href="#" id="warning-note-code-rate" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Code Rate not default</a>
 					</div>
 					<div style="text-align:center">
 						<div style="display:inline-block">
@@ -1076,16 +1090,22 @@
 						<div id="rx-gain-div">
 							<label><input type="checkbox" id="rxgain">Enable Rx Gain</label>
 						</div>
+						<div class="ui-field-contain">
+							<label for="coderate">Code rate:</label>
+						</div>
 						<div class="ui-field-contain coderate">
-							<select name="coderate" id="coderate-select" data-native-menu="false">
+							<select name="coderate" id="coderate-select">
 								<option value="0">4/5 (1 ECC bit, 4 data bits)</option>
 								<option value="1">4/6 (2 ECC bits, 4 data bits)</option>
 								<option value="2">4/7 (3 ECC bits, 4 data bits)</option>
 								<option value="3">4/8 (4 ECC bits, 4 data bits)</option>
 							</select>
 						</div>
+						<div class="ui-field-contain">
+							<label for="lorapower">Lora power:</label>
+						</div>
 						<div class="ui-field-contain lorapower-DRF1268DS">
-							<select name="lorapower" id="lorapower-select-DRF1268DS" data-native-menu="false">
+							<select name="lorapower" id="lorapower-select-DRF1268DS">
 								<option value="1">1dBm</option>
 								<option value="2">2dBm</option>
 								<option value="3">3dBm</option>

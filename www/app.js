@@ -134,12 +134,11 @@ app.ui.onScanButton = function() {
 		app.devices = {};
 		app.ui.displayDeviceList();
 		app.ui.displayStatus('Scanning...');
-		ble.startScan([app.apiService], app.ui.deviceFound, app.ui.scanError);
+		ble.startScanWithOptions([app.apiService], { reportDuplicates: true }, app.ui.deviceFound, app.ui.scanError);
 
 		//evothings.ble.startScan(
 		//	app.ui.deviceFound,
 		//	app.ui.scanError);
-		app.ui.displayStatus('start scan done');
 		app.ui.updateTimer = setInterval(app.ui.displayDeviceList, 500);
 	} else {
 		app.stopScan();
@@ -376,7 +375,7 @@ app.ui.displayWarningNotes = function(chip, ackReq, power, siOneWay, rxGain, cod
 		if (rxGain == '1') {
 			$('#warning-note-rx-gain').hide();
 		} else {
-			$('#warning-note-si-one-way').show();
+			$('#warning-note-rx-gain').show();
 		}
 	}
 	if (codeRate != null) {
@@ -453,8 +452,8 @@ app.ui.getRxGain = function() {
 
 app.writeRxGain = function(callback)
 {
-	var ack = app.ui.getRxGain();
-	app.writeProperty('rxgainenabled', ack.toString(), 
+	var en = app.ui.getRxGain();
+	app.writeProperty('rxgainenabled', en.toString(), 
 		callback,
 		function(error) {
 			app.miscRadioAdvErrorBar.show({
@@ -492,7 +491,7 @@ app.ui.displayPower = function(power)
 	var w = $("#lorapower-select-" + app.ui.chip);
 	if( w.data("mobile-selectmenu") === undefined) {
 		// not initialized yet, lets do so
-		w.selectmenu({ nativeMenu: false });
+		w.selectmenu({ nativeMenu: true });
 	}
 
 	$('#lorapower-select-' + app.ui.chip).selectmenu("refresh", true);
@@ -547,7 +546,7 @@ app.ui.displayCodeRate = function(codeRate)
 	var w = $("#coderate-select");
 	if( w.data("mobile-selectmenu") === undefined) {
 		// not initialized yet, lets do so
-		w.selectmenu({ nativeMenu: false });
+		w.selectmenu({ nativeMenu: true });
 	}
 
 	$('#coderate-select').selectmenu("refresh", true);
@@ -1610,6 +1609,8 @@ app.ui.displayAll = function(allString) {
 	app.ui.displayOneWay(all[16]);
 	app.ui.displayForce4800(all[17]);
 	app.ui.displayWiRocMode(all[18]);
+	app.ui.displayRxGain(all[19]);
+	app.ui.displayCodeRate(all[20]);
 };
 
 app.readAndDisplayAll = function(callback) {
@@ -2581,7 +2582,7 @@ app.ui.displayProperty = function(propAndValueStrings)
 			case 'wirocmode':
 				app.ui.displayWiRocMode(propValue);
 				break;
-			case 'rxgain':
+			case 'rxgainenabled':
 				app.ui.displayRxGain(propValue);
 				break;
 			case 'coderate':
