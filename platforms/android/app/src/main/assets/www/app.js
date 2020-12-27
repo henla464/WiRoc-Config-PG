@@ -79,6 +79,7 @@ app.ui.update.wiRocPythonVersion = null;
 // devices in case no devices are found by scan.
 app.ui.updateTimer = null;
 
+app.chunkLength = 20;
 app.punches = null;
 app.testPunches = null;
 app.commandResponse = null;
@@ -149,9 +150,9 @@ app.stopScan = function() {
 	app.isScanning = false;
 	$('.scan-button').html('Start scan');
 	ble.stopScan();
-	//evothings.ble.stopScan();
 	app.ui.displayStatus('Scan stopped');
 	clearInterval(app.ui.updateTimer);
+	app.ui.displayStatus('Scan stopped 0');
 };
 
 
@@ -280,8 +281,9 @@ app.ui.displayStatus = function(message)
 };
 
 app.ui.onConnectButton = function(event) {
-	app.stopScan(); // should this be here?
+	//app.stopScan(); // should this be here?
 	app.connectErrorCount = 0;
+	app.ui.displayStatus('onConnectButton ' + event.data.address);
 	app.btAddressToConnect = event.data.address;
 	app.connect(app.devices[event.data.address]);
 };
@@ -1423,7 +1425,7 @@ app.ui.displaySendToSirapIPPort = function(sirapIPPort)
 // get all
 app.getAll = function(callback)
 {
-	app.writeCommand('getall', null, 
+	app.writeCommand('getall;'+ app.chunkLength, null, 
 		callback, 
 		function(error) {
 			app.radioErrorBar.show({
@@ -1902,6 +1904,7 @@ app.getWiRocStatus = function(callback) {
 
 app.ui.displayWiRocStatus = function(status) {
 	var statusObj = JSON.parse(status);
+
 	var html = "<h2>Input:</h2><table width=\"100%\" border=1><thead>";
 	html += "<tr><th align=\"left\">Type</th><th align=\"left\">Instance</th></tr></thead><tbody>";
 	for (var i = 0; i < statusObj.inputAdapters.length; i++) {
@@ -1909,7 +1912,6 @@ app.ui.displayWiRocStatus = function(status) {
 		html += "<tr><td>" + inputAdapter.TypeName + "</td><td>" + inputAdapter.InstanceName + "</td></tr>";
 	}
 	html += "</tbody></table>";
-
 	html += "<h2>Output:</h2><table width=\"100%\" border=1><thead>";
 	html += "<tr><th align=\"left\">Type</th><th align=\"left\">Instance</th><th align=\"left\">Msg In</th><th align=\"left\">Msg Out</th><th align=\"left\">Enabled</th></tr></thead><tbody>";
 	for (i = 0; i < statusObj.subscriberAdapters.length ; i++) {
@@ -1989,6 +1991,7 @@ app.writeWiRocSetting = function(key, value, callback, errorCallback)
 };
 
 app.ui.displayWiRocSettings = function(settings) {
+	$('#wiroc-status-content').html(settings);
 	var settingsObj = JSON.parse(settings);
 	var table = $("<table width=\"100%\" border=1><thead><tr><th align=\"left\">Key</th><th align=\"left\">Value</th><th></td></tr></thead><tbody></tbody></table>");
 	for (var i = 0; i < settingsObj.settings.length; i++) {
@@ -2055,7 +2058,7 @@ app.ui.displayPunches = function(punches) {
 	} else {
 		app.punches = app.appendBuffer(app.punches, punches);
 	}
-	if (punches.byteLength < 20) {
+	if (punches.byteLength < app.chunkLength) {
 		// we received all data
 		var rawPunches =  app.fromUtf8(app.punches);
 		app.punches = null; // reset buffer
@@ -2171,7 +2174,7 @@ app.ui.displayTestPunches = function(testPunches) {
 	} else {
 		app.testPunches = app.appendBuffer(app.testPunches, testPunches);
 	}
-	if (testPunches.byteLength < 20) {
+	if (testPunches.byteLength < app.chunkLength) {
 		// we received all data from this push
 
 		var rawTestPunches =  app.fromUtf8(app.testPunches);
@@ -2304,8 +2307,7 @@ app.ui.onSendTestPunchesButton = function(event) {
 	app.ui.misc.noOfTestPunchesToSend = $("#noOfTestPunches option:selected").val();
 	var siNumber = $("#siNumber").val();
 	var sendInterval = $("#sendInterval").val();
-	var ackReq = $('#acknowledgement').prop("checked") ? 1 : 0;
-	var param = app.ui.misc.noOfTestPunchesToSend + ';' + sendInterval + ';' + siNumber + ';' + ackReq;
+	var param = app.ui.misc.noOfTestPunchesToSend + ';' + sendInterval + ';' + siNumber;
 
 	var te = new TextEncoder("utf-8").encode(param);
 	var parameters = new Uint8Array(te);
@@ -2356,7 +2358,11 @@ app.enableCommandNotification = function()
 			} else {
 				app.commandResponse = app.appendBuffer(app.commandResponse, data);
 			}
-			if (data.byteLength < 20) {
+			var a = new TextDecoder("utf-8").decode(data);
+			var b = new TextDecoder("utf-8").decode(app.commandResponse);
+			$('#wiroc-status-content').html('commandNotification: data:' + a + ' total: ' + b);
+	
+			if (data.byteLength < app.chunkLength) {
 				// we received all data
 				var commandAndResponseString = new TextDecoder("utf-8").decode(app.commandResponse);
 				app.commandResponse = null;
@@ -2420,7 +2426,12 @@ app.enablePropertyNotification = function()
 			} else {
 				app.propertyResponse = app.appendBuffer(app.propertyResponse, data);
 			}
-			if (data.byteLength < 20) {
+
+			var a = new TextDecoder("utf-8").decode(data);
+			var b = new TextDecoder("utf-8").decode(app.propertyResponse);
+			$('#wiroc-status-content').html($('#wiroc-status-content').html() + ' || propertyNotification: data.byteLength: ' + data.byteLength + ' chunkLength: ' + app.chunkLength + ' data:' + a + ' total: ' + b);
+
+			if (data.byteLength < app.chunkLength) {
 				// we received all data
 				var propertyResponseString = new TextDecoder("utf-8").decode(app.propertyResponse);
 				app.propertyResponse = null;
@@ -2512,7 +2523,6 @@ app.ui.displayProperty = function(propAndValueStrings)
 				app.ui.displayForce4800(propValue);
 				break;	
 			case 'status':
-				$('#wiroc-status-content').html(propValue);
 				app.ui.displayWiRocStatus(propValue);
 				break;	
 			case 'settings':
@@ -2628,18 +2638,32 @@ app.connect = function(device)
 app.onConnected = function(device)
 {
 	app.stopScan();
+	app.ui.displayStatus('Scan stopped 1');
 	app.devices = {};
+	app.ui.displayStatus('Scan stopped 2');
 	app.ui.displayDeviceList();
-
+	app.ui.displayStatus('Scan stopped 3');
+	
 	app.connectedDevice = device;
-
-	$(":mobile-pagecontainer").pagecontainer( "change", "#page-basic-config", { } );
-	app.enablePropertyNotification();
-	app.enableCommandNotification();
-	app.readAndDisplayAll(function() {
-		$('#tab-radio').css('ui-btn-active');
-		$('#tab-radio').trigger('click');
-	});
+	app.ui.displayStatus('Scan stopped 4');
+	ble.requestMtu(app.connectedDevice.id, 512,
+		function(mtu){
+			app.ui.displayStatus("MTU set to: " + mtu);
+			app.chunkLength = mtu - 3;
+			$(":mobile-pagecontainer").pagecontainer( "change", "#page-basic-config", { } );
+			app.ui.displayStatus('Scan stopped 5');
+			
+			app.enablePropertyNotification();
+			app.enableCommandNotification();
+			app.readAndDisplayAll(function() {
+				$('#tab-radio').css('ui-btn-active');
+				$('#tab-radio').trigger('click');
+			});	
+		},
+		function(failure){
+			app.ui.displayStatus("Failed to request MTU: " + failure);
+		}
+	);
 };
 
 
