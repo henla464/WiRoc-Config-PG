@@ -24,7 +24,6 @@ app.miscDeviceNameSuccessBar = null;
 app.miscStatusErrorBar = null;
 app.miscSettingsErrorBar = null;
 app.miscSettingsSuccessBar = null;
-app.miscServicesErrorBar = null;
 app.miscDatabaseErrorBar = null;
 app.miscDatabaseSuccessBar = null;
 app.miscDatabaseAdvErrorBar = null;
@@ -37,7 +36,9 @@ app.miscUpdateErrorBar = null;
 app.miscUpdateInfoBar = null;
 app.miscSportIdentErrorBar = null;
 app.miscSportIdentSuccessBar = null;
-
+app.btSerialErrorBar = null;
+app.btSerialSuccessBar = null;
+app.btSerialInfoBar = null;
 
 app.apiService =                               'fb880900-4ab2-40a2-a8f0-14cc1c2e5608';
 app.propertyCharacteristic =                    'fb880912-4ab2-40a2-a8f0-14cc1c2e5608';
@@ -46,7 +47,7 @@ app.testPunchesCharacteristic =          'fb880907-4ab2-40a2-a8f0-14cc1c2e5608';
 
 app.isScanning = false;
 app.backendApiKey = '67f11087-32c5-4dc5-9987-bbdecb028d36';
-app.statusMessage = '';
+
 
 // UI methods.
 app.ui = {};
@@ -207,6 +208,7 @@ app.ui.updateBackgroundColor = function()
 		$('#sportident').css('background-color','white');
 	}
 	// update
+	
 	if (app.ui.update.wiRocPythonVersion != app.ui.getUpdateWiRocPython() || app.ui.update.wiRocBLEVersion != app.ui.getUpdateWiRocBLE())
 	{
 		$('#update-adv').css('background-color','#FFEFD5');
@@ -267,11 +269,15 @@ app.ui.displayDeviceList = function()
 };
 
 // Display a status message
+app.ui.displayDebug = function(message)
+{
+	$('#wiroc-debug-content').html($('#wiroc-debug-content').html() + ' ' + message);
+};
+
+
 app.ui.displayStatus = function(message)
 {
-	app.statusMessage += message;
-	$('#wiroc-status-content').html($('#wiroc-status-content').html() + ' ' + message);
-	$('#scan-status').html(app.statusMessage);
+	$('#scan-status').html(message);
 };
 
 app.ui.onConnectButton = function(event) {
@@ -633,6 +639,7 @@ app.writeRange = function(callback)
 
 app.ui.onUpdateWiRocPython = function(event)
 {
+	
 	app.writeUpdateWiRocPython(function() {
 		app.miscUpdateInfoBar.show({
     		html: 'Sent update command'
@@ -780,6 +787,7 @@ app.ui.displayUpdateWiRocPython = function(wirocPythonVersion)
 				}
 				selectpython.val(app.ui.update.wiRocPythonVersion).attr('selected', true).siblings('option').removeAttr('selected');
 				selectpython.selectmenu("refresh", true);
+				app.ui.updateBackgroundColor();
 			});
 		});
 	} else {
@@ -829,6 +837,7 @@ app.ui.displayUpdateWiRocPython = function(wirocPythonVersion)
 				}
 				selectpython.val(app.ui.update.wiRocPythonVersion).attr('selected', true).siblings('option').removeAttr('selected');
 				selectpython.selectmenu("refresh", true);
+				app.ui.updateBackgroundColor();
 			});
 		});
 	}
@@ -841,7 +850,9 @@ app.ui.getUpdateWiRocPython = function() {
 
 app.writeUpdateWiRocPython = function(callback)
 {
+	app.ui.displayDebug('writeUpdateWiRocPython');
 	var version = app.ui.getUpdateWiRocPython();
+	app.ui.displayDebug('writeUpdateWiRocPython version: ' + version);
     app.writeProperty('upgradewirocpython', version, 
 		callback,
 		function(error) {
@@ -856,7 +867,9 @@ app.writeUpdateWiRocPython = function(callback)
 
 app.ui.onUpdateWiRocBLE = function(event)
 {
+	app.ui.displayDebug('onUpdateWiRocBLE');
 	app.writeUpdateWiRocBLE(function() {
+		app.ui.displayDebug('onUpdateWiRocBLE write callback');
 		app.miscUpdateInfoBar.show({
     		html: 'Sent update command'
 		});
@@ -869,7 +882,7 @@ app.getWiRocBLEVersionsFromGithub = function(callback) {
 	{
 		url = 'https://api.github.com/repos/henla464/WiRoc-BLE-Device/releases';
 	}
-	app.ui.displayStatus('getWiRocBLEVersionsFromGithub ' + url);
+	app.ui.displayDebug('getWiRocBLEVersionsFromGithub ' + url);
 	if (window.cordova) {
 		// do something cordova style
 		cordovaHTTP.get(
@@ -883,7 +896,7 @@ app.getWiRocBLEVersionsFromGithub = function(callback) {
 				var versionsArray = [];
 				var noOfVersions = versionsJson.length > 5 ? 5 : versionsJson.length;
 				for (var i = 0; i < noOfVersions; i++) {
-					app.ui.displayStatus('getWiRocBLEVersionsFromGithub ' + versionsJson[i].tag_name);
+					app.ui.displayDebug('getWiRocBLEVersionsFromGithub ' + versionsJson[i].tag_name);
 					versionsArray.push(versionsJson[i].tag_name);
 				}
 				callback(versionsArray);
@@ -910,7 +923,7 @@ app.getWiRocBLEVersionsFromGithub = function(callback) {
 			var noOfVersions = versionsJson.length > 5 ? 5 : versionsJson.length;
 			for (var i = 0; i < noOfVersions; i++) {
 				versionsArray.push(versionsJson[i].tag_name);
-				app.ui.displayStatus('getWiRocBLEVersionsFromGithub ' + versionsJson[i].tag_name);
+				app.ui.displayDebug('getWiRocBLEVersionsFromGithub ' + versionsJson[i].tag_name);
 			}
 			return versionsArray;
 		})
@@ -936,7 +949,7 @@ app.getWiRocBLELatestVersionFromGithub = function(callback) {
 			  if (response) {
 				var versionObj = JSON.parse(response.data);
 				if (versionObj.tag_name) {
-					app.ui.displayStatus('getWiRocBLELatestVersionFromGithub cordova' + versionObj.tag_name);
+					app.ui.displayDebug('getWiRocBLELatestVersionFromGithub cordova' + versionObj.tag_name);
 					callback(versionObj.tag_name);
 					return;
 				}
@@ -960,7 +973,7 @@ app.getWiRocBLELatestVersionFromGithub = function(callback) {
 			return res.json();
 		}).then(function (versionObj) {
 			if (versionObj.tag_name) {
-				app.ui.displayStatus('getWiRocBLELatestVersionFromGithub ' + versionObj.tag_name);
+				app.ui.displayDebug('getWiRocBLELatestVersionFromGithub ' + versionObj.tag_name);
 				return versionObj.tag_name;
 			}
 			return null;
@@ -971,15 +984,15 @@ app.getWiRocBLELatestVersionFromGithub = function(callback) {
 
 app.ui.displayUpdateWiRocBLE = function(wirocBLEVersion)
 {
-	app.ui.displayStatus('displayUpdateWiRocBLE ' + wirocBLEVersion);
+	app.ui.displayDebug('displayUpdateWiRocBLE ' + wirocBLEVersion);
 	if (wirocBLEVersion !== null) {
 		app.ui.update.wiRocBLEVersion = wirocBLEVersion;
 	}
 	if (window.cordova) {
-		app.ui.displayStatus('displayUpdateWiRocBLE cordova');
+		app.ui.displayDebug('displayUpdateWiRocBLE cordova');
 		app.getWiRocBLELatestVersionFromGithub(function(latest) {
 			app.getWiRocBLEVersionsFromGithub(function(versions) {
-				app.ui.displayStatus('displayUpdateWiRocBLE cordova 2');
+				app.ui.displayDebug('displayUpdateWiRocBLE cordova 2');
 				var versionOptions = [];
 				$.each(versions, function(index, version) {
 					if (version != latest) {
@@ -1024,6 +1037,7 @@ app.ui.displayUpdateWiRocBLE = function(wirocBLEVersion)
 				// Select the relevant option, de-select any others
 				selectble.val(app.ui.update.wiRocBLEVersion).attr('selected', true).siblings('option').removeAttr('selected');
 				selectble.selectmenu("refresh", true);
+				app.ui.updateBackgroundColor();
 			});
 		});
 	} else {
@@ -1076,6 +1090,7 @@ app.ui.displayUpdateWiRocBLE = function(wirocBLEVersion)
 				// Select the relevant option, de-select any others
 				selectble.val(app.ui.update.wiRocBLEVersion).attr('selected', true).siblings('option').removeAttr('selected');
 				selectble.selectmenu("refresh", true);
+				app.ui.updateBackgroundColor();
 			});
 		});
 	}
@@ -1088,10 +1103,13 @@ app.ui.getUpdateWiRocBLE = function() {
 
 app.writeUpdateWiRocBLE = function(callback)
 {
+	app.ui.displayDebug('writeUpdateWiRocBLE');
     var version = app.ui.getUpdateWiRocBLE();
+    app.ui.displayDebug('writeUpdateWiRocBLE version: ' + version);
     app.writeProperty('upgradewirocble', version, 
 		callback,
 		function(error) {
+			app.ui.displayDebug('writeUpdateWiRocBLE error');
 			app.updateErrorBar.show({
 				html: 'Error sending update: ' + error
 			});
@@ -1185,7 +1203,7 @@ app.ui.getForce4800 = function() {
 app.writeForce4800 = function(callback)
 {
 	var force4800 = app.ui.getForce4800();
-	app.ui.displayStatus('getForce4800 returned ' + force4800.toString());
+	app.ui.displayDebug('getForce4800 returned ' + force4800.toString());
 	app.writeProperty('force4800baudrate', force4800.toString(), 
 		callback,
 		function(error) {
@@ -1198,7 +1216,7 @@ app.writeForce4800 = function(callback)
 
 app.ui.displayForce4800 = function(force4800)
 {
-	app.ui.displayStatus('displayForce4800 ' + force4800);
+	app.ui.displayDebug('displayForce4800 ' + force4800);
 	var raw = parseInt(force4800);
 	app.ui.sportident.force4800 = raw;
 
@@ -1637,18 +1655,8 @@ app.ui.displayAll = function(allString) {
 	app.ui.displayCodeRate(all[20]);
 };
 
-app.readBasicSettings = function() {
-	app.getBatteryLevel();
-	app.getIsCharging();
-	app.getRange();
-	app.getChannel();
-	app.getAcknowledgementRequested();
-	app.getIPAddress();
-	app.getWiRocMode();
-};
-
-app.ui.onReadBasicButton = function() {
-	app.readBasicSettings();
+app.ui.onReadAllButton = function() {
+	app.getAll();
 };
 
 app.ui.onApplyBasicButton = function() {
@@ -1941,6 +1949,8 @@ app.ui.displayWiRocStatus = function(status) {
 app.ui.onRefreshStatusButton = function() {
 	$('#wiroc-status-content').html('');
 	app.getWiRocStatus();
+	$('#wiroc-services-content').html('');
+	app.getServices();
 };
 
 // Services
@@ -1948,7 +1958,7 @@ app.getServices = function(callback) {
 	app.writeProperty('services', null, 
 		callback, 
 		function(error) {
-			app.miscServicesErrorBar.show({
+			app.miscStatusErrorBar.show({
 				html: 'Error getting services: ' + error
 			});
 		}
@@ -1967,11 +1977,6 @@ app.ui.displayServices = function(services) {
 	html += "</tbody></table>";
 
 	$('#wiroc-services-content').html(html);
-};
-
-app.ui.onRefreshServicesButton = function() {
-	$('#wiroc-services-content').html('');
-	app.getServices();
 };
 
 
@@ -2059,6 +2064,147 @@ app.ui.onEditSettingSaveButton = function(event) {
 		$('#wiroc-settings-content').html('');
 	}, null);
 };
+
+
+//-- Get BT Serial
+app.ui.onGetBTSerialListButton = function() {
+	$('#btserial-list').html('');
+	app.getBTSerialList(function() {});
+};
+
+app.getBTSerialList = function(callback)
+{
+	app.writeProperty('scanbtaddresses', null, 
+		callback, 
+		function(error) {
+			app.btSerialErrorBar.show({
+			    html: 'Error getting BT Serial list: ' + error
+			});
+		}
+	);
+};
+
+app.ui.displayBTSerialList = function(btSerialListString)
+{
+	app.ui.displayDebug(btSerialListString);
+	var arrayOfBTSerial = JSON.parse(btSerialListString);
+	var table = $('<table  style="border:0px;padding:0px;width:100%;"></table>');
+	$('#btserial-list').html(table);
+	for (var i = 0; i < arrayOfBTSerial.length; i++) {
+		var btSerialObj = arrayOfBTSerial[i];
+		var name = btSerialObj.Name;
+		app.ui.displayDebug(name);
+		var btAddr = btSerialObj.BTAddress;
+		app.ui.displayDebug(btAddr);
+		var status = btSerialObj.Status;
+		app.ui.displayDebug(status);
+		var portNumber = btSerialObj.PortNumber;
+		app.ui.displayDebug(portNumber);
+		
+		var element = null;
+		var buttonText = "CONNECT";
+		if (status === "clean") {
+			// Create tag for device data.
+			element = $('<tr>' +
+			       '<td style="white-space:nowrap;">' +name +'</td>' +
+			       '<td style="text-align:center;padding-right:5px;padding-left:5px">' + btAddr + '</td>' +
+			       '<td style="text-align:right;">Connecting</td>' +
+			     '</tr>'
+			);
+			table.append(element);
+		} else {
+			if (status === "closed") {
+				buttonText = "CONNECT";
+			}
+			if (status === "connected") {
+				buttonText = "DISCONNECT";
+			}
+			element = $('<tr>' +
+			       '<td style="white-space:nowrap;">' +name +'</td>' +
+			       '<td style="text-align:center;padding-right:5px;padding-left:5px">' + btAddr + '</td>' +
+			       '<td style="text-align:right;"><a href="#" class="ui-btn btserial-connect-button">' + buttonText + '</a></td>' +
+			     '</tr>'
+			);
+			table.append(element);
+		}
+
+		
+		element.find('a.btserial-connect-button').bind("click",
+			{BTAddress: btAddr, isConnected: (status === "connected"), PortNumber: portNumber},
+			app.ui.onBTSerialConnectButton);
+
+	}
+};
+
+//app.ui.displayBindRFComm = function(btSerialBindRFComm)
+//{
+//	var arrayOfBTSerial = JSON.parse(btSerialBindRFComm);
+//	app.displayDebug("displayBindRFComm: " + arrayOfBTSerial[0].Status);
+//};
+
+//app.ui.displayReleaseRFComm = function(btSerialBindRFComm)
+//{
+//	var arrayOfBTSerial = JSON.parse(btSerialBindRFComm);
+//	app.displayDebug("displayBindRFComm: " + arrayOfBTSerial[0].Status);
+//};
+
+//-- BT Serial connect/ disconnect
+app.ui.onBTSerialConnectButton = function(event) {
+	var btAddr = event.data.BTAddress;
+	var portNumber = event.data.PortNumber;
+	var isConnected = event.data.isConnected;
+	if (isConnected) {
+		app.writeDisconnectBTSerial(portNumber, function() {
+			app.btSerialInfoBar.settings.autohide = true;
+			app.btSerialInfoBar.settings.onHide = function() {
+			        app.getBTSerialList();
+    			};
+			app.btSerialInfoBar.show({
+				html: 'Disconnecting BT Serial'
+			});
+		});
+	} else {
+		app.writeConnectBTSerial(btAddr, function() {
+			app.btSerialInfoBar.settings.autohide = true;
+			app.btSerialInfoBar.settings.onHide = function() {
+			        app.getBTSerialList();
+    			};
+			app.btSerialInfoBar.show({
+				html: 'Connecting BT Serial'
+			});
+		});
+	}
+};
+
+//-- BT Serial connect
+
+app.writeConnectBTSerial = function(btAddr, callback)
+{
+	app.writeProperty('bindrfcomm', btAddr, 
+		callback, 
+		function(error) {
+			app.btSerialErrorBar.show({
+			    html: 'Error connecting to BT Serial: ' + error
+			});
+			app.btSerialInfoBar.hide();
+		}
+	);
+};
+
+//-- BT Serial disconnect
+app.writeDisconnectBTSerial = function(portNumber, callback)
+{
+	app.writeProperty('releaserfcomm', portNumber, 
+		callback, 1,
+		function(error) {
+			app.btSerialErrorBar.show({
+			    html: 'Error disconnecting BT Serial: ' + error
+			});
+		}
+	);
+};
+
+//----------
 
 app.appendBuffer = function(buffer1, buffer2) {
   var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
@@ -2434,6 +2580,7 @@ app.ui.displayProperty = function(propAndValueStrings)
 {
 	// should never receive multiple replies anylonger, so split
 	// with '|' could be removed
+	app.ui.displayDebug('displayProperty:' + propAndValueStrings);
 	var propAndValuesArray = propAndValueStrings.split('|');
 	for (var i = 0; i < propAndValuesArray.length; i++) {
 		var propAndValue = propAndValuesArray[i];
@@ -2525,10 +2672,10 @@ app.ui.displayProperty = function(propAndValueStrings)
 				});
 				break;
 			case 'upgradewirocpython':
-			    // do nothing...    
+			    app.getAll();
     			break;
 			case 'upgradewirocpython':
-				// do nothing...
+				app.getAll();
 				break;	
 			case 'services':
 				app.ui.displayServices(propValue);
@@ -2548,6 +2695,16 @@ app.ui.displayProperty = function(propAndValueStrings)
 			case 'coderate':
 				app.ui.displayCodeRate(propValue);
 				break;
+			case 'scanbtaddresses':
+				app.ui.displayBTSerialList(propValue);
+				break;	
+			case 'bindrfcomm':
+				app.ui.displayBTSerialList(propValue);
+				break;				
+			case 'releaserfcomm':
+				app.ui.displayBTSerialList(propValue);
+				break;				
+				
 			default:
 		}
 	}
@@ -2596,18 +2753,18 @@ app.connect = function(device)
 // Called when device is connected.
 app.onConnected = function(device)
 {
-	app.ui.displayStatus('onConnected1');
+	app.ui.displayDebug('onConnected1');
 	app.devices = {};
 	app.ui.displayDeviceList();
 	
 	app.connectedDevice = device;
-	app.ui.displayStatus('onConnected4');
+	app.ui.displayDebug('onConnected4');
 	ble.requestMtu(app.connectedDevice.id, 512,
 		function(mtu){
-			app.ui.displayStatus("MTU set to: " + mtu);
+			app.ui.displayDebug("MTU set to: " + mtu);
 			app.chunkLength = mtu - 3;
 			$(":mobile-pagecontainer").pagecontainer( "change", "#page-basic-config", { } );
-			app.ui.displayStatus('Scan stopped 5');
+			app.ui.displayDebug('Scan stopped 5');
 			
 			app.enablePropertyNotification();
 			setTimeout(
@@ -2621,7 +2778,7 @@ app.onConnected = function(device)
              1000);
 		},
 		function(failure){
-			app.ui.displayStatus("Failed to request MTU: " + failure);
+			app.ui.displayDebug("Failed to request MTU: " + failure);
 		}
 	);
 };
@@ -2630,7 +2787,7 @@ app.onConnected = function(device)
 // Called if device disconnects.
 app.onDisconnected = function(device)
 {
-	app.ui.displayStatus('onDisconnected1');
+	app.ui.displayDebug('onDisconnected1');
 	
 	app.connectedDevice = null;
 	$.mobile.pageContainer.pagecontainer("change", "#page-device-scan", { });

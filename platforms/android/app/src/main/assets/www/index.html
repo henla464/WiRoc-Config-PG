@@ -419,7 +419,6 @@
 		}
     </style>
 	<script src="cordova.js"></script>
-	<!--script src="ble.js"></script-->
 	<script src="libs/jquery/jquery.js"></script>
 	<script src="libs/peekabar/peekabar.js"></script>
 	<script src="libs/jquery/jquery.mobile-1.4.5.js"></script>
@@ -457,7 +456,6 @@
 
 			$('#devicename').css({'min-height': (viewPortHeight - advHeaderHeight - advTabHeaderHeight -2*tabControlPaddingHeight-2*tabContentPaddingHeight) + 'px'});
 			$('#status').css({'min-height': (viewPortHeight - advHeaderHeight - advTabHeaderHeight -2*tabControlPaddingHeight-2*tabContentPaddingHeight) + 'px'});
-			$('#services').css({'min-height': (viewPortHeight - advHeaderHeight - advTabHeaderHeight -2*tabControlPaddingHeight-2*tabContentPaddingHeight) + 'px'});
 			$('#settings').css({'min-height': (viewPortHeight - advHeaderHeight -  advTabHeaderHeight -2*tabControlPaddingHeight-2*tabContentPaddingHeight) + 'px'});
 			$('#punches').css({'min-height': (viewPortHeight - advHeaderHeight -  advTabHeaderHeight -2*tabControlPaddingHeight-2*tabContentPaddingHeight) + 'px'});
 			$('#database-adv').css({'min-height': (viewPortHeight - advHeaderHeight -  advTabHeaderHeight -2*tabControlPaddingHeight-2*tabContentPaddingHeight) + 'px'});
@@ -495,13 +493,15 @@
 			app.miscStatusErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-status'), autohide: true, backgroundColor: '#ffbf00' });
 			app.miscDeviceNameErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-devicename'), autohide: true, backgroundColor: '#ffbf00' });
 			app.miscSettingsErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-settings'), autohide: true, backgroundColor: '#ffbf00' });
-			app.miscServicesErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-services'), autohide: true, backgroundColor: '#ffbf00' });
 			app.miscDatabaseErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-database'), autohide: true, backgroundColor: '#ffbf00' });
 			app.miscDatabaseAdvErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-database-adv'), autohide: true, backgroundColor: '#ffbf00' });
 			app.miscTestPunchesErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-test'), autohide: true, backgroundColor: '#ffbf00' });
 			app.miscRadioAdvErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-radio-adv'), autohide: true, backgroundColor: '#ffbf00' });
 			app.miscUpdateErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-update-adv'), autohide: true, backgroundColor: '#ffbf00' });
 			app.miscSportIdentErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-sportident'), autohide: true, backgroundColor: '#ffbf00' });
+			app.btSerialSuccessBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-btserial'), autohide: true, backgroundColor: '#99ff99' });
+			app.btSerialErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-btserial'), autohide: true, backgroundColor: '#ffbf00' });
+			app.btSerialInfoBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-btserial'), autohide: true, backgroundColor: '#80d4ff' });
 			
 			
 			$('#wifiConnect').click(app.ui.onWifiPasswordConnectButton);
@@ -788,7 +788,7 @@
 					</div>
 					<div style="text-align:center">
 						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onReadBasicButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
+							<a href="#" onclick="app.ui.onReadAllButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
 							<a href="#" onclick="app.ui.onApplyBasicButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
 						</div>
 					</div>
@@ -979,13 +979,14 @@
 					<ul>
 					<li data-tabname="devicename"><a href="#devicename" data-ajax="false" id="tab-devicename" class="ui-btn-active ui-state-persist">Device name</a></li>
 					<li data-tabname="status"><a href="#status" data-ajax="false" id="tab-status">Status</a></li>
-					<li data-tabname="services"><a href="#services" data-ajax="false" id="tab-services">Services</a></li>
 					<li data-tabname="settings"><a href="#settings" data-ajax="false" id="tab-settings">Settings</a></li>
 					<li data-tabname="punches"><a href="#punches" data-ajax="false" id="tab-punches">Punches</a></li>
 					<li data-tabname="database-adv"><a href="#database-adv" data-ajax="false" id="tab-database-adv">Database &amp; Logs</a></li>
 					<li data-tabname="radio-adv"><a href="#radio-adv" data-ajax="false" id="tab-radio-adv">Radio adv.</a></li>
 					<li data-tabname="update-adv"><a href="#update-adv" data-ajax="false" id="tab-radio-adv">Update</a></li>
 					<li data-tabname="sportident"><a href="#sportident" data-ajax="false" id="tab-sportident">SportIdent</a></li>
+					<li data-tabname="btserial"><a href="#btserial" data-ajax="false" id="tab-btserial">BT Serial</a></li>
+					
 					</ul>
 				</div>
 				<div id="devicename" class="ui-body-d ui-content" style="padding:2vw">
@@ -1008,16 +1009,9 @@
 							<a href="#" onclick="app.ui.onRefreshStatusButton()" class="ui-btn ui-btn-inline ui-corner-all">Get/Refresh</a>
 						</div>
 					</div>
-					<div id="wiroc-status-content"></div>
-				</div>
-				<div id="services" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-services" style="height:1px"></div>
-					<div style="text-align:left">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onRefreshServicesButton()" class="ui-btn ui-btn-inline ui-corner-all">Get/Refresh</a>
-						</div>
-					</div>
 					<div id="wiroc-services-content"></div>
+					<div id="wiroc-status-content"></div>
+					<div id="wiroc-debug-content"></div>
 				</div>
 				<div id="settings" class="ui-body-d ui-content" style="padding:2vw">
 					<div id="notification-settings" style="height:1px"></div>
@@ -1162,6 +1156,16 @@
 						<label for="wirocbleversions">WiRoc BLE version:</label>
 					</div>
 					<a href="#" onclick="app.ui.onUpdateWiRocBLE()" data-subscribe="true" id="btnUpdateWiRocBLE" class="ui-btn ui-corner-all">Update WiRoc BLE</a>
+				</div>
+				<div id="btserial" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-btserial" style="height:1px"></div>
+					<div style="text-align:left">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onGetBTSerialListButton()" class="ui-btn ui-btn-inline ui-corner-all">Get/Refresh BT Serial list</a>
+						</div>
+					</div>
+
+					<div id="btserial-list" class="dynamic">Empty list</div>
 				</div>
 			</div>
 		</div>
