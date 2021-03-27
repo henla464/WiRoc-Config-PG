@@ -70,6 +70,21 @@
     		margin-top:0px;
     	}
     	
+    	.loramode.ui-field-contain {
+    		/*width: 40%;*/
+    		margin: auto;
+    		margin-top:0px;
+    	}
+    	
+    	label.loramode-header {
+			line-height: 10vw;
+    		font-size: 6vw;
+    		text-align: center;
+    		margin-bottom: -1vw;
+			height: 10vw;
+    		/*transition: font-size 1s;*/
+    	}
+    	
     	
     	/* code rate */
     	#coderate-select-button span {
@@ -725,6 +740,14 @@
 					<div id="notification-radio" style="height:1px"></div>
 				
 					<div id="main-RF1276T">
+						<label id="loramode-header" class="loramode-header">Radio Mode</label>
+						<div class="ui-field-contain loramode">
+							<select name="LoraMode" id="loramode-select-RF1276T" data-native-menu="false">
+								<option value="1">RECEIVER</option>
+								<option value="2">REPEATER</option>
+								<option value="3">SENDER</option>
+							</select>
+						</div>
 						<label id="channel-header" class="channel-header">Channel</label>
 						<div class="ui-field-contain channel">
 							<select name="channel" id="channel-select-RF1276T" data-native-menu="false">
@@ -751,6 +774,14 @@
 						</fieldset>
 					</div>
 					<div id="main-DRF1268DS">
+						<label id="loramode-header" class="loramode-header">Radio Mode</label>
+						<div class="ui-field-contain loramode">
+							<select name="LoraMode" id="loramode-select-DRF1268DS" data-native-menu="false">
+								<option value="1">RECEIVER</option>
+								<option value="2">REPEATER</option>
+								<option value="3">SENDER</option>
+							</select>
+						</div>
 						<label id="channel-header" class="channel-header">Channel</label>
 						<div class="ui-field-contain channel">
 							<select name="channel" id="channel-select-DRF1268DS" data-native-menu="false">
