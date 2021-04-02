@@ -523,7 +523,8 @@
 			
 			$('#wifiConnect').click(app.ui.onWifiPasswordConnectButton);
 			$('#saveSettingButton').click(app.ui.onEditSettingSaveButton);
-			$('#sportident-oneway').click(app.ui.enableDisableForce4800);		
+			$('#sportident-oneway').click(app.ui.enableDisableForce4800);
+			$('#sportident-RS232-oneway').click(app.ui.enableDisableForceRS2324800);
 			
 
 			$(":mobile-pagecontainer").on( "pagecontainerbeforechange", function( event, ui ) {
@@ -607,7 +608,15 @@
 				app.ui.updateBackgroundColor();
 			});
 			
+			$("#sportident-RS232-oneway").on( "change", function(event, ui) {
+				app.ui.updateBackgroundColor();
+			});
+			
 			$("#force-4800-bps").on( "change", function(event, ui) {
+				app.ui.updateBackgroundColor();
+			});
+			
+			$("#force-RS232-4800-bps").on( "change", function(event, ui) {
 				app.ui.updateBackgroundColor();
 			});
 			
@@ -745,9 +754,9 @@
 						<label id="loramode-header" class="loramode-header">Radio Mode</label>
 						<div class="ui-field-contain loramode">
 							<select name="LoraMode" id="loramode-select-RF1276T" data-native-menu="false">
-								<option value="1">RECEIVER</option>
-								<option value="2">REPEATER</option>
-								<option value="3">SENDER</option>
+								<option value="RECEIVER">RECEIVER</option>
+								<option value="REPEATER">REPEATER</option>
+								<option value="SENDER">SENDER</option>
 							</select>
 						</div>
 						<label id="channel-header" class="channel-header">Channel</label>
@@ -779,9 +788,9 @@
 						<label id="loramode-header" class="loramode-header">Radio Mode</label>
 						<div class="ui-field-contain loramode">
 							<select name="LoraMode" id="loramode-select-DRF1268DS" data-native-menu="false">
-								<option value="1">RECEIVER</option>
-								<option value="2">REPEATER</option>
-								<option value="3">SENDER</option>
+								<option value="RECEIVER">RECEIVER</option>
+								<option value="REPEATER">REPEATER</option>
+								<option value="SENDER">SENDER</option>
 							</select>
 						</div>
 						<label id="channel-header" class="channel-header">Channel</label>
@@ -1199,15 +1208,15 @@
 						<fieldset data-role="controlgroup" data-mini="true" class="RS232-mode">
 							<legend>RS232 Mode</legend>
 							<input type="radio" name="radio-choice-RS232-mode" id="radio-choice-RS232-mode-receive" value="RECEIVE">
-								<label for="radio-choice-RS232-mode-receive">Receive</label>
+								<label for="radio-choice-RS232-mode-receive">RECEIVE</label>
 							<input type="radio" name="radio-choice-RS232-mode" id="radio-choice-RS232-mode-send" value="SEND">
-								<label for="radio-choice-RS232-mode-send">Send</label>
+								<label for="radio-choice-RS232-mode-send">SEND</label>
 						</fieldset>
 						
 						<div id="sportident-RS232-oneway-div">
 							<label><input type="checkbox" id="sportident-RS232-oneway">One-Way (only listen on RS232 serial)</label>
 						</div>
-						<div id="force-4800-bps-div" style="margin-left: 5vw">
+						<div id="force-RS232-4800-bps-div" style="margin-left: 5vw">
 							<label><input type="checkbox" id="force-RS232-4800-bps">Force 4800 bps</label>
 						</div>
 					</div>

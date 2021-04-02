@@ -496,6 +496,7 @@
 			app.miscTestPunchesSuccessBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-test'), autohide: true, backgroundColor: '#99ff99' });
 			app.miscRadioAdvSuccessBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-radio-adv'), autohide: true, backgroundColor: '#99ff99' });
 			app.miscSportIdentSuccessBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-sportident'), autohide: true, backgroundColor: '#99ff99' });
+			app.miscSportIdentRS232SuccessBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-sportident-RS232'), autohide: true, backgroundColor: '#99ff99' });
 			
 			app.miscUpdateInfoBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-update-adv'), autohide: true, backgroundColor: '#41e8eb' });
 			app.searchDevicesInfoBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-search-devices'), autohide: true, backgroundColor: '#41e8eb' });
@@ -514,6 +515,7 @@
 			app.miscRadioAdvErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-radio-adv'), autohide: true, backgroundColor: '#ffbf00' });
 			app.miscUpdateErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-update-adv'), autohide: true, backgroundColor: '#ffbf00' });
 			app.miscSportIdentErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-sportident'), autohide: true, backgroundColor: '#ffbf00' });
+			app.miscSportIdentRS232ErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-sportident-RS232'), autohide: true, backgroundColor: '#ffbf00' });
 			app.btSerialSuccessBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-btserial'), autohide: true, backgroundColor: '#99ff99' });
 			app.btSerialErrorBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-btserial'), autohide: true, backgroundColor: '#ffbf00' });
 			app.btSerialInfoBar = new $.peekABar({ jqObjToAddBarTo: $('div#notification-btserial'), autohide: true, backgroundColor: '#80d4ff' });
@@ -521,7 +523,8 @@
 			
 			$('#wifiConnect').click(app.ui.onWifiPasswordConnectButton);
 			$('#saveSettingButton').click(app.ui.onEditSettingSaveButton);
-			$('#sportident-oneway').click(app.ui.enableDisableForce4800);		
+			$('#sportident-oneway').click(app.ui.enableDisableForce4800);
+			$('#sportident-RS232-oneway').click(app.ui.enableDisableForceRS2324800);
 			
 
 			$(":mobile-pagecontainer").on( "pagecontainerbeforechange", function( event, ui ) {
@@ -605,7 +608,15 @@
 				app.ui.updateBackgroundColor();
 			});
 			
+			$("#sportident-RS232-oneway").on( "change", function(event, ui) {
+				app.ui.updateBackgroundColor();
+			});
+			
 			$("#force-4800-bps").on( "change", function(event, ui) {
+				app.ui.updateBackgroundColor();
+			});
+			
+			$("#force-RS232-4800-bps").on( "change", function(event, ui) {
 				app.ui.updateBackgroundColor();
 			});
 			
@@ -724,7 +735,7 @@
 		<div role="main" class="ui-content" class="page" style="padding:0">
 			<div class="ui-grid-a">
 				<div id="device-name" class="ui-block-a" style="font-size:5vw;padding-left:1vw;margin:0"></div>
-				<div id="wirocmode" class="ui-block-b" style="font-size:5vw;margin:0;padding-right:1vw;text-align:right"></div>
+				<div id="loramode" class="ui-block-b" style="font-size:5vw;margin:0;padding-right:1vw;text-align:right"></div>
 			</div>
 			<div data-role="tabs" id="tabs-main">
 			 	<div data-role="navbar">
@@ -743,9 +754,9 @@
 						<label id="loramode-header" class="loramode-header">Radio Mode</label>
 						<div class="ui-field-contain loramode">
 							<select name="LoraMode" id="loramode-select-RF1276T" data-native-menu="false">
-								<option value="1">RECEIVER</option>
-								<option value="2">REPEATER</option>
-								<option value="3">SENDER</option>
+								<option value="RECEIVER">RECEIVER</option>
+								<option value="REPEATER">REPEATER</option>
+								<option value="SENDER">SENDER</option>
 							</select>
 						</div>
 						<label id="channel-header" class="channel-header">Channel</label>
@@ -777,9 +788,9 @@
 						<label id="loramode-header" class="loramode-header">Radio Mode</label>
 						<div class="ui-field-contain loramode">
 							<select name="LoraMode" id="loramode-select-DRF1268DS" data-native-menu="false">
-								<option value="1">RECEIVER</option>
-								<option value="2">REPEATER</option>
-								<option value="3">SENDER</option>
+								<option value="RECEIVER">RECEIVER</option>
+								<option value="REPEATER">REPEATER</option>
+								<option value="SENDER">SENDER</option>
 							</select>
 						</div>
 						<label id="channel-header" class="channel-header">Channel</label>
@@ -1003,7 +1014,7 @@
 		<div role="main" class="ui-content" class="page" style="padding:0">
 			<div class="ui-grid-a">
 				<div id="device-name2" class="ui-block-a" style="font-size:5vw;padding-left:1vw;margin:0"></div>
-				<div id="wirocmode2" class="ui-block-b" style="font-size:5vw;margin:0;padding-right:1vw;text-align:right"></div>
+				<div id="loramode2" class="ui-block-b" style="font-size:5vw;margin:0;padding-right:1vw;text-align:right"></div>
 			</div>
 			<div data-role="tabs" id="tabs-adv">
 			 	<div data-role="navbar">
@@ -1015,7 +1026,8 @@
 					<li data-tabname="database-adv"><a href="#database-adv" data-ajax="false" id="tab-database-adv">Database &amp; Logs</a></li>
 					<li data-tabname="radio-adv"><a href="#radio-adv" data-ajax="false" id="tab-radio-adv">Radio adv.</a></li>
 					<li data-tabname="update-adv"><a href="#update-adv" data-ajax="false" id="tab-radio-adv">Update</a></li>
-					<li data-tabname="sportident"><a href="#sportident" data-ajax="false" id="tab-sportident">SportIdent</a></li>
+					<li data-tabname="sportident"><a href="#sportident" data-ajax="false" id="tab-sportident">SportIdent USB</a></li>
+					<li data-tabname="sportident-RS232"><a href="#sportident-RS232" data-ajax="false" id="tab-sportident-RS232">SportIdent RS232</a></li>
 					<li data-tabname="btserial"><a href="#btserial" data-ajax="false" id="tab-btserial">BT Serial</a></li>
 					
 					</ul>
@@ -1158,13 +1170,24 @@
 						</div>
 					</div>
 				</div>
+				<div id="update-adv" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-update-adv" style="height:1px"></div>
+					<div class="ui-field-contain updatewirocpython">
+						<label for="wirocpythonversions">WiRoc version:</label>
+					</div>
+					<a href="#" onclick="app.ui.onUpdateWiRocPython()" data-subscribe="true" id="btnUpdateWiRocPython" class="ui-btn ui-corner-all">Update WiRoc</a>
+					<div class="ui-field-contain updatewirocble">
+						<label for="wirocbleversions">WiRoc BLE version:</label>
+					</div>
+					<a href="#" onclick="app.ui.onUpdateWiRocBLE()" data-subscribe="true" id="btnUpdateWiRocBLE" class="ui-btn ui-corner-all">Update WiRoc BLE</a>
+				</div>
 				<div id="sportident" class="ui-body-d ui-content" style="padding:2vw">
 					<div id="notification-sportident" style="height:1px"></div>
 					
 					
-					<div id="sportident">
+					<div id="sportident2">
 						<div id="sportident-oneway-div">
-							<label><input type="checkbox" id="sportident-oneway">One-Way (only listen on SI serial)</label>
+							<label><input type="checkbox" id="sportident-oneway">One-Way (only listen on USB serial)</label>
 						</div>
 						<div id="force-4800-bps-div" style="margin-left: 5vw">
 							<label><input type="checkbox" id="force-4800-bps">Force 4800 bps</label>
@@ -1177,16 +1200,32 @@
 						</div>
 					</div>
 				</div>
-				<div id="update-adv" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-update-adv" style="height:1px"></div>
-					<div class="ui-field-contain updatewirocpython">
-						<label for="wirocpythonversions">WiRoc version:</label>
+				<div id="sportident-RS232" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-sportident-RS232" style="height:1px"></div>
+					
+					
+					<div id="sportident-RS232-2">
+						<fieldset data-role="controlgroup" data-mini="true" class="RS232-mode">
+							<legend>RS232 Mode</legend>
+							<input type="radio" name="radio-choice-RS232-mode" id="radio-choice-RS232-mode-receive" value="RECEIVE">
+								<label for="radio-choice-RS232-mode-receive">RECEIVE</label>
+							<input type="radio" name="radio-choice-RS232-mode" id="radio-choice-RS232-mode-send" value="SEND">
+								<label for="radio-choice-RS232-mode-send">SEND</label>
+						</fieldset>
+						
+						<div id="sportident-RS232-oneway-div">
+							<label><input type="checkbox" id="sportident-RS232-oneway">One-Way (only listen on RS232 serial)</label>
+						</div>
+						<div id="force-RS232-4800-bps-div" style="margin-left: 5vw">
+							<label><input type="checkbox" id="force-RS232-4800-bps">Force 4800 bps</label>
+						</div>
 					</div>
-					<a href="#" onclick="app.ui.onUpdateWiRocPython()" data-subscribe="true" id="btnUpdateWiRocPython" class="ui-btn ui-corner-all">Update WiRoc</a>
-					<div class="ui-field-contain updatewirocble">
-						<label for="wirocbleversions">WiRoc BLE version:</label>
+					<div style="text-align:center">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onReadSportIdentRS232Button()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
+							<a href="#" onclick="app.ui.onApplySportIdentRS232Button()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
+						</div>
 					</div>
-					<a href="#" onclick="app.ui.onUpdateWiRocBLE()" data-subscribe="true" id="btnUpdateWiRocBLE" class="ui-btn ui-corner-all">Update WiRoc BLE</a>
 				</div>
 				<div id="btserial" class="ui-body-d ui-content" style="padding:2vw">
 					<div id="notification-btserial" style="height:1px"></div>

@@ -71,6 +71,7 @@ app.ui.misc.noOfTestPunchesToSend = null;
 app.ui.sportident = {};
 app.ui.sportident.oneway = null;
 app.ui.sportident.force4800 = null;
+app.ui.sportident.RS232Mode = null;
 app.ui.sportident.RS232OneWay = null;
 app.ui.sportident.forceRS2324800 = null;
 app.ui.update = {};
@@ -212,7 +213,9 @@ app.ui.updateBackgroundColor = function()
 		$('#sportident').css('background-color','white');
 	}
 	// sportident RS232
-	if (app.ui.sportident.RS232OneWay != app.ui.getRS232OneWay() || app.ui.sportident.forceRS2324800 != app.ui.getForceRS2324800())
+	if (app.ui.sportident.RS232Mode != app.ui.getRS232Mode() 
+		|| app.ui.sportident.RS232OneWay != app.ui.getRS232OneWay() 
+		|| app.ui.sportident.forceRS2324800 != app.ui.getForceRS2324800())
 	{
 		$('#sportident-RS232').css('background-color','#FFEFD5');
 	} else {
@@ -398,7 +401,7 @@ app.ui.getLoraMode = function() {
 
 app.writeLoraMode = function(callback)
 {
-	app.writeProperty('loramode', app.ui.getChannel(), 
+	app.writeProperty('loramode', app.ui.getLoraMode(), 
 		callback,
 		function(error) {
 			app.radioErrorBar.show({
@@ -1307,6 +1310,53 @@ app.readSportIdentSettings = function() {
 
 
 //-- SportIdent RS232
+app.ui.displayRS232Mode = function(rs232ModeString)
+{
+	app.ui.sportident.RS232Mode = rs232ModeString;
+	app.ui.displayDebug("rs232ModeString:" + rs232ModeString);
+	$(".RS232-mode [type='radio']").checkboxradio();
+	app.ui.displayDebug("displayRS232Mode 0");
+	$(".RS232-mode [type='radio'][value = '" + rs232ModeString + "']").prop("checked", true).checkboxradio("refresh");
+	app.ui.displayDebug("displayRS232Mode 1");
+	
+	$(".RS232-mode [type='radio']").not( "[value = '" + rs232ModeString + "']").prop("checked", false).checkboxradio("refresh");
+	app.ui.displayDebug("displayRS232Mode 2");
+	app.ui.updateBackgroundColor();
+	app.ui.displayDebug("displayRS232Mode 3");
+};
+
+
+app.getRS232Mode = function(callback)
+{
+    app.writeProperty('rs232mode', null, 
+		callback,
+		function(error) {
+			app.radioErrorBar.show({
+				html: 'Error getting SportIdent RS232 setting (Mode): ' + error
+			});
+		}
+	);
+};
+
+app.ui.getRS232Mode = function() {
+	var selected = $(".RS232-mode [type='radio']:checked");
+	return selected.val();
+};
+
+app.writeRS232Mode = function(callback)
+{
+    app.writeProperty('rs232mode', app.ui.getRS232Mode(), 
+		callback,
+		function(error) {
+			app.radioErrorBar.show({
+				html: 'Error saving SportIdent RS232 setting (Mode): ' + error
+			});
+		}
+	);
+};
+
+
+
 app.ui.enableDisableForceRS2324800 = function() 
 {
   app.ui.enableDisableForceRS2324800WithParam(this.checked);
@@ -1340,7 +1390,7 @@ app.getRS232OneWay = function(callback)
 
 
 app.ui.getRS232OneWay = function() {
-	return $('#sportident-oneway').prop("checked") ? 1 : 0;
+	return $('#sportident-RS232-oneway').prop("checked") ? 1 : 0;
 };
 
 app.writeRS232OneWay = function(callback)
@@ -1360,6 +1410,7 @@ app.ui.displayRS232OneWay = function(oneway)
 {
 	var raw = parseInt(oneway);
 	app.ui.sportident.RS232OneWay = raw;
+	app.ui.displayDebug("RS232OneWay:" + raw);
     $('#sportident-RS232-oneway').checkboxradio();
 	$('#sportident-RS232-oneway').prop("checked",raw !== 0).checkboxradio("refresh");
 	app.ui.enableDisableForceRS2324800WithParam(raw !== 0);
@@ -1420,17 +1471,20 @@ app.ui.onReadSportIdentRS232Button = function() {
 };
 
 app.ui.onApplySportIdentRS232Button = function() {
-    app.writeRS232OneWay(function() {
-		app.writeForceRS2324800(function() {
-			app.miscSportIdentRS232SuccessBar.show({
-				html: 'SportIdent RS232 saved'
+	app.writeRS232Mode(function() {
+		app.writeRS232OneWay(function() {
+			app.writeForceRS2324800(function() {
+				app.miscSportIdentRS232SuccessBar.show({
+					html: 'SportIdent RS232 saved'
+				});
+				app.readSportIdentRS232Settings();
 			});
-			app.readSportIdentRS232Settings();
 		});
 	});
 };
 
 app.readSportIdentRS232Settings = function() {
+	app.getRS232Mode();
 	app.getRS232OneWay();
 	app.getForceRS2324800();
 };
@@ -1839,13 +1893,15 @@ app.ui.displayAll = function(allString) {
     app.ui.displayWarningNotes(all[11], all[5], all[10], all[16], all[19], all[20]);
 	app.ui.displayOneWay(all[16]);
 	app.ui.displayForce4800(all[17]);
-	app.ui.displayWiRocMode(all[18]);
-	app.ui.displayLoraMode(all[18])
+	app.ui.displayLoraMode(all[18]);
 	app.ui.displayRxGain(all[19]);
 	app.ui.displayCodeRate(all[20]);
-	if (all.length > 21) {	
-		//app.ui.displayRS232Mode(all[21]);
+	if (all.length > 21) {
+		app.ui.displayDebug("all[21]:" + all[21]);
+		app.ui.displayRS232Mode(all[21]);
+		app.ui.displayDebug("all[22]:" + all[22]);
 		app.ui.displayRS232OneWay(all[22]);
+		app.ui.displayDebug("all[23]:" + all[23]);
 		app.ui.displayForceRS2324800(all[23]);
 	}
 };
@@ -1855,18 +1911,16 @@ app.ui.onReadAllButton = function() {
 };
 
 app.ui.onApplyBasicButton = function() {
-	app.writeChannel(function() {
-        var displayRadioSettings = function() {
-			app.radioSuccessBar.show({
-		    		html: 'Radio settings saved'
-			});
+	app.writeLoraMode(function() {
+		app.writeChannel(function() {
+			app.writeRange(function() {
+				app.radioSuccessBar.show({
+						html: 'Radio settings saved'
+				});
 
-			app.getRange();
-			app.getChannel();
-			app.getAcknowledgementRequested();
-		};
-		
-		app.writeRange(displayRadioSettings);
+				app.getAll();
+			});
+		});
 	});
 };
 
@@ -2867,6 +2921,9 @@ app.ui.displayProperty = function(propAndValueStrings)
 			case 'onewayreceive':
 				app.ui.displayOneWay(propValue);
 				break;
+			case 'rs232mode':
+				app.ui.displayRS232Mode(propValue);
+				break;
 			case 'rs232onewayreceive':
 				app.ui.displayRS232OneWay(propValue);
 				break;
@@ -2887,7 +2944,7 @@ app.ui.displayProperty = function(propAndValueStrings)
 				break;				
 			case 'releaserfcomm':
 				app.ui.displayBTSerialList(propValue);
-				break;				
+				break;			
 				
 			default:
 		}
