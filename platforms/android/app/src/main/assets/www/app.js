@@ -2169,10 +2169,10 @@ app.ui.displayWiRocStatus = function(status) {
 	}
 	html += "</tbody></table>";
 	html += "<h2>Output:</h2><table width=\"100%\" border=1><thead>";
-	html += "<tr><th align=\"left\">Type</th><th align=\"left\">Instance</th><th align=\"left\">Msg In</th><th align=\"left\">Msg Out</th><th align=\"left\">Enabled</th></tr></thead><tbody>";
+	html += "<tr><th align=\"left\">Type</th><th align=\"left\">Instance</th><th align=\"left\">Msg In</th><th align=\"left\">Msg In Subtype</th><th align=\"left\">Msg Out</th><th align=\"left\">Msg Out Subtype</th><th align=\"left\">Enabled</th></tr></thead><tbody>";
 	for (i = 0; i < statusObj.subscriberAdapters.length ; i++) {
 		var subscriber = statusObj.subscriberAdapters[i];
-		html += "<tr><td>" + subscriber.TypeName + "</td><td>" + subscriber.InstanceName + "</td><td>" + subscriber.MessageInName + "</td><td>" + subscriber.MessageOutName + "</td><td>" + subscriber.Enabled + "</td></tr>";
+		html += "<tr><td>" + subscriber.TypeName + "</td><td>" + subscriber.InstanceName + "</td><td>" + subscriber.MessageInName + "</td><td>" + subscriber.MessageInSubTypeName + "</td><td>" + subscriber.MessageOutName + "</td><td>" + subscriber.MessageOutSubTypeName + "</td><td>" + subscriber.Enabled + "</td></tr>";
 	}
 	html += "</tbody></table>";
 	$('#wiroc-status-content').html(html);
@@ -2469,6 +2469,7 @@ app.ui.displayPunches = function(punches) {
 app.subscribePunches = function() {
 	if ($('#btnSubscribePunches').data('subscribe'))
 	{
+		app.ui.displayDebug("Subcribe punches");
 		ble.startNotification(
 			app.connectedDevice.id, 
 			app.apiService, 
@@ -2486,6 +2487,7 @@ app.subscribePunches = function() {
 		$('#btnSubscribePunches').text("Unsubscribe");
 		$('#btnSubscribePunches').data("subscribe", false);
 	} else {
+		app.ui.displayDebug("Unubcribe punches");
 		app.punches = null;
 		ble.stopNotification(
 			app.connectedDevice.id, 

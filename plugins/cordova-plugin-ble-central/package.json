@@ -1,36 +1,7 @@
 {
-  "_from": "cordova-plugin-ble-central",
-  "_id": "cordova-plugin-ble-central@1.3.1",
-  "_inBundle": false,
-  "_integrity": "sha512-6tONmzQRs6NY5NJ7mDdIM+mvKbRYMfOF9LMr6EU4q8o3I67RrjsBuMvFhLGrXMFQ59WMrZkAGZMWkf78qk70eA==",
-  "_location": "/cordova-plugin-ble-central",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "tag",
-    "registry": true,
-    "raw": "cordova-plugin-ble-central",
-    "name": "cordova-plugin-ble-central",
-    "escapedName": "cordova-plugin-ble-central",
-    "rawSpec": "",
-    "saveSpec": null,
-    "fetchSpec": "latest"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-ble-central/-/cordova-plugin-ble-central-1.3.1.tgz",
-  "_shasum": "70575c7bd8ab2ffd898de85734789ec3513bf58e",
-  "_spec": "cordova-plugin-ble-central",
-  "_where": "/home/henla464/Documents/WiRoc/WiRoc-Config-PG",
-  "author": {
-    "name": "Don Coleman",
-    "email": "don.coleman@gmail.com"
-  },
-  "bugs": {
-    "url": "https://github.com/don/cordova-plugin-ble-central/issues"
-  },
-  "bundleDependencies": false,
+  "name": "cordova-plugin-ble-central",
+  "version": "1.4.1",
+  "description": "Bluetooth Low Energy (BLE) Central Plugin",
   "cordova": {
     "id": "cordova-plugin-ble-central",
     "platforms": [
@@ -39,9 +10,10 @@
       "wp8"
     ]
   },
-  "deprecated": false,
-  "description": "Bluetooth Low Energy (BLE) Central Plugin",
-  "homepage": "https://github.com/don/cordova-plugin-ble-central#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/don/cordova-plugin-ble-central.git"
+  },
   "keywords": [
     "cordova",
     "bluetooth",
@@ -54,11 +26,10 @@
     "cordova-ios",
     "cordova-android"
   ],
+  "author": "Don Coleman <don.coleman@gmail.com>",
   "license": "Apache-2.0",
-  "name": "cordova-plugin-ble-central",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/don/cordova-plugin-ble-central.git"
+  "bugs": {
+    "url": "https://github.com/don/cordova-plugin-ble-central/issues"
   },
-  "version": "1.3.1"
+  "homepage": "https://github.com/don/cordova-plugin-ble-central#readme"
 }

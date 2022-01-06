@@ -19,6 +19,3 @@ out
 gradle-app.setting
 # Android Studio
 .idea
-
-
-release-signing.properties

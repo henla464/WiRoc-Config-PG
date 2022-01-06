@@ -434,7 +434,8 @@
 		}
     </style>
 	<script src="cordova.js"></script>
-	<script src="libs/jquery/jquery.js"></script>
+	<script src="libs/jquery/jquery-3.6.0.min.js"></script>
+	<script src="https://code.jquery.com/jquery-migrate-3.3.2.min.js"></script>
 	<script src="libs/peekabar/peekabar.js"></script>
 	<script src="libs/jquery/jquery.mobile-1.4.5.js"></script>
 	<script src="libs/evothings/evothings.js"></script>
@@ -628,10 +629,6 @@
 				app.ui.updateBackgroundColor();
 			});
 			
-			// Scan header
-			$('#ScanHeader').click(function() {
-				evothings.ble.reset(function() { console.log('reset success'); },function() { console.log('reset fail'); });
-			});
 
 			// Menu
 			$('body').bind('hideOpenMenus', function(){
@@ -725,7 +722,7 @@
 				<h1>WiRoc Config</h1>
 
 				<table>
-					<tr><td>Version</td><td>0.2</td></tr>
+					<tr><td>Version</td><td>0.3</td></tr>
 					<tr><td></td><td></td></tr>
 					<tr><td></td><td></td></tr>
 					<tr><td></td><td></td></tr>
@@ -1003,7 +1000,7 @@
 				<h1>WiRoc Config</h1>
 
 				<table>
-					<tr><td>Version</td><td>0.1.9</td></tr>
+					<tr><td>Version</td><td>0.3</td></tr>
 					<tr><td></td><td></td></tr>
 					<tr><td></td><td></td></tr>
 					<tr><td></td><td></td></tr>

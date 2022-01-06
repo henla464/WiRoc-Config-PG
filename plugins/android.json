@@ -13,10 +13,8 @@
     "cordova-plugin-http": {
       "PACKAGE_NAME": "se.wiroc.configpg"
     },
-    "cordova-plugin-whitelist": {
-      "PACKAGE_NAME": "se.wiroc.configpg"
-    },
     "cordova-plugin-ble-central": {
+      "ACCESS_BACKGROUND_LOCATION": "false",
       "PACKAGE_NAME": "se.wiroc.configpg"
     }
   },
