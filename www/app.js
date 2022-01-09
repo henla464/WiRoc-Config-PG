@@ -74,6 +74,9 @@ app.ui.sportident.force4800 = null;
 app.ui.sportident.RS232Mode = null;
 app.ui.sportident.RS232OneWay = null;
 app.ui.sportident.forceRS2324800 = null;
+app.ui.sportident.BTSerialOneWay = null;
+app.ui.sportident.forceBTSerial4800 = null;
+
 app.ui.update = {};
 app.ui.update.wiRocBLEVersion = null;
 app.ui.update.wiRocPythonVersion = null;
@@ -88,6 +91,9 @@ app.testPunches = null;
 app.propertyResponse = null;
 app.wirocSettings = null;
 app.wirocHWVersion = null;
+app.btSerialNoOfTimesConnectedStatusReceived = 0;
+app.btSerialListStop = false;
+app.lastBTSerialCommand = "CONNECT";
 
 app.initialize = function()
 {
@@ -220,6 +226,14 @@ app.ui.updateBackgroundColor = function()
 		$('#sportident-RS232').css('background-color','#FFEFD5');
 	} else {
 		$('#sportident-RS232').css('background-color','white');
+	}
+	// sportident BTSerial
+	if (app.ui.sportident.BTSerialOneWay != app.ui.getBTSerialOneWay() 
+		|| app.ui.sportident.forceBTSerial4800 != app.ui.getForceBTSerial4800())
+	{
+		$('#sportident-btserial').css('background-color','#FFEFD5');
+	} else {
+		$('#sportident-btserial').css('background-color','white');
 	}
 	// update
 	
@@ -1489,6 +1503,139 @@ app.readSportIdentRS232Settings = function() {
 	app.getForceRS2324800();
 };
 
+//-- BT Serial
+
+
+
+app.ui.enableDisableForceBTSerial4800 = function() 
+{
+  app.ui.enableDisableForceBTSerial4800WithParam(this.checked);
+};
+
+app.ui.enableDisableForceBTSerial4800WithParam = function(oneWayChecked) 
+{
+  if (oneWayChecked) {
+	$('#force-btserial-4800-bps').checkboxradio();
+    $("#force-btserial-4800-bps").removeAttr("disabled");
+	//$('#force-4800-bps').prop("checked", false);
+    $('#force-btserial-4800-bps').checkboxradio('refresh');
+  } else {
+	$('#force-btserial-4800-bps').checkboxradio();
+    $("#force-btserial-4800-bps").attr("disabled", true);
+    $('#force-btserial-4800-bps').prop("checked", false).checkboxradio("refresh");
+  }
+};
+
+app.getBTSerialOneWay = function(callback)
+{
+	app.writeProperty('btserialonewayreceive', null, 
+		callback,
+		function(error) {
+			app.btSerialErrorBar.show({
+				html: 'Error getting one-way: ' + error
+			});
+		}
+	);
+};
+
+
+app.ui.getBTSerialOneWay = function() {
+	return $('#sportident-btserial-oneway').prop("checked") ? 1 : 0;
+};
+
+app.writeBTSerialOneWay = function(callback)
+{
+	var oneway = app.ui.getBTSerialOneWay();
+	app.writeProperty('btserialonewayreceive', oneway.toString(), 
+		callback,
+		function(error) {
+			app.btSerialErrorBar.show({
+				html: 'Error saving one-way: ' + error
+			});
+		}
+	);
+};
+
+app.ui.displayBTSerialOneWay = function(oneway)
+{
+	var raw = parseInt(oneway);
+	app.ui.sportident.BTSerialOneWay = raw;
+	app.ui.displayDebug("BTSerialOneWay:" + raw);
+    $('#sportident-btserial-oneway').checkboxradio();
+	$('#sportident-btserial-oneway').prop("checked",raw !== 0).checkboxradio("refresh");
+	app.ui.enableDisableForceBTSerial4800WithParam(raw !== 0);
+	//todo: app.ui.displayWarningNotes(app.ui.chip, null, null, oneway, null, null);
+	
+	app.ui.updateBackgroundColor();
+};
+
+
+//---- force4800
+
+app.getForceBTSerial4800 = function(callback)
+{
+	app.writeProperty('forcebtserial4800baudrate', null, 
+		callback,
+		function(error) {
+			app.btSerialErrorBar.show({
+				html: 'Error getting force BTSerial 4800: ' + error
+			});
+		}
+	);
+};
+
+
+app.ui.getForceBTSerial4800 = function() {
+	return $('#force-btserial-4800-bps').prop("checked") ? 1 : 0;
+};
+
+app.writeForceBTSerial4800 = function(callback)
+{
+	var force4800 = app.ui.getForceBTSerial4800();
+	app.ui.displayDebug('getForceBTSerial4800 returned ' + force4800.toString());
+	app.writeProperty('forcebtserial4800baudrate', force4800.toString(), 
+		callback,
+		function(error) {
+			app.btSerialErrorBar.show({
+				html: 'Error saving force BTSerial 4800: ' + error
+			});
+		}
+	);
+};
+
+app.ui.displayForceBTSerial4800 = function(force4800)
+{
+	app.ui.displayDebug('displayForceBTSerial4800 ' + force4800);
+	var raw = parseInt(force4800);
+	app.ui.sportident.forceBTSerial4800 = raw;
+
+    $('#force-btserial-4800-bps').checkboxradio();
+    //$("#force-4800-bps").removeAttr("disabled");
+	$('#force-btserial-4800-bps').prop("checked",raw !== 0).checkboxradio("refresh");
+	app.ui.updateBackgroundColor();
+};
+
+
+app.ui.onReadSportIdentBTSerialButton = function() {
+	app.readSportIdentBTSerialSettings();	
+};
+
+app.ui.onApplySportIdentBTSerialButton = function() {
+	app.writeBTSerialOneWay(function() {
+		app.writeForceBTSerial4800(function() {
+			app.btSerialSuccessBar.show({
+				html: 'SportIdent BTSerial saved'
+			});
+			app.readSportIdentBTSerialSettings();
+		});
+	});
+};
+
+app.readSportIdentBTSerialSettings = function() {
+	app.getBTSerialOneWay();
+	app.getForceBTSerial4800();
+};
+
 
 //-- Battery
 
@@ -1873,8 +2020,8 @@ app.ui.displayAll = function(allString) {
 	// isCharging¤wirocDeviceName¤sentToSirapIPPort¤sendToSirapIP¤sentToSirapEnabled¤acknowledgementRequested¤dataRate¤channel¤intPercent¤ipAddress¤power¤
 	//  11   12            13               14             15         16            17            18       19     20         21            22
 	// chip¤range¤wirocPythonVersion¤wirocBLEVersion¤wirocHWVersion¤SIOneWay¤force4800baudrate¤wirocMode¤rxGain¤codeRate¤RS232Mode¤RS232OneWayReceive¤
-	//           23
-	// forceRS2324800BaudRate
+	//           23                     24                   25
+	// forceRS2324800BaudRate¤BTSerialOneWayReceive¤forceBTSerial4800BaudRate
 	app.ui.displayChip(all[11]);
 	app.ui.displayRange(all[12]);
 	app.ui.displayIsCharging(all[0]);
@@ -1903,6 +2050,12 @@ app.ui.displayAll = function(allString) {
 		app.ui.displayRS232OneWay(all[22]);
 		app.ui.displayDebug("all[23]:" + all[23]);
 		app.ui.displayForceRS2324800(all[23]);
+	}
+	if (all.length > 24) {
+		app.ui.displayDebug("all[24]:" + all[24]);
+		app.ui.displayBTSerialOneWay(all[24]);
+		app.ui.displayDebug("all[25]:" + all[25]);
+		app.ui.displayForceBTSerial4800(all[25]);
 	}
 };
 
@@ -2300,12 +2453,22 @@ app.ui.onEditSettingSaveButton = function(event) {
 
 //-- Get BT Serial
 app.ui.onGetBTSerialListButton = function() {
+	app.btSerialNoOfTimesConnectedStatusReceived = 0;
 	$('#btserial-list').html('');
+	app.btSerialListStop = false;
+	$('#stopBTSerialList').removeClass('ui-disabled');
 	app.getBTSerialList(function() {});
 };
 
+app.ui.onBTSerialListStopButton = function() {
+	$('#stopBTSerialList').addClass('ui-disabled');
+	app.btSerialListStop = true;
+};
+
+
 app.getBTSerialList = function(callback)
 {
+	$('#getBTSerialListLoading').show();
 	app.writeProperty('scanbtaddresses', null, 
 		callback, 
 		function(error) {
@@ -2319,52 +2482,121 @@ app.getBTSerialList = function(callback)
 app.ui.displayBTSerialList = function(btSerialListString)
 {
 	app.ui.displayDebug(btSerialListString);
+	$('#getBTSerialListLoading').hide();
+	var updateListAgain = false;
 	var arrayOfBTSerial = JSON.parse(btSerialListString);
-	var table = $('<table  style="border:0px;padding:0px;width:100%;"></table>');
-	$('#btserial-list').html(table);
-	for (var i = 0; i < arrayOfBTSerial.length; i++) {
-		var btSerialObj = arrayOfBTSerial[i];
-		var name = btSerialObj.Name;
-		app.ui.displayDebug(name);
-		var btAddr = btSerialObj.BTAddress;
-		app.ui.displayDebug(btAddr);
-		var status = btSerialObj.Status;
-		app.ui.displayDebug(status);
-		var portNumber = btSerialObj.PortNumber;
-		app.ui.displayDebug(portNumber);
-		
-		var element = null;
-		var buttonText = "CONNECT";
-		if (status === "clean") {
-			// Create tag for device data.
-			element = $('<tr>' +
-			       '<td style="white-space:nowrap;">' +name +'</td>' +
-			       '<td style="text-align:center;padding-right:5px;padding-left:5px">' + btAddr + '</td>' +
-			       '<td style="text-align:right;">Connecting</td>' +
-			     '</tr>'
-			);
-			table.append(element);
-		} else {
-			if (status === "closed") {
-				buttonText = "CONNECT";
+	if (arrayOfBTSerial.length == 0) {
+		$('#btserial-list').html('No BT Serial devices found');
+	} else {
+		var table = $('<table  style="border:0px;padding:0px;width:100%;"></table>');
+		$('#btserial-list').html(table);
+		for (var i = 0; i < arrayOfBTSerial.length; i++) {
+			var btSerialObj = arrayOfBTSerial[i];
+			var name = btSerialObj.Name;
+			app.ui.displayDebug(name);
+			var btAddr = btSerialObj.BTAddress;
+			app.ui.displayDebug(btAddr);
+			var status = btSerialObj.Status;
+			app.ui.displayDebug(status);
+			var portNumber = btSerialObj.PortNumber;
+			app.ui.displayDebug(portNumber);
+			var attachedText = btSerialObj.AttachedText;
+			app.ui.displayDebug(attachedText);
+			
+			var element = null;
+			if (status === "clean" || status == "connecting" || status == "config") {
+				// Create tag for device data.
+				element = $('<tr>' +
+					   '<td style="white-space:nowrap;">' +name + '</td>' +
+					   '<td style="text-align:center;padding-right:5px;padding-left:5px">' + btAddr + '<br/>Connected, no SI</td>' +
+					   '<td style="text-align:right;">Connecting</td>' +
+					 '</tr>'
+				);
+				updateListAgain = true;
+			} else if (status == "disconnecting") {
+				// Create tag for device data.
+				element = $('<tr>' +
+					   '<td style="white-space:nowrap;">' +name + '</td>' +
+					   '<td style="text-align:center;padding-right:5px;padding-left:5px">' + btAddr + '<br/>Disconnecting</td>' +
+					   '<td style="text-align:right;">Disconnecting</td>' +
+					 '</tr>'
+				);
+				updateListAgain = true;
+			} else if (status == "unknown" || status == "bound" || status == "listening") {
+				// Create tag for device data.
+				element = $('<tr>' +
+					   '<td style="white-space:nowrap;">' +name + '</td>' +
+					   '<td style="text-align:center;padding-right:5px;padding-left:5px">' + btAddr + '</td>' +
+					   '<td style="text-align:right;">' + status + '</td>' +
+					 '</tr>'
+				);
+			} else if (status === "connected") {
+				var buttonText = "DISCONNECT";
+				element = $('<tr>' +
+					   '<td style="white-space:nowrap;">' +name + '</td>' +
+					   '<td style="text-align:center;padding-right:5px;padding-left:5px">' + btAddr + '<br/>Connected</td>' +
+					   '<td style="text-align:right;"><a href="#" class="ui-btn btserial-connect-button">' + buttonText + '</a></td>' +
+					 '</tr>'
+				);
+				app.btSerialNoOfTimesConnectedStatusReceived += 1;
+				if (app.btSerialNoOfTimesConnectedStatusReceived <= 2) {
+					updateListAgain = true;
+				}
+			} else if (status === "closed" && attachedText === "tty-attached") {
+				// Create tag for device data.
+				if (app.lastBTSerialCommand == "CONNECT") {
+					statusTextToDisplay = "Connecting"
+				} else {
+					statusTextToDisplay = "Disconnecting"
+				}
+				element = $('<tr>' +
+					   '<td style="white-space:nowrap;">' +name + '</td>' +
+					   '<td style="text-align:center;padding-right:5px;padding-left:5px">' + btAddr + '<br/>' + statusTextToDisplay + ' BT serial</td>' +
+					   '<td style="text-align:right;">' + status + ' ' + attachedText + '</td>' +
+					 '</tr>'
+				);
+				updateListAgain = true;
+			} else if (status === "closed" && attachedText !== "tty-attached") {
+				if (app.lastBTSerialCommand == "CONNECT") {
+					statusTextToDisplay = "Connecting"
+				} else {
+					statusTextToDisplay = "Disconnecting"
+				}
+				var buttonText = "DISCONNECT";
+				element = $('<tr>' +
+					   '<td style="white-space:nowrap;">' +name + '</td>' +
+					   '<td style="text-align:center;padding-right:5px;padding-left:5px">' + btAddr + '<br/>' + statusTextToDisplay + ' BT serial</td>' +
+					   '<td style="text-align:right;">' + status + ' ' + attachedText + '</td>' +
+					 '</tr>'
+				);
+				updateListAgain = true;
+			} else if (status === null) {
+				var buttonText = "CONNECT";
+				element = $('<tr>' +
+					   '<td style="white-space:nowrap;">' +name + '</td>' +
+					   '<td style="text-align:center;padding-right:5px;padding-left:5px">' + btAddr + '<br/>Not connected</td>' +
+					   '<td style="text-align:right;"><a href="#" class="ui-btn btserial-connect-button">' + buttonText + '</a></td>' +
+					 '</tr>'
+				);
 			}
-			if (status === "connected") {
-				buttonText = "DISCONNECT";
-			}
-			element = $('<tr>' +
-			       '<td style="white-space:nowrap;">' +name +'</td>' +
-			       '<td style="text-align:center;padding-right:5px;padding-left:5px">' + btAddr + '</td>' +
-			       '<td style="text-align:right;"><a href="#" class="ui-btn btserial-connect-button">' + buttonText + '</a></td>' +
-			     '</tr>'
-			);
 			table.append(element);
+			
+			element.find('a.btserial-connect-button').bind("click",
+				{BTAddress: btAddr, isConnected: (status === "connected"), PortNumber: portNumber},
+				app.ui.onBTSerialConnectButton);
+
 		}
-
 		
-		element.find('a.btserial-connect-button').bind("click",
-			{BTAddress: btAddr, isConnected: (status === "connected"), PortNumber: portNumber},
-			app.ui.onBTSerialConnectButton);
-
+		if (updateListAgain && !app.btSerialListStop) {
+			setTimeout(
+				function()
+				{
+					app.getBTSerialList(function() {});
+				},
+			1000);
+		} else {
+			$('#stopBTSerialList').addClass('ui-disabled');
+		}
 	}
 };
 
@@ -2386,6 +2618,7 @@ app.ui.onBTSerialConnectButton = function(event) {
 	var portNumber = event.data.PortNumber;
 	var isConnected = event.data.isConnected;
 	if (isConnected) {
+		app.lastBTSerialCommand = "DISCONNECT";
 		app.writeDisconnectBTSerial(portNumber, function() {
 			app.btSerialInfoBar.settings.autohide = true;
 			app.btSerialInfoBar.settings.onHide = function() {
@@ -2396,6 +2629,7 @@ app.ui.onBTSerialConnectButton = function(event) {
 			});
 		});
 	} else {
+		app.lastBTSerialCommand = "CONNECT";
 		app.writeConnectBTSerial(btAddr, function() {
 			app.btSerialInfoBar.settings.autohide = true;
 			app.btSerialInfoBar.settings.onHide = function() {
@@ -2427,7 +2661,7 @@ app.writeConnectBTSerial = function(btAddr, callback)
 app.writeDisconnectBTSerial = function(portNumber, callback)
 {
 	app.writeProperty('releaserfcomm', portNumber, 
-		callback, 1,
+		callback,
 		function(error) {
 			app.btSerialErrorBar.show({
 			    html: 'Error disconnecting BT Serial: ' + error
@@ -2858,6 +3092,9 @@ app.ui.displayProperty = function(propAndValueStrings)
 				break;
 			case 'forcers2324800baudrate':
 				app.ui.displayForceRS2324800(propValue);
+				break;
+			case 'forcebtserial4800baudrate':
+				app.ui.displayForceBTSerial4800(propValue);
 				break;	
 			case 'status':
 				app.ui.displayWiRocStatus(propValue);
@@ -2928,6 +3165,9 @@ app.ui.displayProperty = function(propAndValueStrings)
 				break;
 			case 'rs232onewayreceive':
 				app.ui.displayRS232OneWay(propValue);
+				break;
+			case 'btserialonewayreceive':
+				app.ui.displayBTSerialOneWay(propValue);
 				break;
 			case 'batterylevel':
 				app.ui.displayBatteryLevel(propValue);

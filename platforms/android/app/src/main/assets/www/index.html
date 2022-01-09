@@ -406,6 +406,7 @@
 		.test-punch div.ui-field-contain .ui-btn {
 			margin-top:0px;
 		}
+		.bt-serial-row-1 .ui-loader,
 		.test-punch-row-3 .ui-loader {
 			display: none;
 			z-index: 9999999;
@@ -526,6 +527,7 @@
 			$('#saveSettingButton').click(app.ui.onEditSettingSaveButton);
 			$('#sportident-oneway').click(app.ui.enableDisableForce4800);
 			$('#sportident-RS232-oneway').click(app.ui.enableDisableForceRS2324800);
+			$('#sportident-btserial-oneway').click(app.ui.enableDisableForceBTSerial4800);
 			
 
 			$(":mobile-pagecontainer").on( "pagecontainerbeforechange", function( event, ui ) {
@@ -666,6 +668,8 @@
 				//	app.getAcknowledgementRequested();
 				//};
 			} );
+			
+			//$(":mobile-pagecontainer").pagecontainer( "change", "#page-basic-config", { } );
 		});
 	</script>
 </head>
@@ -722,7 +726,7 @@
 				<h1>WiRoc Config</h1>
 
 				<table>
-					<tr><td>Version</td><td>0.2</td></tr>
+					<tr><td>Version</td><td>1.0.1</td></tr>
 					<tr><td></td><td></td></tr>
 					<tr><td></td><td></td></tr>
 					<tr><td></td><td></td></tr>
@@ -1000,7 +1004,7 @@
 				<h1>WiRoc Config</h1>
 
 				<table>
-					<tr><td>Version</td><td>0.1.9</td></tr>
+					<tr><td>Version</td><td>1.0.1</td></tr>
 					<tr><td></td><td></td></tr>
 					<tr><td></td><td></td></tr>
 					<tr><td></td><td></td></tr>
@@ -1025,7 +1029,7 @@
 					<li data-tabname="update-adv"><a href="#update-adv" data-ajax="false" id="tab-radio-adv">Update</a></li>
 					<li data-tabname="sportident"><a href="#sportident" data-ajax="false" id="tab-sportident">SportIdent USB</a></li>
 					<li data-tabname="sportident-RS232"><a href="#sportident-RS232" data-ajax="false" id="tab-sportident-RS232">SportIdent RS232</a></li>
-					<li data-tabname="btserial"><a href="#btserial" data-ajax="false" id="tab-btserial">BT Serial</a></li>
+					<li data-tabname="btserial"><a href="#btserial" data-ajax="false" id="tab-btserial">SportIdent BT Serial</a></li>
 					
 					</ul>
 				</div>
@@ -1226,10 +1230,41 @@
 				</div>
 				<div id="btserial" class="ui-body-d ui-content" style="padding:2vw">
 					<div id="notification-btserial" style="height:1px"></div>
-					<div style="text-align:left">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onGetBTSerialListButton()" class="ui-btn ui-btn-inline ui-corner-all">Get/Refresh BT Serial list</a>
+					
+					<div id="sportident3">
+						<div id="sportident-btserial-oneway-div">
+							<label><input type="checkbox" id="sportident-btserial-oneway">One-Way (BT Serial devices)</label>
 						</div>
+						<div id="force-btserial-4800-bps-div" style="margin-left: 5vw">
+							<label><input type="checkbox" id="force-btserial-4800-bps">Force 4800 bps</label>
+						</div>
+					</div>
+					<div style="text-align:center">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onReadSportIdentBTSerialButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
+							<a href="#" onclick="app.ui.onApplySportIdentBTSerialButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
+						</div>
+					</div>
+							
+					<div class="ui-grid-b bt-serial-row-0"><hr/></div>
+										
+					<div class="ui-grid-b bt-serial-row-1">
+						<div class="ui-block-a">
+								<a href="#" onclick="app.ui.onGetBTSerialListButton()" class="ui-btn ui-corner-all ui-shadow ">Get BT Serial list</a>
+						</div>
+						<div class="ui-block-b">
+								<a href="#" id="stopBTSerialList" onclick="app.ui.onBTSerialListStopButton()" class="ui-btn ui-corner-all ui-shadow ui-disabled">Stop</a>
+						</div>	
+						<div class="ui-block-c">
+								<div id="getBTSerialListLoading" class="ui-loader ui-corner-all ui-loader-default"><span class="ui-icon-loading"></span></div>
+						</div>	   
+					</div>
+														
+					<div class="ui-grid-a test-punch-row-3">
+						<div class="ui-block-a test-punch">
+							<div id="testPunchLoading" class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span><h1></h1></div>
+						</div>
+						   
 					</div>
 
 					<div id="btserial-list" class="dynamic">Empty list</div>
