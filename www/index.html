@@ -433,15 +433,670 @@
 			border-style:none;
 			color:orangered;
 		}
+		
+		/* for bootstrap modal dialog because jquery mobile messes up the css */
+		button.close {
+			width:auto;
+		}
     </style>
-	<script src="cordova.js"></script>
-	<script src="libs/jquery/jquery-3.6.0.min.js"></script>
-	<script src="https://code.jquery.com/jquery-migrate-3.3.2.min.js"></script>
+     <!-- Bootstrap CSS -->
+    <link href="libs/bootstrap-4.3.1-dist/css/bootstrap.css" rel="stylesheet">
+   
+</head>
+<body ontouchstart=""><!-- ontouchstart="" enables low-delay CSS transitions. -->
+	<div id="page-device-scan" data-role="page">
+		<div data-role="header" data-position="fixed">
+			<img class="header-logo" src="ui/images/logo.png"/>
+			<ul id="menu-right" data-role="menu" style="visibility: hidden">
+			<li>
+				<a href="#" onclick="return false;" data-role="button" data-icon="gear" data-inline="true" data-iconpos="right">Options</a>
+			</li>
+			</ul>
+		</div>
+		
+ 		<div role="main" class="ui-content" class="page" style="padding:0">
+			<div id="notification-search-devices" style="height:0px"></div>
+<!--<a href="#page-basic-config" data-transition="slide">Slide</a>-->
+			<a href="#" onclick="app.ui.onScanButton()" class="ui-btn ui-btn-inline ui-corner-all scan-button">Start scan</a>
+	
+			<p id="scan-status" class="scan-status">Not scanning</p>
+			<ul id="found-devices" class="dynamic"></ul>
+		</div>
+	</div>
+
+
+	
+	<div id="page-basic-config" data-role="page">
+		<div data-role="header" data-position="fixed">
+			<a href="#page-device-scan" id="menu-left" style="top:3px;left:5px" class="ui-btn ui-corner-all ui-btn-inline ui-mini ui-btn-icon-left ui-icon-carat-l" data-rel="back" data-transition="slide">Back</a>			
+			<img class="header-logo" src="ui/images/logo.png"/>
+			<div class="battery-indicator">
+				<div id="battery" class="battery">
+					<div class="level charging"></div>
+				</div>
+			</div>
+			<ul id="menu-right" data-role="menu">
+			<li>
+				<a href="#" onclick="return false;" data-role="button" data-icon="gear" data-inline="true" data-iconpos="right">Options</a>
+				<ul data-role="listview" data-inset="true">
+					<li><a href="#page-advanced-config">Advanced</a></li>
+					<li><a href="#" id="popup-about-link">About</a></li>
+
+				</ul>
+			</li>
+			</ul>      
+		</div>
+
+		<div data-role="popup" id="popup-about" data-dismissible="true">
+			<a href="#" data-rel="back" data-role="button" data-theme="b" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+			<div data-role="header" data-theme="a">
+				<h1>About</h1>
+			</div>
+			<span>
+				<h1>WiRoc Config</h1>
+
+				<table>
+					<tr><td>Version</td><td>1.0.2</td></tr>
+					<tr><td></td><td></td></tr>
+					<tr><td></td><td></td></tr>
+					<tr><td></td><td></td></tr>
+				</table>
+			</span>
+		</div>
+		<div role="main" class="ui-content" class="page" style="padding:0">
+			<div class="ui-grid-a">
+				<div id="device-name" class="ui-block-a" style="font-size:5vw;padding-left:1vw;margin:0"></div>
+				<div id="loramode" class="ui-block-b" style="font-size:5vw;margin:0;padding-right:1vw;text-align:right"></div>
+			</div>
+			<div data-role="tabs" id="tabs-main">
+			 	<div data-role="navbar">
+					<ul>
+					<li data-tabname="radio"><a href="#radio" data-ajax="false" id="tab-radio" class="ui-btn-active ui-state-persist">Radio</a></li>
+					<li data-tabname="sirap"><a href="#sirap" data-ajax="false" id="tab-sirap">SIRAP-tcp/ip</a></li>
+					<li data-tabname="test"><a href="#test" data-ajax="false" id="tab-test">Test</a></li>
+					<li data-tabname="network"><a href="#network" data-ajax="false" id="tab-network">Network</a></li>
+					<li data-tabname="database"><a href="#database" data-ajax="false" id="tab-database">Database</a></li>
+					</ul>
+				</div>
+				<div id="radio" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-radio" style="height:1px"></div>
+				
+					<div id="main-RF1276T">
+						<label id="loramode-header" class="loramode-header">Radio Mode</label>
+						<div class="ui-field-contain loramode">
+							<select name="LoraMode" id="loramode-select-RF1276T" data-native-menu="false">
+								<option value="RECEIVER">RECEIVER</option>
+								<option value="REPEATER">REPEATER</option>
+								<option value="SENDER">SENDER</option>
+							</select>
+						</div>
+						<label id="channel-header" class="channel-header">Channel</label>
+						<div class="ui-field-contain channel">
+							<select name="channel" id="channel-select-RF1276T" data-native-menu="false">
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+								<option value="7">7</option>
+								<option value="8">8</option>
+							</select>
+						</div>
+						<fieldset data-role="controlgroup" data-type="horizontal" class="datarate-RF1276T">
+							<legend>Range<br/>Data rate</legend>
+							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-1-RF1276T" value="L" checked="checked">
+								<label for="radio-choice-data-rate-1-RF1276T">Long<br/>293 bps</label>
+							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-2-RF1276T" value="ML">
+								<label for="radio-choice-data-rate-2-RF1276T">Med-Long<br/>537 bps</label>
+							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-3-RF1276T" value="MS">
+								<label for="radio-choice-data-rate-3-RF1276T">Med-Short<br/>977 bps</label>
+							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-4-RF1276T" value="S">
+								<label for="radio-choice-data-rate-4-RF1276T">Short<br/>1758 bps</label>
+						</fieldset>
+					</div>
+					<div id="main-DRF1268DS">
+						<label id="loramode-header" class="loramode-header">Radio Mode</label>
+						<div class="ui-field-contain loramode">
+							<select name="LoraMode" id="loramode-select-DRF1268DS" data-native-menu="false">
+								<option value="RECEIVER">RECEIVER</option>
+								<option value="REPEATER">REPEATER</option>
+								<option value="SENDER">SENDER</option>
+							</select>
+						</div>
+						<label id="channel-header" class="channel-header">Channel</label>
+						<div class="ui-field-contain channel">
+							<select name="channel" id="channel-select-DRF1268DS" data-native-menu="false">
+								<option value="1">1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="5">5</option>
+								<option value="6">6</option>
+							</select>
+						</div>
+
+						<fieldset data-role="controlgroup" data-mini="true" class="datarate-DRF1268DS">
+							<legend>Range - Data rate</legend>
+							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-1-DRF1268DS" value="UL">
+								<label for="radio-choice-data-rate-1-DRF1268DS">Ultra Long       73 bps</label>
+							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-2-DRF1268DS" value="XL">
+								<label for="radio-choice-data-rate-2-DRF1268DS">eXtra long       134 bps</label>
+							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-3-DRF1268DS" value="L" checked="checked">
+								<label for="radio-choice-data-rate-3-DRF1268DS">Long             244 bps</label>
+							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-4-DRF1268DS" value="ML">
+								<label for="radio-choice-data-rate-4-DRF1268DS">Medium long      439 bps</label>
+							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-5-DRF1268DS" value="MS">
+								<label for="radio-choice-data-rate-5-DRF1268DS">Medium short     781 bps</label>
+							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-6-DRF1268DS" value="S">
+								<label for="radio-choice-data-rate-6-DRF1268DS">Short           1367 bps</label>
+						</fieldset>
+					</div>
+					<div>
+						<a href="#" id="warning-note-req-ack" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Request acknowledgement disabled</a>
+						<a href="#" id="warning-note-radio-power" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Radio power changed</a>
+						<a href="#" id="warning-note-si-one-way" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">SportIdent USB one-way enabled</a>
+						<a href="#" id="warning-note-rs232-si-one-way" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">SportIdent RS232 one-way enabled</a>
+						<a href="#" id="warning-note-btserial-si-one-way" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">SportIdent BT Serial one-way enabled</a>
+						<a href="#" id="warning-note-rx-gain" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Rx Gain disabled</a>
+						<a href="#" id="warning-note-code-rate" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Code Rate not default</a>
+					</div>
+					<div style="text-align:center">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onReadAllButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
+							<a href="#" onclick="app.ui.onApplyBasicButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
+						</div>
+					</div>
+				</div>			
+				<div id="sirap" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-sirap" style="height:1px"></div>
+					<div class="ui-field-contain advanced-config">
+						<label for="sendtosirapenabled">Send punches via SIRAP-tcp/ip</label>
+						<input type="checkbox" name="sendtosirapenabled" id="sendtosirapenabled">
+					</div>
+					<div class="ui-field-contain advanced-config">
+						<label for="sendtosirapip">IP&nbsp;address:</label>
+						<input type="text" name="sendtosirapip" id="sendtosirapip">
+					</div>
+					<div class="ui-field-contain advanced-config">
+						<label for="sendtosirapipport">Port:</label>
+						<input type="number" min="1" max="65535" name="sendtosirapipport" id="sendtosirapipport">
+					</div>
+
+					<div style="text-align:center">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onReadSirapButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
+							<a href="#" onclick="app.ui.onApplySirapButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
+						</div>
+					</div>
+				</div>
+				<div id="test" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-test" style="height:1px"></div>
+					<div class="ui-grid-b test-punch-row-1">
+						<div class="ui-block-a test-punch">
+							<div data-role="fieldcontain">
+								<label for="siNumber" class="ui-hidden-accessible">SI no:</label>
+								<input type="number" name="siNumber" id="siNumber" value="999999" style="margin-top:2px" placeholder="SI Number"/>
+							</div>
+						</div>
+						<div class="ui-block-b test-punch">
+							<div data-role="fieldcontain">
+							<label for="noOfTestPunches" class="ui-hidden-accessible">Number of punches to send:</label>
+							<select name="noOfTestPunches" id="noOfTestPunches" data-native-menu="false">
+								<option value="0">Times</option>
+								<option value="1" selected>1</option>
+								<option value="2">2</option>
+								<option value="3">3</option>
+								<option value="4">4</option>
+								<option value="6">6</option>
+								<option value="8">8</option>
+								<option value="10">10</option>
+								<option value="15">15</option>
+								<option value="20">20</option>
+								<option value="30">30</option>
+								<option value="50">50</option>
+								<option value="100">100</option>
+							</select>
+							</div>
+						</div>
+						<div class="ui-block-c test-punch">
+							<div data-role="fieldcontain">
+							<label for="sendInterval" class="ui-hidden-accessible">Interval:</label>
+							<select name="sendInterval" id="sendInterval" data-native-menu="false">
+								<option value="0">Interval</option>
+								<option value="500" selected>0.5 s</option>
+								<option value="1000">1 s</option>
+								<option value="1500">1.5 s</option>
+								<option value="2000">2 s</option>
+								<option value="3000">3 s</option>
+								<option value="4000">4 s</option>
+								<option value="5000">5 s</option>
+								<option value="10000">10 s</option>
+								<option value="15000">15 s</option>
+							</select>
+							</div>
+						</div>
+					</div>
+					<div class="ui-grid-solo test-punch-row-2">
+						<div class="ui-block-a test-punch">
+							<div data-role="fieldcontain">
+								<a href="#" id="testPunch" onclick="app.ui.onSendTestPunchesButton()" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-check">Send test punches</a>
+							</div>
+						</div>	   
+					</div>
+
+					<div class="ui-grid-a test-punch-row-3">
+						<div class="ui-block-a test-punch">
+							<div id="testPunchLoading" class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span><h1></h1></div>
+						</div>
+						<div class="ui-block-b test-punch">
+							<div data-role="fieldcontain">
+								<a href="#" id="stopTestPunch" onclick="app.ui.onSendTestPunchesStopButton()" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-delete ui-disabled">Stop updates</a>
+							</div>
+						</div>	   
+					</div>
+
+					<div id="wiroc-test-punches-content">
+						<table id="wiroc-test-punches-table" width="100%" border=1>
+							<thead><tr><th align="left">SINo</th><th align="left">Time</th><th>RSSI</th><th>Tries</th><th>Status</th></tr></thead>
+							<tfoot><tr data-id="summary"><td colspan="3">Success %</td><td>Unknown%</td><td>Unknown%</td></tr></tfoot>
+							<tbody></tbody>
+						</table>
+					</div>
+				</div>
+				<div id="network" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-network" style="height:1px"></div>
+					<div style="text-align:left">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onGetNetworkWifiListButton()" class="ui-btn ui-btn-inline ui-corner-all">Get/Refresh wifi list</a>
+						</div>
+					</div>
+
+					<div id="wifi-networks" class="dynamic">Empty list</div>
+					<hr/>
+					<div style="text-align:left">
+						<div style="display:inline-block">
+							Renew IP: <span id="ipaddress"></span><br/>
+							<a href="#" onclick="app.ui.onRenewIPWifi()" class="ui-btn ui-btn-inline ui-corner-all" style="min-width:25vw">Wifi</a>
+							<a href="#" onclick="app.ui.onRenewIPEthernet()" class="ui-btn ui-btn-inline ui-corner-all" style="min-width:25vw">Ethernet</a>
+						</div>
+					</div>
+
+					<div class="modal fade" id="popupWifiLogin" tabindex="-1" role="dialog" aria-labelledby="modalTitleLabel" aria-hidden="true">
+					  <div class="modal-dialog" role="document">
+						<div class="modal-content">
+						  <div class="modal-header">
+							<h5 class="modal-title" id="modalTitleLabel">Enter password</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							  <span aria-hidden="true">&times;</span>
+							</button>
+						  </div>
+						  <div class="modal-body">
+							<label for="wifiPassword" class="ui-hidden-accessible">Password:</label>
+							<input type="password" name="wifiPassword" id="wifiPassword" value="" placeholder="password" data-theme="a">
+						  </div>
+						  <div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+							<button type="button" id="wifiConnect" class="btn btn-primary">Connect</button>
+						  </div>
+						</div>
+					  </div>
+					</div>
+					<!--
+					<div data-role="popup" id="popupWifiLogin" data-theme="a" class="ui-corner-all">
+						<div style="padding:10px 20px;">
+							<h3>Enter password</h3>
+							<label for="wifiPassword" class="ui-hidden-accessible">Password:</label>
+							<input type="password" name="wifiPassword" id="wifiPassword" value="" placeholder="password" data-theme="a">
+							<button id="wifiConnect" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Connect</button>
+						</div>
+					</div>
+					-->
+				</div>
+				<div id="database" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-database" style="height:1px"></div>
+					<div style="text-align:left">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onDeletePunchesButton()" class="ui-btn ui-btn-inline ui-corner-all">Delete all punches from database</a>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+
+
+
+	<div id="page-advanced-config" data-role="page">
+		<div data-role="header" data-position="fixed">
+			<a href="#page-device-scan" id="menu-left" class="ui-btn ui-corner-all ui-btn-inline ui-mini ui-btn-icon-left ui-icon-carat-l" data-rel="back" data-transition="slide">Back</a>			
+			<img class="header-logo" src="ui/images/logo.png"/>
+			<div class="battery-indicator">
+				<div id="battery" class="battery">
+					<div class="level"></div>
+				</div>
+			</div>
+			<ul id="menu-right" data-role="menu">
+			<li>
+				<a href="#" onclick="return false;" data-role="button" data-icon="gear" data-inline="true" data-iconpos="right">Options</a>
+				<ul data-role="listview" data-inset="true">
+					<li><a href="#" id="popup-about-2-link">About</a></li>
+
+				</ul>
+			</li>
+			</ul>      
+		</div>
+		<div data-role="popup" id="popup-about-2" data-dismissible="true">
+			<a href="#" data-rel="back" data-role="button" data-theme="b" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+			<div data-role="header" data-theme="a">
+				<h1>About</h1>
+			</div>
+			<span>
+				<h1>WiRoc Config</h1>
+
+				<table>
+					<tr><td>Version</td><td>1.0.2</td></tr>
+					<tr><td></td><td></td></tr>
+					<tr><td></td><td></td></tr>
+					<tr><td></td><td></td></tr>
+				</table>
+			</span>
+		</div>
+		
+		<div role="main" class="ui-content" class="page" style="padding:0">
+			<div class="ui-grid-a">
+				<div id="device-name2" class="ui-block-a" style="font-size:5vw;padding-left:1vw;margin:0"></div>
+				<div id="loramode2" class="ui-block-b" style="font-size:5vw;margin:0;padding-right:1vw;text-align:right"></div>
+			</div>
+			<div data-role="tabs" id="tabs-adv">
+			 	<div data-role="navbar">
+					<ul>
+					<li data-tabname="devicename"><a href="#devicename" data-ajax="false" id="tab-devicename" class="ui-btn-active ui-state-persist">Device name</a></li>
+					<li data-tabname="status"><a href="#status" data-ajax="false" id="tab-status">Status</a></li>
+					<li data-tabname="settings"><a href="#settings" data-ajax="false" id="tab-settings">Settings</a></li>
+					<li data-tabname="punches"><a href="#punches" data-ajax="false" id="tab-punches">Punches</a></li>
+					<li data-tabname="database-adv"><a href="#database-adv" data-ajax="false" id="tab-database-adv">Database &amp; Logs</a></li>
+					<li data-tabname="radio-adv"><a href="#radio-adv" data-ajax="false" id="tab-radio-adv">Radio adv.</a></li>
+					<li data-tabname="update-adv"><a href="#update-adv" data-ajax="false" id="tab-radio-adv">Update</a></li>
+					<li data-tabname="sportident"><a href="#sportident" data-ajax="false" id="tab-sportident">SportIdent USB</a></li>
+					<li data-tabname="sportident-RS232"><a href="#sportident-RS232" data-ajax="false" id="tab-sportident-RS232">SportIdent RS232</a></li>
+					<li data-tabname="btserial"><a href="#btserial" data-ajax="false" id="tab-btserial">SportIdent BT Serial</a></li>
+					
+					</ul>
+				</div>
+				<div id="devicename" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-devicename" style="height:1px"></div>
+					<div class="ui-field-contain advanced-config">
+						<label for="sendtosirapip">Device Name:</label>
+						<input type="text" name="wirocdevicename" id="wirocdevicename">
+					</div>
+					<div style="text-align:center">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onReadDeviceNameButton()" class="ui-btn ui-btn-inline ui-corner-all">Read</a>
+							<a href="#" onclick="app.ui.onApplyDeviceNameButton()" class="ui-btn ui-btn-inline ui-corner-all">Save</a>
+						</div>
+					</div>
+				</div>
+				<div id="status" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-status" style="height:1px"></div>
+					<div style="text-align:left">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onRefreshStatusButton()" class="ui-btn ui-btn-inline ui-corner-all">Get/Refresh</a>
+						</div>
+					</div>
+					<div id="wiroc-services-content"></div>
+					<div id="wiroc-status-content"></div>
+					<div id="wiroc-debug-content"></div>
+				</div>
+				<div id="settings" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-settings" style="height:1px"></div>
+					<div style="text-align:left">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onRefreshSettingsButton()" class="ui-btn ui-btn-inline ui-corner-all">Get/Refresh</a>
+						</div>
+					</div>
+					<div id="wiroc-settings-content"></div>
+		
+					<div style="text-align:left">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onAddSetting()" data-toggle="modal" data-target="#popupAddEditSetting" class="ui-btn ui-btn-inline ui-corner-all">Add setting</a>
+						</div>
+					</div>
+					
+					<div class="modal fade" id="popupAddEditSetting" tabindex="-1" role="dialog" aria-labelledby="modalTitleLabel" aria-hidden="true">
+					  <div class="modal-dialog" role="document">
+						<div class="modal-content">
+						  <div class="modal-header">
+							<h5 class="modal-title" id="modalTitleLabel">Setting</h5>
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							  <span aria-hidden="true">&times;</span>
+							</button>
+						  </div>
+						  <div class="modal-body">
+							<label for="settingKey" class="ui-hidden-accessible">Key:</label>
+							<input type="text" name="settingKey" id="settingKey" value="" placeholder="Key" data-theme="a">
+							<label for="settingValue" class="ui-hidden-accessible">Value:</label>
+							<input type="text" name="settingValue" id="settingValue" value="" placeholder="Value" data-theme="a">
+						  </div>
+						  <div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+							<button type="button" id="saveSettingButton" class="btn btn-primary">Save setting</button>
+						  </div>
+						</div>
+					  </div>
+					</div>
+
+				</div>
+				<div id="punches" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-punches" style="height:1px"></div>
+					<div style="text-align:left">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onSubscribePunchesButton()" data-subscribe="true" id="btnSubscribePunches" class="ui-btn ui-btn-inline ui-corner-all">Subscribe</a>
+						</div>
+					</div>
+					<div id="wiroc-punches-content">
+						<table id="wiroc-punches-table" width="100%" border=1>
+							<thead><tr><th align=\"left\">Station</th><th align=\"left\">SI Card</th><th>Time</td></tr></thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</div>
+				<div id="database-adv" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-database-adv" style="height:1px"></div>
+					<div style="text-align:center">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onDropAllTablesButton()" data-subscribe="true" id="btnDropAllTables" class="ui-btn ui-btn-inline ui-corner-all">Drop all database tables</a>
+							<a href="#" onclick="app.ui.onUploadDatabaseAndLogsButton()" data-subscribe="true" id="btnUploadDatabaseAndLogs" class="ui-btn ui-btn-inline ui-corner-all">Upload database and logs</a>
+						</div>
+					</div>
+				</div>
+				<div id="radio-adv" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-radio-adv" style="height:1px"></div>
+					<div id="acknowledge-div">
+		 				<label><input type="checkbox" id="acknowledgement">Request acknowledgement</label>
+					</div>
+					
+					<div id="radio-adv-RF1276T">
+						<div class="ui-field-contain lorapower-RF1276T">
+							<select name="lorapower" id="lorapower-select-RF1276T" data-native-menu="false">
+								<option value="1">4dBm</option>
+								<option value="2">7dBm</option>
+								<option value="3">10dBm</option>
+								<option value="4">13dBm</option>
+								<option value="5">14dBm (&le;11 el. Yagi)</option>
+								<option value="6">17dBm (&le;7 el. Yagi)</option>
+								<option value="7" selected>20dBm (&le;4 el. Yagi)</option>
+							</select>
+						</div>
+					</div>
+					<div id="radio-adv-DRF1268DS">
+						<div id="rx-gain-div">
+							<label><input type="checkbox" id="rxgain">Enable Rx Gain</label>
+						</div>
+						<div class="ui-field-contain">
+							<label for="coderate">Code rate:</label>
+						</div>
+						<div class="ui-field-contain coderate">
+							<select name="coderate" id="coderate-select">
+								<option value="0">4/5 (1 ECC bit, 4 data bits)</option>
+								<option value="1">4/6 (2 ECC bits, 4 data bits)</option>
+								<option value="2">4/7 (3 ECC bits, 4 data bits)</option>
+								<option value="3">4/8 (4 ECC bits, 4 data bits)</option>
+							</select>
+						</div>
+						<div class="ui-field-contain">
+							<label for="lorapower">Lora power:</label>
+						</div>
+						<div class="ui-field-contain lorapower-DRF1268DS">
+							<select name="lorapower" id="lorapower-select-DRF1268DS">
+								<option value="1">1dBm</option>
+								<option value="2">2dBm</option>
+								<option value="3">3dBm</option>
+								<option value="4">4dBm</option>
+								<option value="5">5dBm</option>
+								<option value="6">6dBm</option>
+								<option value="7">7dBm</option>
+								<option value="8">7dBm</option>
+								<option value="9">9dBm</option>
+								<option value="10">10dBm</option>
+								<option value="11">11dBm</option>
+								<option value="12">12dBm</option>
+								<option value="13">13dBm</option>
+								<option value="14">14dBm</option>
+								<option value="15">15dBm</option>
+								<option value="16">16dBm (&le;11 el. Yagi)</option>
+								<option value="17">17dBm</option>
+								<option value="18">18dBm</option>
+								<option value="19">19dBm (&le;7 el. Yagi)</option>
+								<option value="20">20dBm</option>
+								<option value="21">21dBm</option>
+								<option value="22" selected>22dBm (&le;4 el. Yagi)</option>
+							</select>
+						</div>
+					</div>
+					<div style="text-align:center">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onReadRadioAdvButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
+							<a href="#" onclick="app.ui.onApplyRadioAdvButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
+						</div>
+					</div>
+				</div>
+				<div id="update-adv" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-update-adv" style="height:1px"></div>
+					<div class="ui-field-contain updatewirocpython">
+						<label for="wirocpythonversions">WiRoc version:</label>
+					</div>
+					<a href="#" onclick="app.ui.onUpdateWiRocPython()" data-subscribe="true" id="btnUpdateWiRocPython" class="ui-btn ui-corner-all">Update WiRoc</a>
+					<div class="ui-field-contain updatewirocble">
+						<label for="wirocbleversions">WiRoc BLE version:</label>
+					</div>
+					<a href="#" onclick="app.ui.onUpdateWiRocBLE()" data-subscribe="true" id="btnUpdateWiRocBLE" class="ui-btn ui-corner-all">Update WiRoc BLE</a>
+				</div>
+				<div id="sportident" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-sportident" style="height:1px"></div>
+					
+					
+					<div id="sportident2">
+						<div id="sportident-oneway-div">
+							<label><input type="checkbox" id="sportident-oneway">One-Way (only listen on USB serial)</label>
+						</div>
+						<div id="force-4800-bps-div" style="margin-left: 5vw">
+							<label><input type="checkbox" id="force-4800-bps">Force 4800 bps</label>
+						</div>
+					</div>
+					<div style="text-align:center">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onReadSportIdentButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
+							<a href="#" onclick="app.ui.onApplySportIdentButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
+						</div>
+					</div>
+				</div>
+				<div id="sportident-RS232" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-sportident-RS232" style="height:1px"></div>
+					
+					
+					<div id="sportident-RS232-2">
+						<fieldset data-role="controlgroup" data-mini="true" class="RS232-mode">
+							<legend>RS232 Mode</legend>
+							<input type="radio" name="radio-choice-RS232-mode" id="radio-choice-RS232-mode-receive" value="RECEIVE">
+								<label for="radio-choice-RS232-mode-receive">RECEIVE</label>
+							<input type="radio" name="radio-choice-RS232-mode" id="radio-choice-RS232-mode-send" value="SEND">
+								<label for="radio-choice-RS232-mode-send">SEND</label>
+						</fieldset>
+						
+						<div id="sportident-RS232-oneway-div">
+							<label><input type="checkbox" id="sportident-RS232-oneway">One-Way (only listen on RS232 serial)</label>
+						</div>
+						<div id="force-RS232-4800-bps-div" style="margin-left: 5vw">
+							<label><input type="checkbox" id="force-RS232-4800-bps">Force 4800 bps</label>
+						</div>
+					</div>
+					<div style="text-align:center">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onReadSportIdentRS232Button()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
+							<a href="#" onclick="app.ui.onApplySportIdentRS232Button()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
+						</div>
+					</div>
+				</div>
+				<div id="btserial" class="ui-body-d ui-content" style="padding:2vw">
+					<div id="notification-btserial" style="height:1px"></div>
+					
+					<div id="sportident3">
+						<div id="sportident-btserial-oneway-div">
+							<label><input type="checkbox" id="sportident-btserial-oneway">One-Way (BT Serial devices)</label>
+						</div>
+						<div id="force-btserial-4800-bps-div" style="margin-left: 5vw">
+							<label><input type="checkbox" id="force-btserial-4800-bps">Force 4800 bps</label>
+						</div>
+					</div>
+					<div style="text-align:center">
+						<div style="display:inline-block">
+							<a href="#" onclick="app.ui.onReadSportIdentBTSerialButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
+							<a href="#" onclick="app.ui.onApplySportIdentBTSerialButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
+						</div>
+					</div>
+							
+					<div class="ui-grid-b bt-serial-row-0"><hr/></div>
+										
+					<div class="ui-grid-b bt-serial-row-1">
+						<div class="ui-block-a">
+								<a href="#" onclick="app.ui.onGetBTSerialListButton()" class="ui-btn ui-corner-all ui-shadow ">Get BT Serial list</a>
+						</div>
+						<div class="ui-block-b">
+								<a href="#" id="stopBTSerialList" onclick="app.ui.onBTSerialListStopButton()" class="ui-btn ui-corner-all ui-shadow ui-disabled">Stop</a>
+						</div>	
+						<div class="ui-block-c">
+								<div id="getBTSerialListLoading" class="ui-loader ui-corner-all ui-loader-default"><span class="ui-icon-loading"></span></div>
+						</div>	   
+					</div>
+														
+					<div class="ui-grid-a test-punch-row-3">
+						<div class="ui-block-a test-punch">
+							<div id="testPunchLoading" class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span><h1></h1></div>
+						</div>
+						   
+					</div>
+
+					<div id="btserial-list" class="dynamic">Empty list</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+<script src="cordova.js"></script>
+	<script src="libs/jquery/jquery-3.6.0.js"></script>
+	<script src="libs/jquery/jquery-migrate-3.3.2.js"></script>
 	<script src="libs/peekabar/peekabar.js"></script>
 	<script src="libs/jquery/jquery.mobile-1.4.5.js"></script>
 	<script src="libs/evothings/evothings.js"></script>
 	<script src="libs/evothings/ui/ui.js"></script>
 	<script type="text/javascript" src="libs/jquery.actuals/jquery.actual.js"></script>
+	<!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="libs/bootstrap-4.3.1-dist/js/bootstrap.bundle.js"></script>
+  
 	<script src="app.js"></script>
 	<!--script src="http://192.168.11.139:8080/target/target-script-min.js#anonymous"></script-->
 	<script>
@@ -669,609 +1324,24 @@
 				//};
 			} );
 			
+			
+			
+			//function (event) {
+				
+				
+			  //var button = $(event.relatedTarget) // Button that triggered the modal
+			  //var recipient = button.data('whatever') // Extract info from data-* attributes
+			  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
+			  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
+			  //var modal = $(this)
+			  //modal.find('.modal-title').text('New message to ' + recipient)
+			  //modal.find('.modal-body input').val(recipient)
+			//});
+			
+			
 			//$(":mobile-pagecontainer").pagecontainer( "change", "#page-basic-config", { } );
 		});
 	</script>
-</head>
-<body ontouchstart=""><!-- ontouchstart="" enables low-delay CSS transitions. -->
-	<div id="page-device-scan" data-role="page">
-		<div data-role="header" data-position="fixed">
-			<img class="header-logo" src="ui/images/logo.png"/>
-			<ul id="menu-right" data-role="menu" style="visibility: hidden">
-			<li>
-				<a href="#" onclick="return false;" data-role="button" data-icon="gear" data-inline="true" data-iconpos="right">Options</a>
-			</li>
-			</ul>
-		</div>
-		
- 		<div role="main" class="ui-content" class="page" style="padding:0">
-			<div id="notification-search-devices" style="height:0px"></div>
-<!--<a href="#page-basic-config" data-transition="slide">Slide</a>-->
-			<a href="#" onclick="app.ui.onScanButton()" class="ui-btn ui-btn-inline ui-corner-all scan-button">Start scan</a>
-	
-			<p id="scan-status" class="scan-status">Not scanning</p>
-			<ul id="found-devices" class="dynamic"></ul>
-		</div>
-	</div>
-
-
-	
-	<div id="page-basic-config" data-role="page">
-		<div data-role="header" data-position="fixed">
-			<a href="#page-device-scan" id="menu-left" style="top:3px;left:5px" class="ui-btn ui-corner-all ui-btn-inline ui-mini ui-btn-icon-left ui-icon-carat-l" data-rel="back" data-transition="slide">Back</a>			
-			<img class="header-logo" src="ui/images/logo.png"/>
-			<div class="battery-indicator">
-				<div id="battery" class="battery">
-					<div class="level charging"></div>
-				</div>
-			</div>
-			<ul id="menu-right" data-role="menu">
-			<li>
-				<a href="#" onclick="return false;" data-role="button" data-icon="gear" data-inline="true" data-iconpos="right">Options</a>
-				<ul data-role="listview" data-inset="true">
-					<li><a href="#page-advanced-config">Advanced</a></li>
-					<li><a href="#" id="popup-about-link">About</a></li>
-
-				</ul>
-			</li>
-			</ul>      
-		</div>
-
-		<div data-role="popup" id="popup-about" data-dismissible="true">
-			<a href="#" data-rel="back" data-role="button" data-theme="b" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
-			<div data-role="header" data-theme="a">
-				<h1>About</h1>
-			</div>
-			<span>
-				<h1>WiRoc Config</h1>
-
-				<table>
-					<tr><td>Version</td><td>1.0.1</td></tr>
-					<tr><td></td><td></td></tr>
-					<tr><td></td><td></td></tr>
-					<tr><td></td><td></td></tr>
-				</table>
-			</span>
-		</div>
-		<div role="main" class="ui-content" class="page" style="padding:0">
-			<div class="ui-grid-a">
-				<div id="device-name" class="ui-block-a" style="font-size:5vw;padding-left:1vw;margin:0"></div>
-				<div id="loramode" class="ui-block-b" style="font-size:5vw;margin:0;padding-right:1vw;text-align:right"></div>
-			</div>
-			<div data-role="tabs" id="tabs-main">
-			 	<div data-role="navbar">
-					<ul>
-					<li data-tabname="radio"><a href="#radio" data-ajax="false" id="tab-radio" class="ui-btn-active ui-state-persist">Radio</a></li>
-					<li data-tabname="sirap"><a href="#sirap" data-ajax="false" id="tab-sirap">SIRAP-tcp/ip</a></li>
-					<li data-tabname="test"><a href="#test" data-ajax="false" id="tab-test">Test</a></li>
-					<li data-tabname="network"><a href="#network" data-ajax="false" id="tab-network">Network</a></li>
-					<li data-tabname="database"><a href="#database" data-ajax="false" id="tab-database">Database</a></li>
-					</ul>
-				</div>
-				<div id="radio" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-radio" style="height:1px"></div>
-				
-					<div id="main-RF1276T">
-						<label id="loramode-header" class="loramode-header">Radio Mode</label>
-						<div class="ui-field-contain loramode">
-							<select name="LoraMode" id="loramode-select-RF1276T" data-native-menu="false">
-								<option value="RECEIVER">RECEIVER</option>
-								<option value="REPEATER">REPEATER</option>
-								<option value="SENDER">SENDER</option>
-							</select>
-						</div>
-						<label id="channel-header" class="channel-header">Channel</label>
-						<div class="ui-field-contain channel">
-							<select name="channel" id="channel-select-RF1276T" data-native-menu="false">
-								<option value="1">1</option>
-								<option value="2">2</option>
-								<option value="3">3</option>
-								<option value="4">4</option>
-								<option value="5">5</option>
-								<option value="6">6</option>
-								<option value="7">7</option>
-								<option value="8">8</option>
-							</select>
-						</div>
-						<fieldset data-role="controlgroup" data-type="horizontal" class="datarate-RF1276T">
-							<legend>Range<br/>Data rate</legend>
-							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-1-RF1276T" value="L" checked="checked">
-								<label for="radio-choice-data-rate-1-RF1276T">Long<br/>293 bps</label>
-							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-2-RF1276T" value="ML">
-								<label for="radio-choice-data-rate-2-RF1276T">Med-Long<br/>537 bps</label>
-							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-3-RF1276T" value="MS">
-								<label for="radio-choice-data-rate-3-RF1276T">Med-Short<br/>977 bps</label>
-							<input type="radio" name="radio-choice-data-rate-RF1276T" id="radio-choice-data-rate-4-RF1276T" value="S">
-								<label for="radio-choice-data-rate-4-RF1276T">Short<br/>1758 bps</label>
-						</fieldset>
-					</div>
-					<div id="main-DRF1268DS">
-						<label id="loramode-header" class="loramode-header">Radio Mode</label>
-						<div class="ui-field-contain loramode">
-							<select name="LoraMode" id="loramode-select-DRF1268DS" data-native-menu="false">
-								<option value="RECEIVER">RECEIVER</option>
-								<option value="REPEATER">REPEATER</option>
-								<option value="SENDER">SENDER</option>
-							</select>
-						</div>
-						<label id="channel-header" class="channel-header">Channel</label>
-						<div class="ui-field-contain channel">
-							<select name="channel" id="channel-select-DRF1268DS" data-native-menu="false">
-								<option value="1">1</option>
-								<option value="2">2</option>
-								<option value="3">3</option>
-								<option value="4">4</option>
-								<option value="5">5</option>
-								<option value="6">6</option>
-							</select>
-						</div>
-
-						<fieldset data-role="controlgroup" data-mini="true" class="datarate-DRF1268DS">
-							<legend>Range - Data rate</legend>
-							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-1-DRF1268DS" value="UL">
-								<label for="radio-choice-data-rate-1-DRF1268DS">Ultra Long       73 bps</label>
-							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-2-DRF1268DS" value="XL">
-								<label for="radio-choice-data-rate-2-DRF1268DS">eXtra long       134 bps</label>
-							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-3-DRF1268DS" value="L" checked="checked">
-								<label for="radio-choice-data-rate-3-DRF1268DS">Long             244 bps</label>
-							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-4-DRF1268DS" value="ML">
-								<label for="radio-choice-data-rate-4-DRF1268DS">Medium long      439 bps</label>
-							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-5-DRF1268DS" value="MS">
-								<label for="radio-choice-data-rate-5-DRF1268DS">Medium short     781 bps</label>
-							<input type="radio" name="radio-choice-data-rate-DRF1268DS" id="radio-choice-data-rate-6-DRF1268DS" value="S">
-								<label for="radio-choice-data-rate-6-DRF1268DS">Short           1367 bps</label>
-						</fieldset>
-					</div>
-					<div>
-						<a href="#" id="warning-note-req-ack" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Request acknowledgement disabled</a>
-						<a href="#" id="warning-note-radio-power" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Radio power changed</a>
-						<a href="#" id="warning-note-si-one-way" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">SportIdent one-way enabled</a>
-						<a href="#" id="warning-note-rx-gain" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Rx Gain disabled</a>
-						<a href="#" id="warning-note-code-rate" class="warning-note ui-btn ui-btn-icon-left ui-icon-alert">Code Rate not default</a>
-					</div>
-					<div style="text-align:center">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onReadAllButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
-							<a href="#" onclick="app.ui.onApplyBasicButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
-						</div>
-					</div>
-				</div>			
-				<div id="sirap" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-sirap" style="height:1px"></div>
-					<div class="ui-field-contain advanced-config">
-						<label for="sendtosirapenabled">Send punches via SIRAP-tcp/ip</label>
-						<input type="checkbox" name="sendtosirapenabled" id="sendtosirapenabled">
-					</div>
-					<div class="ui-field-contain advanced-config">
-						<label for="sendtosirapip">IP&nbsp;address:</label>
-						<input type="text" name="sendtosirapip" id="sendtosirapip">
-					</div>
-					<div class="ui-field-contain advanced-config">
-						<label for="sendtosirapipport">Port:</label>
-						<input type="number" min="1" max="65535" name="sendtosirapipport" id="sendtosirapipport">
-					</div>
-
-					<div style="text-align:center">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onReadSirapButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
-							<a href="#" onclick="app.ui.onApplySirapButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
-						</div>
-					</div>
-				</div>
-				<div id="test" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-test" style="height:1px"></div>
-					<div class="ui-grid-b test-punch-row-1">
-						<div class="ui-block-a test-punch">
-							<div data-role="fieldcontain">
-								<label for="siNumber" class="ui-hidden-accessible">SI no:</label>
-								<input type="number" name="siNumber" id="siNumber" value="999999" style="margin-top:2px" placeholder="SI Number"/>
-							</div>
-						</div>
-						<div class="ui-block-b test-punch">
-							<div data-role="fieldcontain">
-							<label for="noOfTestPunches" class="ui-hidden-accessible">Number of punches to send:</label>
-							<select name="noOfTestPunches" id="noOfTestPunches" data-native-menu="false">
-								<option value="0">Times</option>
-								<option value="1" selected>1</option>
-								<option value="2">2</option>
-								<option value="3">3</option>
-								<option value="4">4</option>
-								<option value="6">6</option>
-								<option value="8">8</option>
-								<option value="10">10</option>
-								<option value="15">15</option>
-								<option value="20">20</option>
-								<option value="30">30</option>
-								<option value="50">50</option>
-								<option value="100">100</option>
-							</select>
-							</div>
-						</div>
-						<div class="ui-block-c test-punch">
-							<div data-role="fieldcontain">
-							<label for="sendInterval" class="ui-hidden-accessible">Interval:</label>
-							<select name="sendInterval" id="sendInterval" data-native-menu="false">
-								<option value="0">Interval</option>
-								<option value="500" selected>0.5 s</option>
-								<option value="1000">1 s</option>
-								<option value="1500">1.5 s</option>
-								<option value="2000">2 s</option>
-								<option value="3000">3 s</option>
-								<option value="4000">4 s</option>
-								<option value="5000">5 s</option>
-								<option value="10000">10 s</option>
-								<option value="15000">15 s</option>
-							</select>
-							</div>
-						</div>
-					</div>
-					<div class="ui-grid-solo test-punch-row-2">
-						<div class="ui-block-a test-punch">
-							<div data-role="fieldcontain">
-								<a href="#" id="testPunch" onclick="app.ui.onSendTestPunchesButton()" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-check">Send test punches</a>
-							</div>
-						</div>	   
-					</div>
-
-					<div class="ui-grid-a test-punch-row-3">
-						<div class="ui-block-a test-punch">
-							<div id="testPunchLoading" class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span><h1></h1></div>
-						</div>
-						<div class="ui-block-b test-punch">
-							<div data-role="fieldcontain">
-								<a href="#" id="stopTestPunch" onclick="app.ui.onSendTestPunchesStopButton()" class="ui-btn ui-corner-all ui-shadow ui-btn-icon-left ui-icon-delete ui-disabled">Stop updates</a>
-							</div>
-						</div>	   
-					</div>
-
-					<div id="wiroc-test-punches-content">
-						<table id="wiroc-test-punches-table" width="100%" border=1>
-							<thead><tr><th align="left">SINo</th><th align="left">Time</th><th>RSSI</th><th>Tries</th><th>Status</th></tr></thead>
-							<tfoot><tr data-id="summary"><td colspan="3">Success %</td><td>Unknown%</td><td>Unknown%</td></tr></tfoot>
-							<tbody></tbody>
-						</table>
-					</div>
-				</div>
-				<div id="network" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-network" style="height:1px"></div>
-					<div style="text-align:left">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onGetNetworkWifiListButton()" class="ui-btn ui-btn-inline ui-corner-all">Get/Refresh wifi list</a>
-						</div>
-					</div>
-
-					<div id="wifi-networks" class="dynamic">Empty list</div>
-					<hr/>
-					<div style="text-align:left">
-						<div style="display:inline-block">
-							Renew IP: <span id="ipaddress"></span><br/>
-							<a href="#" onclick="app.ui.onRenewIPWifi()" class="ui-btn ui-btn-inline ui-corner-all" style="min-width:25vw">Wifi</a>
-							<a href="#" onclick="app.ui.onRenewIPEthernet()" class="ui-btn ui-btn-inline ui-corner-all" style="min-width:25vw">Ethernet</a>
-						</div>
-					</div>
-
-					<div data-role="popup" id="popupWifiLogin" data-theme="a" class="ui-corner-all">
-						<div style="padding:10px 20px;">
-							<h3>Enter password</h3>
-							<label for="wifiPassword" class="ui-hidden-accessible">Password:</label>
-							<input type="password" name="wifiPassword" id="wifiPassword" value="" placeholder="password" data-theme="a">
-							<button id="wifiConnect" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Connect</button>
-						</div>
-					</div>
-				</div>
-				<div id="database" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-database" style="height:1px"></div>
-					<div style="text-align:left">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onDeletePunchesButton()" class="ui-btn ui-btn-inline ui-corner-all">Delete all punches from database</a>
-						</div>
-					</div>
-				</div>
-
-			</div>
-		</div>
-	</div>
-
-
-
-
-
-	<div id="page-advanced-config" data-role="page">
-		<div data-role="header" data-position="fixed">
-			<a href="#page-device-scan" id="menu-left" class="ui-btn ui-corner-all ui-btn-inline ui-mini ui-btn-icon-left ui-icon-carat-l" data-rel="back" data-transition="slide">Back</a>			
-			<img class="header-logo" src="ui/images/logo.png"/>
-			<div class="battery-indicator">
-				<div id="battery" class="battery">
-					<div class="level"></div>
-				</div>
-			</div>
-			<ul id="menu-right" data-role="menu">
-			<li>
-				<a href="#" onclick="return false;" data-role="button" data-icon="gear" data-inline="true" data-iconpos="right">Options</a>
-				<ul data-role="listview" data-inset="true">
-					<li><a href="#" id="popup-about-2-link">About</a></li>
-
-				</ul>
-			</li>
-			</ul>      
-		</div>
-		<div data-role="popup" id="popup-about-2" data-dismissible="true">
-			<a href="#" data-rel="back" data-role="button" data-theme="b" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
-			<div data-role="header" data-theme="a">
-				<h1>About</h1>
-			</div>
-			<span>
-				<h1>WiRoc Config</h1>
-
-				<table>
-					<tr><td>Version</td><td>1.0.1</td></tr>
-					<tr><td></td><td></td></tr>
-					<tr><td></td><td></td></tr>
-					<tr><td></td><td></td></tr>
-				</table>
-			</span>
-		</div>
-		
-		<div role="main" class="ui-content" class="page" style="padding:0">
-			<div class="ui-grid-a">
-				<div id="device-name2" class="ui-block-a" style="font-size:5vw;padding-left:1vw;margin:0"></div>
-				<div id="loramode2" class="ui-block-b" style="font-size:5vw;margin:0;padding-right:1vw;text-align:right"></div>
-			</div>
-			<div data-role="tabs" id="tabs-adv">
-			 	<div data-role="navbar">
-					<ul>
-					<li data-tabname="devicename"><a href="#devicename" data-ajax="false" id="tab-devicename" class="ui-btn-active ui-state-persist">Device name</a></li>
-					<li data-tabname="status"><a href="#status" data-ajax="false" id="tab-status">Status</a></li>
-					<li data-tabname="settings"><a href="#settings" data-ajax="false" id="tab-settings">Settings</a></li>
-					<li data-tabname="punches"><a href="#punches" data-ajax="false" id="tab-punches">Punches</a></li>
-					<li data-tabname="database-adv"><a href="#database-adv" data-ajax="false" id="tab-database-adv">Database &amp; Logs</a></li>
-					<li data-tabname="radio-adv"><a href="#radio-adv" data-ajax="false" id="tab-radio-adv">Radio adv.</a></li>
-					<li data-tabname="update-adv"><a href="#update-adv" data-ajax="false" id="tab-radio-adv">Update</a></li>
-					<li data-tabname="sportident"><a href="#sportident" data-ajax="false" id="tab-sportident">SportIdent USB</a></li>
-					<li data-tabname="sportident-RS232"><a href="#sportident-RS232" data-ajax="false" id="tab-sportident-RS232">SportIdent RS232</a></li>
-					<li data-tabname="btserial"><a href="#btserial" data-ajax="false" id="tab-btserial">SportIdent BT Serial</a></li>
-					
-					</ul>
-				</div>
-				<div id="devicename" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-devicename" style="height:1px"></div>
-					<div class="ui-field-contain advanced-config">
-						<label for="sendtosirapip">Device Name:</label>
-						<input type="text" name="wirocdevicename" id="wirocdevicename">
-					</div>
-					<div style="text-align:center">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onReadDeviceNameButton()" class="ui-btn ui-btn-inline ui-corner-all">Read</a>
-							<a href="#" onclick="app.ui.onApplyDeviceNameButton()" class="ui-btn ui-btn-inline ui-corner-all">Save</a>
-						</div>
-					</div>
-				</div>
-				<div id="status" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-status" style="height:1px"></div>
-					<div style="text-align:left">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onRefreshStatusButton()" class="ui-btn ui-btn-inline ui-corner-all">Get/Refresh</a>
-						</div>
-					</div>
-					<div id="wiroc-services-content"></div>
-					<div id="wiroc-status-content"></div>
-					<div id="wiroc-debug-content"></div>
-				</div>
-				<div id="settings" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-settings" style="height:1px"></div>
-					<div style="text-align:left">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onRefreshSettingsButton()" class="ui-btn ui-btn-inline ui-corner-all">Get/Refresh</a>
-						</div>
-					</div>
-					<div id="wiroc-settings-content"></div>
-					<a href="#" onclick="app.ui.onAddSetting()" class="ui-btn ui-btn-inline ui-corner-all">Add setting</a>
-					<div data-role="popup" id="popupAddEditSetting" data-theme="a" class="ui-corner-all">
-						<div style="padding:10px 20px;">
-							<h3>Setting</h3>
-							<label for="settingKey" class="ui-hidden-accessible">Key:</label>
-							<input type="text" name="settingKey" id="settingKey" value="" placeholder="Key" data-theme="a">
-							<label for="settingValue" class="ui-hidden-accessible">Value:</label>
-							<input type="text" name="settingValue" id="settingValue" value="" placeholder="Value" data-theme="a">
-							<button id="saveSettingButton" class="ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Save setting</button>
-						</div>
-					</div>
-				</div>
-				<div id="punches" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-punches" style="height:1px"></div>
-					<div style="text-align:left">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onSubscribePunchesButton()" data-subscribe="true" id="btnSubscribePunches" class="ui-btn ui-btn-inline ui-corner-all">Subscribe</a>
-						</div>
-					</div>
-					<div id="wiroc-punches-content">
-						<table id="wiroc-punches-table" width="100%" border=1>
-							<thead><tr><th align=\"left\">Station</th><th align=\"left\">SI Card</th><th>Time</td></tr></thead>
-							<tbody></tbody>
-						</table>
-					</div>
-				</div>
-				<div id="database-adv" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-database-adv" style="height:1px"></div>
-					<div style="text-align:center">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onDropAllTablesButton()" data-subscribe="true" id="btnDropAllTables" class="ui-btn ui-btn-inline ui-corner-all">Drop all database tables</a>
-							<a href="#" onclick="app.ui.onUploadDatabaseAndLogsButton()" data-subscribe="true" id="btnUploadDatabaseAndLogs" class="ui-btn ui-btn-inline ui-corner-all">Upload database and logs</a>
-						</div>
-					</div>
-				</div>
-				<div id="radio-adv" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-radio-adv" style="height:1px"></div>
-					<div id="acknowledge-div">
-		 				<label><input type="checkbox" id="acknowledgement">Request acknowledgement</label>
-					</div>
-					
-					<div id="radio-adv-RF1276T">
-						<div class="ui-field-contain lorapower-RF1276T">
-							<select name="lorapower" id="lorapower-select-RF1276T" data-native-menu="false">
-								<option value="1">4dBm</option>
-								<option value="2">7dBm</option>
-								<option value="3">10dBm</option>
-								<option value="4">13dBm</option>
-								<option value="5">14dBm (&le;11 el. Yagi)</option>
-								<option value="6">17dBm (&le;7 el. Yagi)</option>
-								<option value="7" selected>20dBm (&le;4 el. Yagi)</option>
-							</select>
-						</div>
-					</div>
-					<div id="radio-adv-DRF1268DS">
-						<div id="rx-gain-div">
-							<label><input type="checkbox" id="rxgain">Enable Rx Gain</label>
-						</div>
-						<div class="ui-field-contain">
-							<label for="coderate">Code rate:</label>
-						</div>
-						<div class="ui-field-contain coderate">
-							<select name="coderate" id="coderate-select">
-								<option value="0">4/5 (1 ECC bit, 4 data bits)</option>
-								<option value="1">4/6 (2 ECC bits, 4 data bits)</option>
-								<option value="2">4/7 (3 ECC bits, 4 data bits)</option>
-								<option value="3">4/8 (4 ECC bits, 4 data bits)</option>
-							</select>
-						</div>
-						<div class="ui-field-contain">
-							<label for="lorapower">Lora power:</label>
-						</div>
-						<div class="ui-field-contain lorapower-DRF1268DS">
-							<select name="lorapower" id="lorapower-select-DRF1268DS">
-								<option value="1">1dBm</option>
-								<option value="2">2dBm</option>
-								<option value="3">3dBm</option>
-								<option value="4">4dBm</option>
-								<option value="5">5dBm</option>
-								<option value="6">6dBm</option>
-								<option value="7">7dBm</option>
-								<option value="8">7dBm</option>
-								<option value="9">9dBm</option>
-								<option value="10">10dBm</option>
-								<option value="11">11dBm</option>
-								<option value="12">12dBm</option>
-								<option value="13">13dBm</option>
-								<option value="14">14dBm</option>
-								<option value="15">15dBm</option>
-								<option value="16">16dBm (&le;11 el. Yagi)</option>
-								<option value="17">17dBm</option>
-								<option value="18">18dBm</option>
-								<option value="19">19dBm (&le;7 el. Yagi)</option>
-								<option value="20">20dBm</option>
-								<option value="21">21dBm</option>
-								<option value="22" selected>22dBm (&le;4 el. Yagi)</option>
-							</select>
-						</div>
-					</div>
-					<div style="text-align:center">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onReadRadioAdvButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
-							<a href="#" onclick="app.ui.onApplyRadioAdvButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
-						</div>
-					</div>
-				</div>
-				<div id="update-adv" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-update-adv" style="height:1px"></div>
-					<div class="ui-field-contain updatewirocpython">
-						<label for="wirocpythonversions">WiRoc version:</label>
-					</div>
-					<a href="#" onclick="app.ui.onUpdateWiRocPython()" data-subscribe="true" id="btnUpdateWiRocPython" class="ui-btn ui-corner-all">Update WiRoc</a>
-					<div class="ui-field-contain updatewirocble">
-						<label for="wirocbleversions">WiRoc BLE version:</label>
-					</div>
-					<a href="#" onclick="app.ui.onUpdateWiRocBLE()" data-subscribe="true" id="btnUpdateWiRocBLE" class="ui-btn ui-corner-all">Update WiRoc BLE</a>
-				</div>
-				<div id="sportident" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-sportident" style="height:1px"></div>
-					
-					
-					<div id="sportident2">
-						<div id="sportident-oneway-div">
-							<label><input type="checkbox" id="sportident-oneway">One-Way (only listen on USB serial)</label>
-						</div>
-						<div id="force-4800-bps-div" style="margin-left: 5vw">
-							<label><input type="checkbox" id="force-4800-bps">Force 4800 bps</label>
-						</div>
-					</div>
-					<div style="text-align:center">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onReadSportIdentButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
-							<a href="#" onclick="app.ui.onApplySportIdentButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
-						</div>
-					</div>
-				</div>
-				<div id="sportident-RS232" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-sportident-RS232" style="height:1px"></div>
-					
-					
-					<div id="sportident-RS232-2">
-						<fieldset data-role="controlgroup" data-mini="true" class="RS232-mode">
-							<legend>RS232 Mode</legend>
-							<input type="radio" name="radio-choice-RS232-mode" id="radio-choice-RS232-mode-receive" value="RECEIVE">
-								<label for="radio-choice-RS232-mode-receive">RECEIVE</label>
-							<input type="radio" name="radio-choice-RS232-mode" id="radio-choice-RS232-mode-send" value="SEND">
-								<label for="radio-choice-RS232-mode-send">SEND</label>
-						</fieldset>
-						
-						<div id="sportident-RS232-oneway-div">
-							<label><input type="checkbox" id="sportident-RS232-oneway">One-Way (only listen on RS232 serial)</label>
-						</div>
-						<div id="force-RS232-4800-bps-div" style="margin-left: 5vw">
-							<label><input type="checkbox" id="force-RS232-4800-bps">Force 4800 bps</label>
-						</div>
-					</div>
-					<div style="text-align:center">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onReadSportIdentRS232Button()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
-							<a href="#" onclick="app.ui.onApplySportIdentRS232Button()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
-						</div>
-					</div>
-				</div>
-				<div id="btserial" class="ui-body-d ui-content" style="padding:2vw">
-					<div id="notification-btserial" style="height:1px"></div>
-					
-					<div id="sportident3">
-						<div id="sportident-btserial-oneway-div">
-							<label><input type="checkbox" id="sportident-btserial-oneway">One-Way (BT Serial devices)</label>
-						</div>
-						<div id="force-btserial-4800-bps-div" style="margin-left: 5vw">
-							<label><input type="checkbox" id="force-btserial-4800-bps">Force 4800 bps</label>
-						</div>
-					</div>
-					<div style="text-align:center">
-						<div style="display:inline-block">
-							<a href="#" onclick="app.ui.onReadSportIdentBTSerialButton()" class="ui-btn ui-btn-inline ui-corner-all read-basic-button">Read</a>
-							<a href="#" onclick="app.ui.onApplySportIdentBTSerialButton()" class="ui-btn ui-btn-inline ui-corner-all apply-basic-button">Save</a>
-						</div>
-					</div>
-							
-					<div class="ui-grid-b bt-serial-row-0"><hr/></div>
-										
-					<div class="ui-grid-b bt-serial-row-1">
-						<div class="ui-block-a">
-								<a href="#" onclick="app.ui.onGetBTSerialListButton()" class="ui-btn ui-corner-all ui-shadow ">Get BT Serial list</a>
-						</div>
-						<div class="ui-block-b">
-								<a href="#" id="stopBTSerialList" onclick="app.ui.onBTSerialListStopButton()" class="ui-btn ui-corner-all ui-shadow ui-disabled">Stop</a>
-						</div>	
-						<div class="ui-block-c">
-								<div id="getBTSerialListLoading" class="ui-loader ui-corner-all ui-loader-default"><span class="ui-icon-loading"></span></div>
-						</div>	   
-					</div>
-														
-					<div class="ui-grid-a test-punch-row-3">
-						<div class="ui-block-a test-punch">
-							<div id="testPunchLoading" class="ui-loader ui-corner-all ui-body-a ui-loader-default"><span class="ui-icon-loading"></span><h1></h1></div>
-						</div>
-						   
-					</div>
-
-					<div id="btserial-list" class="dynamic">Empty list</div>
-				</div>
-			</div>
-		</div>
-	</div>
 
 </body>
 </html>

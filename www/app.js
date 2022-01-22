@@ -427,7 +427,7 @@ app.writeLoraMode = function(callback)
 
 
 //
-app.ui.displayWarningNotes = function(chip, ackReq, power, siOneWay, rxGain, codeRate)
+app.ui.displayWarningNotes = function(chip, ackReq, power, siOneWay, rxGain, codeRate, rs232OneWay, btSerialOneWay)
 {
 	//app.radioErrorBar.show({ html: (chip==null?'null':chip) +':'+(ackReq==null?'null':ackReq) +':'+(power==null?'null':power)+':'+(siOneWay==null?'null':siOneWay) });
 	if (ackReq !== null) {
@@ -464,6 +464,20 @@ app.ui.displayWarningNotes = function(chip, ackReq, power, siOneWay, rxGain, cod
 			$('#warning-note-code-rate').hide();
 		} else {
 			$('#warning-note-code-rate').show();
+		}
+	}
+	if (rs232OneWay !== null) {
+		if (rs232OneWay == '1') {
+			$('#warning-note-rs232-si-one-way').show();
+		} else {
+			$('#warning-note-rs232-si-one-way').hide();
+		}
+	}
+	if (btSerialOneWay !== null) {
+		if (btSerialOneWay == '1') {
+			$('#warning-note-btserial-si-one-way').show();
+		} else {
+			$('#warning-note-btserial-si-one-way').hide();
 		}
 	}
 };
@@ -508,7 +522,7 @@ app.ui.displayAcknowledgementRequested = function(acknowledgement)
 	app.ui.radio.acknowledgementRequested = raw;
     $('#acknowledgement').checkboxradio();
 	$('#acknowledgement').prop("checked",raw !== 0).checkboxradio("refresh");
-	app.ui.displayWarningNotes(app.ui.chip, acknowledgement, null, null, null, null);
+	app.ui.displayWarningNotes(app.ui.chip, acknowledgement, null, null, null, null, null, null);
 	app.ui.updateBackgroundColor();
 };
 
@@ -550,7 +564,7 @@ app.ui.displayRxGain = function(rxGain)
 	app.ui.radio.rxGain = raw;
     $('#rxgain').checkboxradio();
 	$('#rxgain').prop("checked",raw !== 0).checkboxradio("refresh");
-	app.ui.displayWarningNotes(app.ui.chip, null, null, null, rxGain, null);
+	app.ui.displayWarningNotes(app.ui.chip, null, null, null, rxGain, null, null, null);
 	app.ui.updateBackgroundColor();
 };
 
@@ -577,7 +591,7 @@ app.ui.displayPower = function(power)
 
 	$('#lorapower-select-' + app.ui.chip).selectmenu("refresh", true);
 	
-	app.ui.displayWarningNotes(app.ui.chip, null, raw, null, null, null);
+	app.ui.displayWarningNotes(app.ui.chip, null, raw, null, null, null, null, null);
 	
 	app.ui.updateBackgroundColor();
 };
@@ -632,7 +646,7 @@ app.ui.displayCodeRate = function(codeRate)
 
 	$('#coderate-select').selectmenu("refresh", true);
 	
-	app.ui.displayWarningNotes(app.ui.chip, null, null, null, null, raw);
+	app.ui.displayWarningNotes(app.ui.chip, null, null, null, null, raw, null, null);
 	
 	app.ui.updateBackgroundColor();
 };
@@ -1249,7 +1263,7 @@ app.ui.displayOneWay = function(oneway)
     $('#sportident-oneway').checkboxradio();
 	$('#sportident-oneway').prop("checked",raw !== 0).checkboxradio("refresh");
 	app.ui.enableDisableForce4800WithParam(raw !== 0);
-	app.ui.displayWarningNotes(app.ui.chip, null, null, oneway, null, null);
+	app.ui.displayWarningNotes(app.ui.chip, null, null, oneway, null, null, null, null);
 	
 	app.ui.updateBackgroundColor();
 };
@@ -1329,14 +1343,10 @@ app.ui.displayRS232Mode = function(rs232ModeString)
 	app.ui.sportident.RS232Mode = rs232ModeString;
 	app.ui.displayDebug("rs232ModeString:" + rs232ModeString);
 	$(".RS232-mode [type='radio']").checkboxradio();
-	app.ui.displayDebug("displayRS232Mode 0");
 	$(".RS232-mode [type='radio'][value = '" + rs232ModeString + "']").prop("checked", true).checkboxradio("refresh");
-	app.ui.displayDebug("displayRS232Mode 1");
-	
 	$(".RS232-mode [type='radio']").not( "[value = '" + rs232ModeString + "']").prop("checked", false).checkboxradio("refresh");
-	app.ui.displayDebug("displayRS232Mode 2");
 	app.ui.updateBackgroundColor();
-	app.ui.displayDebug("displayRS232Mode 3");
+
 };
 
 
@@ -1428,7 +1438,7 @@ app.ui.displayRS232OneWay = function(oneway)
     $('#sportident-RS232-oneway').checkboxradio();
 	$('#sportident-RS232-oneway').prop("checked",raw !== 0).checkboxradio("refresh");
 	app.ui.enableDisableForceRS2324800WithParam(raw !== 0);
-	//todo: app.ui.displayWarningNotes(app.ui.chip, null, null, oneway, null, null);
+	app.ui.displayWarningNotes(app.ui.chip, null, null, null, null, null, raw, null);
 	
 	app.ui.updateBackgroundColor();
 };
@@ -1564,7 +1574,7 @@ app.ui.displayBTSerialOneWay = function(oneway)
     $('#sportident-btserial-oneway').checkboxradio();
 	$('#sportident-btserial-oneway').prop("checked",raw !== 0).checkboxradio("refresh");
 	app.ui.enableDisableForceBTSerial4800WithParam(raw !== 0);
-	//todo: app.ui.displayWarningNotes(app.ui.chip, null, null, oneway, null, null);
+	app.ui.displayWarningNotes(app.ui.chip, null, null, null, null, null, null, raw);
 	
 	app.ui.updateBackgroundColor();
 };
@@ -1922,12 +1932,12 @@ app.ui.onWifiConnectButton = function(event) {
 		});
 	} else {
 		$('#popupWifiLogin').data('networkName', networkName);
-		$('#popupWifiLogin').popup('open');
+		$('#popupWifiLogin').modal();
 	}
 };
 
 app.ui.onWifiPasswordConnectButton = function(event) {
-	$('#popupWifiLogin').popup('close');
+	$('#popupWifiLogin').modal('hide');
 	app.networkInfoBar.settings.autohide = false;
 	app.networkInfoBar.settings.onHide = function() {
 	        app.getNetworkWifiList();
@@ -1937,6 +1947,7 @@ app.ui.onWifiPasswordConnectButton = function(event) {
 	});
 	var networkName = $('#popupWifiLogin').data('networkName');
 	var password = $('#wifiPassword').val();
+	app.ui.displayDebug(networkName + "  " + password);
 	app.writeConnectWifi(networkName, password, function() {
 		setTimeout(function () { app.networkInfoBar.hide();}, 6000);			
 	});
@@ -2037,8 +2048,7 @@ app.ui.displayAll = function(allString) {
     app.ui.displayUpdateWiRocPython('v' + all[13]);
 	app.ui.displayUpdateWiRocBLE('v' + all[14]);
 	app.wirocHWVersion = all[15];
-    app.ui.displayWarningNotes(all[11], all[5], all[10], all[16], all[19], all[20]);
-	app.ui.displayOneWay(all[16]);
+    app.ui.displayOneWay(all[16]);
 	app.ui.displayForce4800(all[17]);
 	app.ui.displayLoraMode(all[18]);
 	app.ui.displayRxGain(all[19]);
@@ -2056,6 +2066,7 @@ app.ui.displayAll = function(allString) {
 		app.ui.displayBTSerialOneWay(all[24]);
 		app.ui.displayDebug("all[25]:" + all[25]);
 		app.ui.displayForceBTSerial4800(all[25]);
+		app.ui.displayWarningNotes(all[11], all[5], all[10], all[16], all[19], parseInt(all[20]), all[22], all[24]);
 	}
 };
 
@@ -2150,25 +2161,25 @@ app.ui.onGetNetworkWifiListButton = function() {
 	app.getNetworkWifiList();
 };
 
-app.getDeviceFromBackend = function(btAddress, callback) {
-	var url = "http://wirelessradioonlinecontrol.tk/api/v1/Devices/LookupDeviceByBTAddress/" + encodeURI(btAddress);
+
+app.setWiRocNameInMonitorDatabase = function(btAddress, wirocName) {
+	var url = "https://monitor.wiroc.se/api/v1/Devices/" + btAddress + "/UpdateDeviceName/" + wirocName;
+	app.ui.displayDebug('setWiRocNameInMonitorDatabase: ' + url);
 	if (window.cordova) {
 		// do something cordova style
+		app.ui.displayDebug('setWiRocNameInMonitorDatabase: 1');
 		cordovaHTTP.get(
-		   url,
+		   url, 
 		   {},
 		   { Authorization: app.backendApiKey },
 		   function (response) {
-			  if (response) {
-				 callback(JSON.parse(response.data));
-			  }
 		   },
 		   function (error) {
 		   }
 		);
 	}
 	else {
-		// fallback to web methods
+		app.ui.displayDebug('setWiRocNameInMonitorDatabase: 2');
 		return fetch(url,
 		{
 			credentials: 'same-origin',
@@ -2177,37 +2188,6 @@ app.getDeviceFromBackend = function(btAddress, callback) {
 			  'Authorization': app.backendApiKey
 			},
 			method: "GET"
-		})
-		.then(function(res) { 
-			return res.json();
-		})
-		.catch(function(res){ });
-	}
-};
-
-app.saveDeviceToBackend = function(backendJsonDevice) {
-	if (window.cordova) {
-		// do something cordova style
-		cordovaHTTP.get(
-		   "http://wirelessradioonlinecontrol.tk/api/v1/Devices/" + backendJsonDevice.id + "/UpdateDeviceName/" + backendJsonDevice.name, 
-		   backendJsonDevice,
-		   { Authorization: app.backendApiKey },
-		   function (response) {
-		   },
-		   function (error) {
-		   }
-		);
-	}
-	else {
-		return fetch("http://wirelessradioonlinecontrol.tk/api/v1/Devices/" + backendJsonDevice.id,
-		{
-			credentials: 'same-origin',
-			headers: {
-			  'Accept': 'application/json',
-			  'Authorization': app.backendApiKey
-			},
-			method: "PUT",
-			body: JSON.stringify( backendJsonDevice )
 		})
 		.catch(function(res){ });
 	}
@@ -2224,12 +2204,7 @@ app.ui.onApplyDeviceNameButton = function()
 			html: 'Device name saved'
 		});
 		// save to backend
-		app.getDeviceFromBackend(app.connectedDevice.address, function(backendJsonDevice) {
-			if (backendJsonDevice) {
-				backendJsonDevice.name = devName;
-				app.saveDeviceToBackend(backendJsonDevice);
-			}
-		});
+		app.setWiRocNameInMonitorDatabase(app.connectedDevice.id, devName);
 		app.getWiRocDeviceName();
 	});
 };
@@ -2424,7 +2399,6 @@ app.ui.onAddSetting = function(event)
 	$('#settingValue').val('');
 	$('#popupAddEditSetting').data('Key', '');
 	$('#popupAddEditSetting').data('Value', '');
-	$('#popupAddEditSetting').popup('open');
 };
 
 app.ui.onEditSetting = function(event)
@@ -2435,13 +2409,14 @@ app.ui.onEditSetting = function(event)
 	$('#settingValue').val(value);
 	$('#popupAddEditSetting').data('Key', key);
 	$('#popupAddEditSetting').data('Value', value);
-	$('#popupAddEditSetting').popup('open');
+	$('#popupAddEditSetting').modal();
 };
 
 app.ui.onEditSettingSaveButton = function(event) {
-	$('#popupAddEditSetting').popup('close');
+	$('#popupAddEditSetting').modal('hide');
 	var key = $('#settingKey').val();
 	var value = $('#settingValue').val();
+	app.ui.displayDebug(key + " -- " + value);
 	app.writeWiRocSetting(key, value, function() {
 		app.miscSettingsSuccessBar.show({
 			html: 'Setting saved'

@@ -11172,7 +11172,7 @@ $.widget( "mobile.popup", {
 
 		// swallow the the initial navigation event, and bind for the next
 		this.window.one( "beforenavigate", function( theEvent ) {
-			theEvent.preventDefault();
+			//theEvent.preventDefault();
 			self._open( options );
 			self._bindContainerClose();
 		});
