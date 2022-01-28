@@ -30,29 +30,8 @@
 	.ui-btn-icon-left {
 	    padding-left: 40px;
 	}
-
-        /* Visible channel */
-    	#channel-select-RF1276T-button span {
-    		font-size: 20vw;
-    	}
-    	/* Channel list */
-    	#channel-select-RF1276T-menu li a {
-    		font-size: 4vw;
-    		padding-top:0.5em;
-    		padding-bottom:0.5em;
-    	}
-    	/* Visible channel */
-    	#channel-select-DRF1268DS-button span {
-    		font-size: 20vw;
-    	}
-    	/* Channel list */
-    	#channel-select-DRF1268DS-menu li a {
-    		font-size: 4vw;
-    		padding-top:0.5em;
-    		padding-bottom:0.5em;
-    	}
-   	
-    	label.channel-header {
+	
+		label.channel-header {
 			line-height: 16vw;
     		font-size: 10vw;
     		text-align: center;
@@ -60,6 +39,29 @@
 			height: 16vw;
     		/*transition: font-size 1s;*/
     	}
+
+        /* Visible channel 
+    	#channel-select-RF1276T-button span {
+    		font-size: 20vw;
+    	}
+    	 Channel list 
+    	#channel-select-RF1276T-menu li a {
+    		font-size: 4vw;
+    		padding-top:0.5em;
+    		padding-bottom:0.5em;
+    	}
+    	 Visible channel 
+    	#channel-select-DRF1268DS-button span {
+    		font-size: 20vw;
+    	}
+    	 Channel list 
+    	#channel-select-DRF1268DS-menu li a {
+    		font-size: 4vw;
+    		padding-top:0.5em;
+    		padding-bottom:0.5em;
+    	}
+   	
+    
 	
     	.ui-select {
     		margin-top: 0px;
@@ -69,6 +71,7 @@
     		margin: auto;
     		margin-top:0px;
     	}
+    	*/
     	
     	.loramode.ui-field-contain {
     		/*width: 40%;*/
@@ -464,6 +467,30 @@
 		</div>
 	</div>
 
+		<div class="modal fade" id="popup-about" tabindex="-1" role="dialog" aria-labelledby="modalTitleLabel" aria-hidden="true">
+		  <div class="modal-dialog" role="document">
+			<div class="modal-content">
+			  <div class="modal-header">
+				<h5 class="modal-title" id="modalTitleLabel">About</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				  <span aria-hidden="true">&times;</span>
+				</button>
+			  </div>
+			  <div class="modal-body">
+				<h1>WiRoc Config</h1>
+				<table>
+					<tr><td>Version</td><td>1.0.3</td></tr>
+					<tr><td></td><td></td></tr>
+					<tr><td></td><td></td></tr>
+					<tr><td></td><td></td></tr>
+				</table>
+			  </div>
+			  <div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			  </div>
+			</div>
+		  </div>
+		</div>
 
 	
 	<div id="page-basic-config" data-role="page">
@@ -487,22 +514,9 @@
 			</ul>      
 		</div>
 
-		<div data-role="popup" id="popup-about" data-dismissible="true">
-			<a href="#" data-rel="back" data-role="button" data-theme="b" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
-			<div data-role="header" data-theme="a">
-				<h1>About</h1>
-			</div>
-			<span>
-				<h1>WiRoc Config</h1>
-
-				<table>
-					<tr><td>Version</td><td>1.0.2</td></tr>
-					<tr><td></td><td></td></tr>
-					<tr><td></td><td></td></tr>
-					<tr><td></td><td></td></tr>
-				</table>
-			</span>
-		</div>
+		
+					
+		
 		<div role="main" class="ui-content" class="page" style="padding:0">
 			<div class="ui-grid-a">
 				<div id="device-name" class="ui-block-a" style="font-size:5vw;padding-left:1vw;margin:0"></div>
@@ -524,7 +538,7 @@
 					<div id="main-RF1276T">
 						<label id="loramode-header" class="loramode-header">Radio Mode</label>
 						<div class="ui-field-contain loramode">
-							<select name="LoraMode" id="loramode-select-RF1276T" data-native-menu="false">
+							<select name="LoraMode" id="loramode-select-RF1276T">
 								<option value="RECEIVER">RECEIVER</option>
 								<option value="REPEATER">REPEATER</option>
 								<option value="SENDER">SENDER</option>
@@ -532,7 +546,7 @@
 						</div>
 						<label id="channel-header" class="channel-header">Channel</label>
 						<div class="ui-field-contain channel">
-							<select name="channel" id="channel-select-RF1276T" data-native-menu="false">
+							<select name="channel" id="channel-select-RF1276T">
 								<option value="1">1</option>
 								<option value="2">2</option>
 								<option value="3">3</option>
@@ -558,7 +572,7 @@
 					<div id="main-DRF1268DS">
 						<label id="loramode-header" class="loramode-header">Radio Mode</label>
 						<div class="ui-field-contain loramode">
-							<select name="LoraMode" id="loramode-select-DRF1268DS" data-native-menu="false">
+							<select name="LoraMode" id="loramode-select-DRF1268DS">
 								<option value="RECEIVER">RECEIVER</option>
 								<option value="REPEATER">REPEATER</option>
 								<option value="SENDER">SENDER</option>
@@ -566,7 +580,7 @@
 						</div>
 						<label id="channel-header" class="channel-header">Channel</label>
 						<div class="ui-field-contain channel">
-							<select name="channel" id="channel-select-DRF1268DS" data-native-menu="false">
+							<select name="channel" id="channel-select-DRF1268DS">
 								<option value="1">1</option>
 								<option value="2">2</option>
 								<option value="3">3</option>
@@ -788,22 +802,6 @@
 				</ul>
 			</li>
 			</ul>      
-		</div>
-		<div data-role="popup" id="popup-about-2" data-dismissible="true">
-			<a href="#" data-rel="back" data-role="button" data-theme="b" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
-			<div data-role="header" data-theme="a">
-				<h1>About</h1>
-			</div>
-			<span>
-				<h1>WiRoc Config</h1>
-
-				<table>
-					<tr><td>Version</td><td>1.0.2</td></tr>
-					<tr><td></td><td></td></tr>
-					<tr><td></td><td></td></tr>
-					<tr><td></td><td></td></tr>
-				</table>
-			</span>
 		</div>
 		
 		<div role="main" class="ui-content" class="page" style="padding:0">
@@ -1306,8 +1304,8 @@
 			});
 
 			// about link
-			$( "#popup-about-link" ).on("click", function (event, ui) { $( "#popup-about" ).popup( "open" ); return false; });
-			$( "#popup-about-2-link" ).on("click", function (event, ui) { $( "#popup-about-2" ).popup( "open" ); return false; });
+			$( "#popup-about-link" ).on("click", function (event, ui) { $('#popup-about').modal(); return false; });
+			$( "#popup-about-2-link" ).on("click", function (event, ui) { $('#popup-about').modal(); return false; });
 
 			$( "#tabs-main" ).on( "tabsactivate", function( event, ui ) { 
 				app.basicConfigTab = ui.newTab.data("tabname");
@@ -1323,20 +1321,6 @@
 				//	app.getAcknowledgementRequested();
 				//};
 			} );
-			
-			
-			
-			//function (event) {
-				
-				
-			  //var button = $(event.relatedTarget) // Button that triggered the modal
-			  //var recipient = button.data('whatever') // Extract info from data-* attributes
-			  // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-			  // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
-			  //var modal = $(this)
-			  //modal.find('.modal-title').text('New message to ' + recipient)
-			  //modal.find('.modal-body input').val(recipient)
-			//});
 			
 			
 			//$(":mobile-pagecontainer").pagecontainer( "change", "#page-basic-config", { } );

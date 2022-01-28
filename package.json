@@ -1,6 +1,6 @@
 {
   "name": "se.wiroc.configpg",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "displayName": "WiRoc Config",
   "license": "GPL-3.0",
   "description": "App to configure WiRoc devices",
