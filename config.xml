@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget android-versionCode="4" id="se.wiroc.configpg" version="1.0.4" versionCode="4" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
+<widget android-versionCode="6" id="se.wiroc.configpg" version="1.0.6" versionCode="6" xmlns="http://www.w3.org/ns/widgets" xmlns:gap="http://phonegap.com/ns/1.0">
     <name>WiRoc Config</name>
     <description>
         Configure WiRoc Devices

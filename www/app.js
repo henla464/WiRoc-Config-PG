@@ -143,7 +143,7 @@ app.ui.onScanButton = function() {
 		app.devices = {};
 		app.ui.displayDeviceList();
 		app.ui.displayStatus('Scanning...');
-		ble.startScanWithOptions([app.apiService], { reportDuplicates: true }, app.ui.deviceFound, app.ui.scanError);
+		ble.startScanWithOptions([app.apiService], { reportDuplicates: true, scanMode: 'lowLatency' }, app.ui.deviceFound, app.ui.scanError);
 
 		app.ui.updateTimer = setInterval(app.ui.displayDeviceList, 500);
 	} else {
@@ -254,7 +254,7 @@ app.ui.displayDeviceList = function()
 	$.each(app.devices, function(key, device)
 	{
 		// Only show devices that are updated during the last 10 seconds.
-		if (device.timeStamp + 10000 > timeNow)
+		if (timeNow < device.timeStamp + 10000)
 		{
 			// Map the RSSI value to a width in percent for the indicator.
 			var rssiWidth = 100; // Used when RSSI is zero or greater.
@@ -1952,6 +1952,9 @@ app.ui.onRenewIPEthernet = function()
 };
 
 app.ui.displayAll = function(allString) {
+	if {allString == null || allString.length == 0) {
+		return;
+	}
 	var all = allString.split('¤');
 	//     0             1                2               3            4                       5                 6        7        8         9       10   
 	// isCharging¤wirocDeviceName¤sentToSirapIPPort¤sendToSirapIP¤sentToSirapEnabled¤acknowledgementRequested¤dataRate¤channel¤intPercent¤ipAddress¤power¤
@@ -2792,7 +2795,7 @@ app.ui.onSendTestPunchesButton = function(event) {
 
 	app.ui.misc.noOfTestPunchesToSend = $("#noOfTestPunches option:selected").val();
 	var siNumber = $("#siNumber").val();
-	var sendInterval = $("#sendInterval").val();
+	var sendInterval = $("#sendInterval option:selected").val();
 	var param = app.ui.misc.noOfTestPunchesToSend + '\t' + sendInterval + '\t' + siNumber;
 
 	var te = new TextEncoder("utf-8").encode(param);
@@ -2904,6 +2907,9 @@ app.ui.displayProperty = function(propAndValueStrings)
 {
 	// should never receive multiple replies anylonger, so split
 	// with '|' could be removed
+	if (propAndValueStrings == null || propAndValueStrings.length == 0) {
+		return;
+	}
 	app.ui.displayDebug('displayProperty:' + propAndValueStrings);
 	var propAndValuesArray = propAndValueStrings.split('|');
 	for (var i = 0; i < propAndValuesArray.length; i++) {
@@ -2965,7 +2971,7 @@ app.ui.displayProperty = function(propAndValueStrings)
 			case 'listwifi':
 				app.ui.displayNetworkWifiList(propValue);
 				break;
-		    case 'connectwifi':
+		    	case 'connectwifi':
 		       	// do nothing...
 			    break;
 			case 'disconnectwifi':

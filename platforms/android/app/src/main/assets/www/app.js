@@ -143,7 +143,7 @@ app.ui.onScanButton = function() {
 		app.devices = {};
 		app.ui.displayDeviceList();
 		app.ui.displayStatus('Scanning...');
-		ble.startScanWithOptions([app.apiService], { reportDuplicates: true }, app.ui.deviceFound, app.ui.scanError);
+		ble.startScanWithOptions([app.apiService], { reportDuplicates: true, scanMode: 'lowLatency' }, app.ui.deviceFound, app.ui.scanError);
 
 		app.ui.updateTimer = setInterval(app.ui.displayDeviceList, 500);
 	} else {
@@ -254,7 +254,7 @@ app.ui.displayDeviceList = function()
 	$.each(app.devices, function(key, device)
 	{
 		// Only show devices that are updated during the last 10 seconds.
-		if (device.timeStamp + 10000 > timeNow)
+		if (timeNow < device.timeStamp + 10000)
 		{
 			// Map the RSSI value to a width in percent for the indicator.
 			var rssiWidth = 100; // Used when RSSI is zero or greater.
@@ -2792,7 +2792,7 @@ app.ui.onSendTestPunchesButton = function(event) {
 
 	app.ui.misc.noOfTestPunchesToSend = $("#noOfTestPunches option:selected").val();
 	var siNumber = $("#siNumber").val();
-	var sendInterval = $("#sendInterval").val();
+	var sendInterval = $("#sendInterval option:selected").val();
 	var param = app.ui.misc.noOfTestPunchesToSend + '\t' + sendInterval + '\t' + siNumber;
 
 	var te = new TextEncoder("utf-8").encode(param);
